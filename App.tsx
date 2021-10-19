@@ -9,7 +9,7 @@ const {Navigator, Screen} = createStackNavigator()
 
 import { StatusBar } from 'react-native';
 import { Routes } from './src/routes';
-
+import { LogBox } from 'react-native';
 
 export default function App() {
   const [fontsLoaded] = useFonts({MeeraInimai_400Regular})
@@ -19,6 +19,8 @@ export default function App() {
       <AppLoading />
     )
   }
+  LogBox.ignoreLogs(['Warning:...']); // ignore specific logs
+  LogBox.ignoreAllLogs(); // ignore all logs
 
   return (
     <>

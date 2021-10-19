@@ -1,8 +1,8 @@
 
 import {Picker} from '@react-native-picker/picker'
-import React from 'react'
+import React, { useState } from 'react'
 import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
-
+import firebase from "../../config/firebase";
 
 import logoImg from '../../assets/logo.png'
 import { ButtonIcon } from '../../components/ButtonIcon'
@@ -12,9 +12,35 @@ import {useNavigation} from '@react-navigation/native'
 
 export function SignUp(){
     const navigation = useNavigation()
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [name, setName] = useState('')
+    const [phone, setPhone] = useState('')
+    const [account, setAccount] = useState('')
+    const [errorRegister, setRegisterError] = useState(false)
+    //const database = firebase.database("https://harkonnen-auto-default-rtdb.europe-west1.firebasedatabase.app")
 
-    function handleSignIn() {
-        navigation.navigate('HomeUser' as never)
+    async function handleSignUp() {
+        await firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            // Signed in
+            var user = userCredential.user;
+            firebase.database().ref('users/' + user?.uid).set({
+                username: name,
+                email: email,
+                password : password,
+                phone: phone,
+                account: account
+              });
+            navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
+            // ...
+        })
+        .catch((error) => {
+            setRegisterError(true)
+            //var errorCode = error.code;
+            //var errorMessage = error.message;
+            // ..
+        });
     }
 
     function handleLogin() {
@@ -31,19 +57,19 @@ export function SignUp(){
                         <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
                         <View style={styles.login}>
                             <Image source={logoImg} style={styles.img} />
-                            <TextInput style={styles.input} placeholder="Nome" />
-                            <TextInput style={styles.input} placeholder="Email" />
-                            <TextInput style={styles.input} placeholder="Password" />
-                            <TextInput style={styles.input} placeholder="Nº de telefone" />
-                            <View style={styles.picker}>
-                                <Picker mode="dropdown" >
-                                    <Picker.Item label="Tipo de conta..." style={styles.textInput} />
-                                    <Picker.Item label="Utilizador" style={styles.textInput} />
-                                    <Picker.Item label="Oficina" style={styles.textInput} />
-                                    <Picker.Item label="Empresa de Reboques" style={styles.textInput} />
+                            <TextInput style={styles.input} placeholder="Nome" value={name} onChangeText={(text) => setName(text)}/>
+                            <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={(text) => setEmail(text)} />
+                            <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} value={password} onChangeText={(text) => setPassword(text)} />
+                            <TextInput style={styles.input} placeholder="Nº de telefone" value={phone} onChangeText={(text) => setPhone(text)} />
+                            <View style={styles.picker} >
+                                <Picker mode="dropdown" selectedValue={account} onValueChange={(text, index) => setAccount(text)} >
+                                    <Picker.Item label="Tipo de conta..." value="" style={styles.textInput} />
+                                    <Picker.Item label="Utilizador" value="user" style={styles.textInput} />
+                                    <Picker.Item label="Oficina" value="workshop" style={styles.textInput} />
+                                    <Picker.Item label="Empresa de Reboques" value="trailers" style={styles.textInput} />
                                 </Picker>
                             </View>
-                            <ButtonIcon title="Acessar" onPress={handleSignIn} />
+                            <ButtonIcon title="Acessar" onPress={handleSignUp} />
                             <Text style={styles.text} onPress={handleLogin} >
                                 Já tenho uma conta. Toque para entrar.
                             </Text>

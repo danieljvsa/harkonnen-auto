@@ -1,8 +1,8 @@
 
 
-import React from 'react'
+import React, { useState } from 'react'
 import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
-
+import firebase from "../../config/firebase";
 
 import logoImg from '../../assets/logo.png'
 import { ButtonIcon } from '../../components/ButtonIcon'
@@ -12,9 +12,24 @@ import {useNavigation} from '@react-navigation/native'
 
 export function SignIn(){
     const navigation = useNavigation()
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [errorLogin, setLoginError] = useState(false)
 
     function handleSignIn() {
-        navigation.navigate('HomeUser' as never)
+        firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            // Signed in
+            var user = userCredential.user;
+            navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
+            // ...
+        })
+        .catch((error) => {
+            setLoginError(true)
+            //var errorCode = error.code;
+            //var errorMessage = error.message;
+            // ..
+        });
     }
 
     function handleSignUp() {
@@ -31,8 +46,8 @@ export function SignIn(){
                         <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
                         <View style={styles.login}>
                             <Image source={logoImg} style={styles.img} />
-                            <TextInput style={styles.input} placeholder="Email" />
-                            <TextInput style={styles.input} placeholder="Password" />
+                            <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={(text) => setEmail(text)} />
+                            <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} value={password} onChangeText={(text) => setPassword(text)} />
                             <ButtonIcon title="Acessar" onPress={handleSignIn} />
                             <Text style={styles.text} onPress={handleSignUp} >
                                 Não tenho uma conta. Toque para criar uma agora.
