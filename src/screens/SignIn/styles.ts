@@ -43,6 +43,13 @@ export const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    errorMessage: {
+        marginBottom: 5,
+        color: theme.colors.errorMessage,
+        textAlign: 'center',
+        fontSize: 14,
+        fontFamily: theme.fonts.text,
     }
 
 })

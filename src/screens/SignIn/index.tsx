@@ -16,20 +16,31 @@ export function SignIn(){
     const [password, setPassword] = useState('')
     const [errorLogin, setLoginError] = useState(false)
 
-    function handleSignIn() {
-        firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // Signed in
-            var user = userCredential.user;
-            navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
-            // ...
-        })
-        .catch((error) => {
+    async function handleError() {
+        if(email == "" || password == "" ){
             setLoginError(true)
-            //var errorCode = error.code;
-            //var errorMessage = error.message;
-            // ..
-        });
+        }else(
+            setLoginError(false)
+        )
+    }
+
+    function handleSignIn() {
+        handleError()
+        if(errorLogin === false){
+            firebase.auth().signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                // Signed in
+                var user = userCredential.user;
+                navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
+                // ...
+            })
+            .catch((error) => {
+                setLoginError(true)
+                //var errorCode = error.code;
+                //var errorMessage = error.message;
+                // ..
+            });
+        }
     }
 
     function handleSignUp() {
@@ -48,6 +59,15 @@ export function SignIn(){
                             <Image source={logoImg} style={styles.img} />
                             <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={(text) => setEmail(text)} />
                             <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} value={password} onChangeText={(text) => setPassword(text)} />
+                            {(errorLogin === true ) ? (
+                                <View>
+                                    <Text style={styles.errorMessage} >Verifique todos os campos ou tem conta</Text>
+                                </View>
+                            ) : (
+                                <View>
+                                    <Text></Text>
+                                </View>
+                            )}
                             <ButtonIcon title="Acessar" onPress={handleSignIn} />
                             <Text style={styles.text} onPress={handleSignUp} >
                                 Não tenho uma conta. Toque para criar uma agora.

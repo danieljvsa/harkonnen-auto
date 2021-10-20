@@ -18,29 +18,49 @@ export function SignUp(){
     const [phone, setPhone] = useState('')
     const [account, setAccount] = useState('')
     const [errorRegister, setRegisterError] = useState(false)
-    //const database = firebase.database("https://harkonnen-auto-default-rtdb.europe-west1.firebasedatabase.app")
+    const [isDuplicated, setIsDuplicated] = useState(false)
+
+    async function handleError() {
+        if(name == "" || email == "" || password == "" || phone == ""){
+            setRegisterError(true)
+        }else(
+            setRegisterError(false)
+        )
+    }
+    
+    async function handleDuplicatedAccounts(){
+        await firebase.auth().signInWithEmailAndPassword(email,password)
+        .then((user) => {
+            setIsDuplicated(true)
+            navigation.navigate('SignIn' as never)
+        })
+    }
 
     async function handleSignUp() {
-        await firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // Signed in
-            var user = userCredential.user;
-            firebase.database().ref('users/' + user?.uid).set({
-                username: name,
-                email: email,
-                password : password,
-                phone: phone,
-                account: account
-              });
-            navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
-            // ...
-        })
-        .catch((error) => {
-            setRegisterError(true)
-            //var errorCode = error.code;
-            //var errorMessage = error.message;
-            // ..
-        });
+        handleError()
+        handleDuplicatedAccounts()
+        if(isDuplicated === false){
+            await firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                // Signed in
+                var user = userCredential.user;
+                firebase.database().ref('users/' + user?.uid).set({
+                    username: name,
+                    email: email,
+                    password : password,
+                    phone: phone,
+                    account: account
+                });
+                navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
+                // ...
+            })
+            .catch((error) => {
+                setRegisterError(true)
+                //var errorCode = error.code;
+                //var errorMessage = error.message;
+                // ..
+            });
+        }
     }
 
     function handleLogin() {
@@ -69,6 +89,15 @@ export function SignUp(){
                                     <Picker.Item label="Empresa de Reboques" value="trailers" style={styles.textInput} />
                                 </Picker>
                             </View>
+                            {(isDuplicated === true || errorRegister === true ) ? (
+                                <View>
+                                    <Text style={styles.errorMessage}>Verifique todos os campos ou se já tem conta</Text>
+                                </View>
+                            ) : (
+                                <View>
+                                    <Text></Text>
+                                </View>
+                            )}
                             <ButtonIcon title="Acessar" onPress={handleSignUp} />
                             <Text style={styles.text} onPress={handleLogin} >
                                 Já tenho uma conta. Toque para entrar.
