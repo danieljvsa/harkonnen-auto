@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import firebase from "../../config/firebase";
 
@@ -8,42 +8,20 @@ import logoImg from '../../assets/logo.png'
 import { ButtonIcon } from '../../components/ButtonIcon'
 import { styles } from './styles'
 import {useNavigation} from '@react-navigation/native'
+import { AuthContext } from '../../contexts/AuthContext';
 
 
 export function SignIn(){
     const navigation = useNavigation()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [errorLogin, setLoginError] = useState(false)
+    const {handleSignIn, errorLogin} = useContext(AuthContext)
 
-    async function handleError() {
-        if(email == "" || password == "" ){
-            setLoginError(true)
-        }else(
-            setLoginError(false)
-        )
+    function signIn() {
+        handleSignIn(email,password)
     }
 
-    function handleSignIn() {
-        handleError()
-        if(errorLogin === false){
-            firebase.auth().signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                // Signed in
-                var user = userCredential.user;
-                navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
-                // ...
-            })
-            .catch((error) => {
-                setLoginError(true)
-                //var errorCode = error.code;
-                //var errorMessage = error.message;
-                // ..
-            });
-        }
-    }
-
-    function handleSignUp() {
+    function goToSignUp() {
         navigation.navigate('SignUp' as never)
     }
 
@@ -68,8 +46,8 @@ export function SignIn(){
                                     <Text></Text>
                                 </View>
                             )}
-                            <ButtonIcon title="Acessar" onPress={handleSignIn} />
-                            <Text style={styles.text} onPress={handleSignUp} >
+                            <ButtonIcon title="Acessar" onPress={signIn} />
+                            <Text style={styles.text} onPress={goToSignUp} >
                                 Não tenho uma conta. Toque para criar uma agora.
                             </Text>
                         </View>
