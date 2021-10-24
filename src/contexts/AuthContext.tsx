@@ -2,12 +2,26 @@ import { useNavigation } from "@react-navigation/native";
 import React, { createContext, useState } from "react";
 import firebase from "../config/firebase";
 
+type User = {
+    id: string,
+    username: string,
+    email: string,
+    password : string,
+    phone: string,
+    account: string
+}
+
 type AuthContextData = {
     handleSignIn: (email: string, password: string) => void,
     handleSignUp: (email: string, password: string, name: string, phone: string, account: string) => void,
     errorLogin: boolean,
     errorRegister: boolean,
-    isDuplicated: boolean
+    isDuplicated: boolean,
+    currentUser: User | null,
+    signOut: () => void,
+    updateName: (name: string) => void,
+    updateEmail: (email: string) => void,
+    updatePhone: (phone: string) => void
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -17,6 +31,7 @@ export function AuthProvider({children}:any) {
     const [errorLogin, setLoginError] = useState(false)
     const [errorRegister, setRegisterError] = useState(false)
     const [isDuplicated, setIsDuplicated] = useState(false)
+    const [currentUser, setCurrentUser] = useState<User | null>(null)
     
     async function handleErrorSignUp(email: string, password: string, name: string, phone: string, account: string) {
         if(name == "" || email == "" || password == "" || phone == "" || account == ""){
@@ -42,12 +57,41 @@ export function AuthProvider({children}:any) {
         })
     }
 
+    async function signOut() {
+        firebase.auth().signOut().then(() => {
+            navigation.navigate('SignIn' as never)
+        }).catch((error) => {
+        // An error happened.
+        });
+          
+    }
+
     async function signIn(email: string, password: string) {
         if(errorLogin === false){
             firebase.auth().signInWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 // Signed in
                 var user = userCredential.user;
+                let userId = user?.uid
+                if(userId){
+                    firebase.database().ref("users").child(userId).get().then((snapshot) => {
+                        if (snapshot.exists()) {
+                            setCurrentUser({
+                                id: (userId) ? (userId) : ("7777"),
+                                username: snapshot.val().username,
+                                email: snapshot.val().email,
+                                password: snapshot.val().password,
+                                phone: snapshot.val().phone,
+                                account: snapshot.val().account,
+                            });
+                            //console.log(currentUser)
+                        } else {
+                        console.log("No data available");
+                        }
+                    }).catch((error) => {
+                        console.error(error);
+                    });
+                }
                 navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
                 // ...
             })
@@ -66,7 +110,16 @@ export function AuthProvider({children}:any) {
             .then((userCredential) => {
                 // Signed in
                 var user = userCredential.user;
+                let userId = user?.uid
                 firebase.database().ref('users/' + user?.uid).set({
+                    username: name,
+                    email: email,
+                    password : password,
+                    phone: phone,
+                    account: account
+                });
+                setCurrentUser({
+                    id: (userId) ? (userId) : ("7777"),
                     username: name,
                     email: email,
                     password : password,
@@ -96,9 +149,22 @@ export function AuthProvider({children}:any) {
         signUp(email, password, name, phone, account)
     }
 
+    async function updateName(name: string){
+        await firebase.database().ref('/users/' + currentUser?.id).update({username: name})
+    }
+
+    async function updateEmail(email: string){
+        await firebase.database().ref('/users/' + currentUser?.id).update({email: email})
+    }
+
+    async function updatePhone(phone: string){
+        await firebase.database().ref('/users/' + currentUser?.id).update({phone: phone})
+    }
+
+
     
     return(
-        <AuthContext.Provider value={{handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated}}>
+        <AuthContext.Provider value={{updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

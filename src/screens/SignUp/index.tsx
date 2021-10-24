@@ -39,7 +39,7 @@ export function SignUp(){
                         <View style={styles.login}>
                             <Image source={logoImg} style={styles.img} />
                             <TextInput style={styles.input} placeholder="Nome" value={name} onChangeText={(text) => setName(text)}/>
-                            <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={(text) => setEmail(text)} />
+                            <TextInput style={styles.input} autoCapitalize="none" placeholder="Email" value={email} onChangeText={(text) => setEmail(text)} />
                             <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} value={password} onChangeText={(text) => setPassword(text)} />
                             <TextInput style={styles.input} placeholder="Nº de telefone" value={phone} onChangeText={(text) => setPhone(text)} />
                             <View style={styles.picker} >

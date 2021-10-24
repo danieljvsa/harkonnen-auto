@@ -6,32 +6,35 @@ export const styles = StyleSheet.create({
         width: 312,
         marginLeft: 30,
         marginRight: 30,
-        height: 94,
+        height: 50,
         backgroundColor: theme.colors.card,
-        borderRadius: 12,
+        borderRadius: 8,
         alignItems: 'center',
-        marginBottom: 33
+        marginBottom: 19
     },
     content: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
         flexDirection: 'row',
-        paddingTop: 18,
-        paddingBottom: 18,
-        paddingLeft: 30
+        //paddingTop: 18,
+        //paddingBottom: 18,
+        //paddingLeft: 30,
+        textAlignVertical: 'center',
     },
     img:{
-        marginRight: 22,
-        height: 64,
-        width: 64
+        marginRight: 10,
+        height: 24,
+        width: 24,
+        //textAlignVertical: 'center',
     },
     title: {
         color: theme.colors.title,
         fontSize: 20,
         flex: 1,
-        textAlignVertical: 'center',
+        //textAlignVertical: 'center',
         fontFamily: theme.fonts.text,
-        paddingRight: 20,
+        marginLeft: 16,
+        marginTop: 5,
     }
 })

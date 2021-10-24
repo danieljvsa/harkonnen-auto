@@ -35,7 +35,7 @@ export function SignIn(){
                         <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
                         <View style={styles.login}>
                             <Image source={logoImg} style={styles.img} />
-                            <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={(text) => setEmail(text)} />
+                            <TextInput style={styles.input} autoCapitalize="none" placeholder="Email" value={email} onChangeText={(text) => setEmail(text)} />
                             <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} value={password} onChangeText={(text) => setPassword(text)} />
                             {(errorLogin === true ) ? (
                                 <View>
