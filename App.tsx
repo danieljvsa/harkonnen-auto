@@ -21,8 +21,8 @@ export default function App() {
       <AppLoading />
     )
   }
-  //LogBox.ignoreLogs(['Warning:...']); // ignore specific logs
-  //LogBox.ignoreAllLogs(); // ignore all logs
+  LogBox.ignoreLogs(['Warning:...']); // ignore specific logs
+  LogBox.ignoreAllLogs(); // ignore all logs
 
   return (
     <>

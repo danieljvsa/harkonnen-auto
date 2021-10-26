@@ -37,6 +37,7 @@ export function ProfileProf(){
                     <CardProfile title="Avaliações da Assistência..." />
                 )
                 }
+                <CardProfile title="Ver Perfil" />
                 <CardProfile title="Sair" onPress={signOut} />
             </View>
             <Menu style={styles.footer} />

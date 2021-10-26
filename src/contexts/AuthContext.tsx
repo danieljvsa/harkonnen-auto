@@ -1,6 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { createContext, useState } from "react";
 import firebase from "../config/firebase";
+import 'react-native-get-random-values';
+import { v4 as uuid4 } from 'uuid';
+
 
 type User = {
     id: string,
@@ -21,7 +24,9 @@ type AuthContextData = {
     signOut: () => void,
     updateName: (name: string) => void,
     updateEmail: (email: string) => void,
-    updatePhone: (phone: string) => void
+    updatePhone: (phone: string) => void,
+    updateImage: (image: string) => void,
+    updateAddress: (address: string) => void,
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -161,10 +166,40 @@ export function AuthProvider({children}:any) {
         await firebase.database().ref('/users/' + currentUser?.id).update({phone: phone})
     }
 
+    async function updateImage(image: any){
+        const fileExtension = image.split('.').pop()
 
+        let uuid = uuid4()
+
+        const fileName = `${uuid}.${fileExtension}`
+        let storageRef = firebase.storage().ref(`users/images/${fileName}`)
+        storageRef.put(image).on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            snapshot => {
+                console.log("snapshot:" + snapshot.state)
+
+                if(snapshot.state === firebase.storage.TaskState.SUCCESS){
+                    console.log('success')
+                }
+            },
+            error => {
+                console.log("Error image: " + error.message)
+            },
+            () => {
+                storageRef.getDownloadURL().then( downloadUrl => {
+                    console.log("File avaiable at: " + downloadUrl)
+                    firebase.database().ref('/users/' + currentUser?.id).update({image: downloadUrl})
+                })
+            }
+        )
+    }
     
+    async function updateAddress(address: string){
+        await firebase.database().ref('/users/' + currentUser?.id).update({address: address})
+    }
+
     return(
-        <AuthContext.Provider value={{updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{ updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

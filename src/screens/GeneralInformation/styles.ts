@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
         height: 204,
         alignSelf: 'stretch',
         textAlign: 'center',
-        margin: 0
+        margin: 0,
     },
 
     arrowBack: {
@@ -79,6 +79,12 @@ export const styles = StyleSheet.create({
         marginTop: 23,
         marginLeft: 17,
     },
+    goBackUploaded:{
+        height: 50,
+        width: 50,
+        marginTop: 0,
+        marginLeft: 17,
+    },
 
     upload: {
         alignSelf: 'center',
@@ -86,6 +92,19 @@ export const styles = StyleSheet.create({
         width: 87,
         marginTop: 0,
         
-    }
+    },
+    imageUploaded:{
+        alignSelf: 'stretch',
+        textAlign: 'center',
+        height: 190,
+        
+    },
+    headerUploaded: {
+        backgroundColor: '#FFFF',
+        height: 190,
+        alignSelf: 'stretch',
+        textAlign: 'center',
+        paddingTop: 20
+    },
     
 })

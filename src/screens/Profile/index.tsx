@@ -30,6 +30,7 @@ export function Profile(){
             <View style={styles.menu} >
                 <CardProfile title="Informações Gerais" onPress={goToGeneralInformation} />
                 <CardProfile title="Avaliações do Perfil" />
+                <CardProfile title="Ver Perfil" />
                 <CardProfile title="Sair" onPress={signOut} />
             </View>
             <Menu style={styles.footer} />

@@ -1,8 +1,9 @@
 
 
 import React, { useContext, useState } from 'react'
-import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView } from 'react-native'
+import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView, ImageBackground } from 'react-native'
 import firebase from "../../config/firebase";
+import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types'
 
 import uploadImg from '../../assets/upload.png'
 import arrowBack from '../../assets/arrow-back.png'
@@ -11,6 +12,7 @@ import { styles } from './styles'
 import {useNavigation} from '@react-navigation/native'
 import { AuthContext } from '../../contexts/AuthContext';
 import { RectButton } from 'react-native-gesture-handler';
+import * as ImagePicker from 'expo-image-picker';
 
 
 export function GeneralInformation(){
@@ -19,7 +21,8 @@ export function GeneralInformation(){
     const [name, setName] = useState('')
     const [phone, setPhone] = useState('')
     const [address, setAddress] = useState('')
-    const {updateName, currentUser, updateEmail, updatePhone} = useContext(AuthContext)
+    const [image, setImage] = useState('')
+    const {updateName, currentUser, updateEmail, updatePhone, updateImage, updateAddress} = useContext(AuthContext)
 
     function handleUpdates() {
         if(name != ""){
@@ -31,10 +34,34 @@ export function GeneralInformation(){
         if(phone != ""){
             updatePhone(phone)
         }
+        if(image != ""){
+            updateImage(image)
+        }
+        if(address != ""){
+            updateAddress(address)
+        }
     }
 
     function goBack() {
         navigation.goBack()
+    }
+
+    async function pickImage(){
+        let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (permissionResult.granted === false) {
+          alert("Permission to access camera roll is required!");
+          return;
+        }
+    
+        let pickerResult = await ImagePicker.launchImageLibraryAsync();
+        
+        if (pickerResult.cancelled === true) {
+            return;
+        }
+      
+        const { uri } = pickerResult as unknown as ImageInfo
+        setImage(uri);
     }
 
     return(
@@ -45,11 +72,25 @@ export function GeneralInformation(){
             <ScrollView>
                     <View style={styles.container}>
                         <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-                        <View style={styles.header}>
-                            <RectButton style={styles.goBack} onPress={goBack} >
-                                <Image source={arrowBack} style={styles.arrowBack}  />
-                            </RectButton>
-                            <Image source={uploadImg} style={styles.upload} />
+                        <View style={styles.header}  >
+                            {(image === "") ? (
+                                <View style={styles.header}  >
+                                    <RectButton style={styles.goBack} onPress={goBack} >
+                                        <Image source={arrowBack} style={styles.arrowBack}  />
+                                    </RectButton>
+                                    <RectButton onPress={pickImage} >
+                                        <Image source={uploadImg} style={styles.upload} />
+                                    </RectButton>
+                                </View>
+                            ) : (
+                                <View style={styles.headerUploaded} >
+                                    <ImageBackground source={{uri: image}} style={styles.imageUploaded} >
+                                    <RectButton style={styles.goBackUploaded} onPress={goBack} >
+                                        <Image source={arrowBack} style={styles.arrowBack}  />
+                                    </RectButton>
+                                   </ImageBackground>
+                                </View>
+                            )}
                         </View>
                         <View style={styles.login}>
                             <View style={styles.inputG} >
@@ -70,8 +111,9 @@ export function GeneralInformation(){
                                     <TextInput style={styles.input} placeholder="ex: Rua do Morro, 123, Porto" value={address} onChangeText={(text) => setAddress(text)} />
                                 </View>
                             ) : (
-                                <View>
-                                    <Text></Text>
+                                <View style={styles.inputG}>
+                                    <Text style={styles.inputTitle}></Text>
+                                    <TextInput />
                                 </View>
                             )}
                             
