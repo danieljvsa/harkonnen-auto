@@ -36,8 +36,9 @@ export const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
     },
     img:{
-        marginBottom: 117,
-        resizeMode: 'contain',
+        //marginTop: 30,
+        resizeMode: 'center',
+        alignSelf: "center",
         height: 75,
     },
     text:{
@@ -60,8 +61,7 @@ export const styles = StyleSheet.create({
         fontFamily: theme.fonts.text,
     },
     header: {
-        backgroundColor: theme.colors.card,
-        height: 204,
+        height: 170,
         alignSelf: 'stretch',
         textAlign: 'center',
         margin: 0,

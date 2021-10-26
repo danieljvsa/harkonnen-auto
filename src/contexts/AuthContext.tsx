@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import firebase from "../config/firebase";
 import 'react-native-get-random-values';
 import { v4 as uuid4 } from 'uuid';
@@ -27,6 +27,10 @@ type AuthContextData = {
     updatePhone: (phone: string) => void,
     updateImage: (image: string) => void,
     updateAddress: (address: string) => void,
+    updateLocation: (location: string) => void,
+    updateServicesCharges: (fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string) => void,
+    locations: Object[],
+    updateServicesStatus: (fullReview: string, extraReview: string, serviceCollection: string) => void,
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -37,6 +41,11 @@ export function AuthProvider({children}:any) {
     const [errorRegister, setRegisterError] = useState(false)
     const [isDuplicated, setIsDuplicated] = useState(false)
     const [currentUser, setCurrentUser] = useState<User | null>(null)
+    const [locations, setLocations] = useState([])
+
+    useEffect(() => {
+        getLocations()
+    },[])
     
     async function handleErrorSignUp(email: string, password: string, name: string, phone: string, account: string) {
         if(name == "" || email == "" || password == "" || phone == "" || account == ""){
@@ -198,8 +207,63 @@ export function AuthProvider({children}:any) {
         await firebase.database().ref('/users/' + currentUser?.id).update({address: address})
     }
 
+    async function updateLocation(location: string){
+        await firebase.database().ref('/users/' + currentUser?.id).update({location: location})
+    }
+
+    async function updateServicesCharges(fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string){
+        if (fullReview != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({fullReview: fullReview})
+        }
+        if (extraReview != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({extraReview: extraReview})
+        }
+        if (oil != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({oil: oil})
+        }
+        if (damper != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({damper: damper})
+        }
+        if (battery != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({battery: battery})
+        }
+        if (airConditioning != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({airConditioning: airConditioning})
+        }
+        if (tires != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({tires: tires})
+        }
+        if (brakes != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({brakes: brakes})
+        }
+        if (serviceCollection != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({serviceCollection: serviceCollection})
+        }
+    }
+
+    async function updateServicesStatus(fullReview: string, extraReview: string, serviceCollection: string){
+        if (fullReview != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({fullReview: fullReview})
+        }
+        if (extraReview != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({extraReview: extraReview})
+        }
+        if (serviceCollection != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({serviceCollection: serviceCollection})
+        }
+    }
+
+    async function getLocations() {
+        await firebase.database().ref("d").get().then((snapshot) => {
+            //console.log(snapshot.val())
+            setLocations(snapshot.val())
+        })
+    }
+
+
+
     return(
-        <AuthContext.Provider value={{ updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

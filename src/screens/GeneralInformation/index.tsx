@@ -13,6 +13,7 @@ import {useNavigation} from '@react-navigation/native'
 import { AuthContext } from '../../contexts/AuthContext';
 import { RectButton } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
+import { Picker } from '@react-native-picker/picker';
 
 
 export function GeneralInformation(){
@@ -22,7 +23,8 @@ export function GeneralInformation(){
     const [phone, setPhone] = useState('')
     const [address, setAddress] = useState('')
     const [image, setImage] = useState('')
-    const {updateName, currentUser, updateEmail, updatePhone, updateImage, updateAddress} = useContext(AuthContext)
+    const [location, setLocation] = useState('')
+    const {updateName, currentUser, updateEmail, updatePhone, updateImage, updateAddress, locations, updateLocation} = useContext(AuthContext)
 
     function handleUpdates() {
         if(name != ""){
@@ -39,6 +41,9 @@ export function GeneralInformation(){
         }
         if(address != ""){
             updateAddress(address)
+        }
+        if(location != ""){
+            updateLocation(location)
         }
     }
 
@@ -69,7 +74,6 @@ export function GeneralInformation(){
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.scroll}
         >
-            <ScrollView>
                     <View style={styles.container}>
                         <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
                         <View style={styles.header}  >
@@ -92,36 +96,48 @@ export function GeneralInformation(){
                                 </View>
                             )}
                         </View>
-                        <View style={styles.login}>
-                            <View style={styles.inputG} >
-                                <Text style={styles.inputTitle} >Nome</Text>
-                                <TextInput style={styles.input} placeholder="ex: Paul Atreides" value={name} onChangeText={(text) => setName(text)} />
-                            </View>
-                            <View style={styles.inputG}>
-                                <Text style={styles.inputTitle} >Email</Text>
-                                <TextInput style={styles.input} autoCapitalize="none" placeholder="ex: example@gmail.com" value={email} onChangeText={(text) => setEmail(text)} />
-                            </View>
-                            <View style={styles.inputG}>
-                                <Text style={styles.inputTitle} >Nº de Telefone</Text>
-                                <TextInput style={styles.input} placeholder="ex: 912333222" value={phone} onChangeText={(text) => setPhone(text)} />
-                            </View>
-                            {(currentUser?.account === "workshop" || currentUser?.account === "trailers") ? (
-                                <View style={styles.inputG}>
-                                    <Text style={styles.inputTitle} >Morada</Text>
-                                    <TextInput style={styles.input} placeholder="ex: Rua do Morro, 123, Porto" value={address} onChangeText={(text) => setAddress(text)} />
+                        <ScrollView>
+                            <View style={styles.login}>
+                                <View style={styles.inputG} >
+                                    <Text style={styles.inputTitle} >Nome</Text>
+                                    <TextInput style={styles.input} placeholder="ex: Paul Atreides" value={name} onChangeText={(text) => setName(text)} />
                                 </View>
-                            ) : (
                                 <View style={styles.inputG}>
-                                    <Text style={styles.inputTitle}></Text>
-                                    <TextInput />
+                                    <Text style={styles.inputTitle} >Email</Text>
+                                    <TextInput style={styles.input} autoCapitalize="none" placeholder="ex: example@gmail.com" value={email} onChangeText={(text) => setEmail(text)} />
                                 </View>
-                            )}
-                            
-                            
-                        </View>
+                                <View style={styles.inputG}>
+                                    <Text style={styles.inputTitle} >Nº de Telefone</Text>
+                                    <TextInput style={styles.input} placeholder="ex: 912333222" value={phone} onChangeText={(text) => setPhone(text)} />
+                                </View>
+                                {(currentUser?.account === "workshop" || currentUser?.account === "trailers") ? (
+                                    <>
+                                        <View style={styles.inputG}>
+                                            <Text style={styles.inputTitle} >Morada</Text>
+                                            <TextInput style={styles.input} placeholder="ex: Rua do Morro, 123, Porto" value={address} onChangeText={(text) => setAddress(text)} />
+                                        </View>
+                                        <View style={styles.inputG}>
+                                            <Text style={styles.inputTitle} >Localização (Distrito)</Text>
+                                            <View style={styles.picker} >
+                                                <Picker selectedValue={location} onValueChange={(text, index) => setLocation(text)} >
+                                                    <Picker.Item label="Localização..." value="" style={styles.textInput} />
+                                                    {locations.map((location: any) =>{
+                                                        return <Picker.Item label={location.Designacao} value={location.Designacao} style={styles.textInput} key={location.Dicofre} />
+                                                    })}
+                                                </Picker>
+                                            </View>
+                                        </View>
+                                    </>
+                                ) : (
+                                    <View style={styles.inputG}>
+                                        <Text style={styles.inputTitle}></Text>
+                                        <TextInput />
+                                    </View>
+                                )}
+                            </View>
+                        </ScrollView>
                         <ButtonIcon title="Salvar" onPress={handleUpdates} />
                     </View>
-                </ScrollView>
             </KeyboardAvoidingView>
     )
 }

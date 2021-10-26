@@ -7,6 +7,8 @@ import { SignUp } from '../screens/SignUp'
 import { ProfileProf } from '../screens/ProfileProf'
 import { Profile } from '../screens/Profile'
 import { GeneralInformation } from '../screens/GeneralInformation'
+import { ChangePlans } from '../screens/ChangePlans'
+import { ServiceStatus } from '../screens/ServiceStatus'
 
 const {Navigator, Screen} = createStackNavigator()
 
@@ -19,6 +21,8 @@ export function AuthRoutes() {
             <Screen name="ProfileProf" component={ProfileProf} />
             <Screen name="Profile" component={Profile} />
             <Screen name="GeneralInformation" component={GeneralInformation} />
+            <Screen name="ChangePlans" component={ChangePlans} />
+            <Screen name="ServiceStatus" component={ServiceStatus} />
         </Navigator>
     )
 }

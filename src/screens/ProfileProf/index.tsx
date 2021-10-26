@@ -24,13 +24,24 @@ export function ProfileProf(){
         navigation.navigate('GeneralInformation' as never)
     }
 
+    function goToChangePlans() {
+        if(currentUser?.account === "workshop"){
+            navigation.navigate('ChangePlans' as never)
+        }
+    }
+    function goToServiceStatus() {
+        if(currentUser?.account === "workshop"){
+            navigation.navigate('ServiceStatus' as never)
+        }
+    }
+
     return(
         <View style={styles.container}>
             <Image source={logoImg} style={styles.img} ></Image>
             <View style={styles.menu} >
                 <CardProfile title="Informações Gerais" onPress={goToGeneralInformation} />
-                <CardProfile title="Modificar Planos" />
-                <CardProfile title="Ativar/Desativar Serviços" />
+                <CardProfile title="Modificar Planos" onPress={goToChangePlans} />
+                <CardProfile title="Ativar/Desativar Serviços" onPress={goToServiceStatus} />
                 {(currentUser?.account === "workshop") ? (
                     <CardProfile title="Avaliações da Oficina" />
                 ) : (
