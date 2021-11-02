@@ -14,6 +14,14 @@ type User = {
     account: string
 }
 
+type Client = {
+    id: string,
+    username: string,
+    phone: string,
+    account: string,
+    image: string
+}
+
 type AuthContextData = {
     handleSignIn: (email: string, password: string) => void,
     handleSignUp: (email: string, password: string, name: string, phone: string, account: string) => void,
@@ -31,6 +39,10 @@ type AuthContextData = {
     updateServicesCharges: (fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string) => void,
     locations: Object[],
     updateServicesStatus: (fullReview: string, extraReview: string, serviceCollection: string) => void,
+    updateServicesChargesReb: (assistanceRequest: string, pickup: string, mechanicalAssistance: string) => void,
+    updateServicesStatusReb: (assistanceRequest: string, pickup: string, mechanicalAssistance: string) => void,
+    getClientUser: () => void,
+    currentClient: Client | null
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -42,6 +54,7 @@ export function AuthProvider({children}:any) {
     const [isDuplicated, setIsDuplicated] = useState(false)
     const [currentUser, setCurrentUser] = useState<User | null>(null)
     const [locations, setLocations] = useState([])
+    const [currentClient, setCurrentClient] = useState<Client | null>(null)
 
     useEffect(() => {
         getLocations()
@@ -177,12 +190,13 @@ export function AuthProvider({children}:any) {
 
     async function updateImage(image: any){
         const fileExtension = image.split('.').pop()
-
+        let response = await fetch(image)
         let uuid = uuid4()
 
         const fileName = `${uuid}.${fileExtension}`
         let storageRef = firebase.storage().ref(`users/images/${fileName}`)
-        storageRef.put(image).on(
+        let blob = await response.blob()
+        storageRef.put(blob).on(
             firebase.storage.TaskEvent.STATE_CHANGED,
             snapshot => {
                 console.log("snapshot:" + snapshot.state)
@@ -253,6 +267,31 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    async function updateServicesChargesReb(assistanceRequest: string, pickup: string, mechanicalAssistance: string){
+        if (assistanceRequest != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({assistanceRequest: assistanceRequest})
+        }
+        if (pickup != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({pickup: pickup})
+        }
+        if (mechanicalAssistance != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({mechanicalAssistance: mechanicalAssistance})
+        }
+        
+    }
+
+    async function updateServicesStatusReb(assistanceRequest: string, pickup: string, mechanicalAssistance: string){
+        if (assistanceRequest != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({mechanicalAssistance: mechanicalAssistance})
+        }
+        if (pickup != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({pickup: pickup})
+        }
+        if (mechanicalAssistance != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({mechanicalAssistance: mechanicalAssistance})
+        }
+    }
+
     async function getLocations() {
         await firebase.database().ref("d").get().then((snapshot) => {
             //console.log(snapshot.val())
@@ -260,10 +299,26 @@ export function AuthProvider({children}:any) {
         })
     }
 
+    async function getClientUser(){
+        await firebase.database().ref("/users/" + currentUser?.id).get().then((snapshot) =>{
+            if (snapshot.exists()) {
+                setCurrentClient({  
+                    id: (currentUser?.id) ? currentUser?.id : "777",
+                    username: snapshot.val().username,
+                    phone: snapshot.val().phone,
+                    account: snapshot.val().account,
+                    image: snapshot.val().image
+                    
+                })
+            }else{
+                console.log("No data avaiable")
+            }
+        })
+    }
 
 
     return(
-        <AuthContext.Provider value={{updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

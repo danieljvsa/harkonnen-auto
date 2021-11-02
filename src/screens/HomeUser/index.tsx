@@ -19,6 +19,10 @@ export function HomeUser(){
     const {currentUser} = useContext(AuthContext)
     const navigation = useNavigation()
 
+    function goToWorkshopSearch(){
+        navigation.navigate('WorkshopSearch' as never)
+    }
+
     function goToProfile() {
         navigation.navigate('Profile' as never)
     }
@@ -42,7 +46,7 @@ export function HomeUser(){
                     )
                 )
                 : (  <>
-                    <Card src={Wrench} title="Oficinas" />
+                    <Card src={Wrench} title="Oficinas" onPress={goToWorkshopSearch} />
                     <Card src={Car} title="Assistência de Viagem" />
                     <Card src={CheckMark} title="Quiz" />
                     </>

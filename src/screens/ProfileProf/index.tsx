@@ -27,11 +27,15 @@ export function ProfileProf(){
     function goToChangePlans() {
         if(currentUser?.account === "workshop"){
             navigation.navigate('ChangePlans' as never)
+        }else{
+            navigation.navigate('ChangePlansReb' as never)
         }
     }
     function goToServiceStatus() {
         if(currentUser?.account === "workshop"){
             navigation.navigate('ServiceStatus' as never)
+        }else{
+            navigation.navigate('ServiceStatusReb' as never)
         }
     }
 

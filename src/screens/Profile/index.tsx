@@ -24,13 +24,17 @@ export function Profile(){
         navigation.navigate('GeneralInformation' as never)
     }
 
+    function goToProfile() {
+        navigation.navigate('ViewProfile' as never)
+    }
+
     return(
         <View style={styles.container}>
             <Image source={logoImg} style={styles.img} ></Image>
             <View style={styles.menu} >
                 <CardProfile title="Informações Gerais" onPress={goToGeneralInformation} />
                 <CardProfile title="Avaliações do Perfil" />
-                <CardProfile title="Ver Perfil" />
+                <CardProfile title="Ver Perfil" onPress={goToProfile} />
                 <CardProfile title="Sair" onPress={signOut} />
             </View>
             <Menu style={styles.footer} />
