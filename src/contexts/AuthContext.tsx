@@ -4,6 +4,29 @@ import firebase from "../config/firebase";
 import 'react-native-get-random-values';
 import { v4 as uuid4 } from 'uuid';
 
+type WorkshopProf = {
+    id: string,
+    username: string,
+    phone: string,
+    account: string,
+    image: string,
+    address: string,
+    fullReview: string, 
+    extraReview: string,
+    serviceCollection: string    
+}
+
+type TrailerProf = {
+    id: string,
+    username: string,
+    phone: string,
+    account: string,
+    image: string,
+    address: string,
+    assistanceRequest: string, 
+    pickup: string, 
+    mechanicalAssistance: string
+}
 
 type User = {
     id: string,
@@ -42,7 +65,10 @@ type AuthContextData = {
     updateServicesChargesReb: (assistanceRequest: string, pickup: string, mechanicalAssistance: string) => void,
     updateServicesStatusReb: (assistanceRequest: string, pickup: string, mechanicalAssistance: string) => void,
     getClientUser: () => void,
-    currentClient: Client | null
+    currentClient: Client | null,
+    getProfUser: () => void,
+    currentWorkshopProf: WorkshopProf | null,
+    currentTrailerProf: TrailerProf | null 
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -55,6 +81,8 @@ export function AuthProvider({children}:any) {
     const [currentUser, setCurrentUser] = useState<User | null>(null)
     const [locations, setLocations] = useState([])
     const [currentClient, setCurrentClient] = useState<Client | null>(null)
+    const [currentWorkshopProf, setCurrentWorkshopProf] = useState<WorkshopProf | null>(null)
+    const [currentTrailerProf, setCurrentTrailerProf] = useState<TrailerProf | null>(null)
 
     useEffect(() => {
         getLocations()
@@ -316,9 +344,49 @@ export function AuthProvider({children}:any) {
         })
     }
 
+    async function getProfUser() {
+        if(currentUser?.account === "workshop"){
+            await firebase.database().ref("/users/" + currentUser?.id).get().then((snapshot) =>{
+                if (snapshot.exists()) {
+                    setCurrentWorkshopProf({  
+                        id: (currentUser?.id) ? currentUser?.id : "777",
+                        username: snapshot.val().username,
+                        phone: snapshot.val().phone,
+                        account: snapshot.val().account,
+                        image: snapshot.val().image,
+                        address: snapshot.val().address,
+                        fullReview: snapshot.child("services").child("status").val().fullReview,
+                        extraReview: snapshot.child("services").child("status").val().extraReview,
+                        serviceCollection: snapshot.child("services").child("status").val().serviceCollection
+                    })
+                }else{
+                    console.log("No data avaiable")
+                }
+            })
+        }else{
+            await firebase.database().ref("/users/" + currentUser?.id).get().then((snapshot) =>{
+                if (snapshot.exists()) {
+                    setCurrentTrailerProf({  
+                        id: (currentUser?.id) ? currentUser?.id : "777",
+                        username: snapshot.val().username,
+                        phone: snapshot.val().phone,
+                        account: snapshot.val().account,
+                        image: snapshot.val().image,
+                        address: snapshot.val().address,
+                        assistanceRequest: snapshot.child("services").child("status").val().assistanceRequest,
+                        pickup: snapshot.child("services").child("status").val().pickup,
+                        mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance
+                    })
+                }else{
+                    console.log("No data avaiable")
+                }
+            })
+        }
+    }
+
 
     return(
-        <AuthContext.Provider value={{currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

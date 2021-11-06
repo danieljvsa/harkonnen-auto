@@ -14,6 +14,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { RectButton } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
+import * as Location from 'expo-location';
 
 
 export function GeneralInformation(){
@@ -24,9 +25,63 @@ export function GeneralInformation(){
     const [address, setAddress] = useState('')
     const [image, setImage] = useState('')
     const [location, setLocation] = useState('')
+    const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
     const {updateName, currentUser, updateEmail, updatePhone, updateImage, updateAddress, locations, updateLocation} = useContext(AuthContext)
 
-    function handleUpdates() {
+    async function GetCurrentLocation() {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+
+        await Location.enableNetworkProviderAsync()
+      
+        if (status !== 'granted') {
+          Alert.alert(
+            'Permission not granted',
+            'Allow the app to use location service.',
+            [{ text: 'OK' }],
+            { cancelable: false }
+          );
+        }
+      
+        let resCode = await Location.geocodeAsync(address)
+        let latitude = 0
+        let longitude = 0
+      
+        if (resCode) {
+            resCode.map((res) => {
+                latitude = res.latitude
+                longitude = res.longitude
+            })
+            console.log(latitude + ", " + longitude )
+          let response = await Location.reverseGeocodeAsync({
+            latitude ,
+            longitude
+          });
+      
+          for (let item of response) {
+            let location = `${item.region}`;
+            setLocation(location);
+          }
+
+          console.log(location)
+        }
+      };
+
+    async function CheckIfLocationEnabled() {
+        let enabled = await Location.hasServicesEnabledAsync();
+    
+        if (!enabled) {
+          Alert.alert(
+            'Location Service not enabled',
+            'Please enable your location services to continue',
+            [{ text: 'OK' }],
+            { cancelable: false }
+          );
+        } else {
+          setLocationServiceEnabled(enabled);
+        }
+      };
+
+    async function handleUpdates() {
         if(name != ""){
             updateName(name)
         }
@@ -40,10 +95,12 @@ export function GeneralInformation(){
             updateImage(image)
         }
         if(address != ""){
+            CheckIfLocationEnabled()
+            GetCurrentLocation()
+            if (location != ""){
+                updateLocation(location)
+            }
             updateAddress(address)
-        }
-        if(location != ""){
-            updateLocation(location)
         }
     }
 
@@ -115,17 +172,6 @@ export function GeneralInformation(){
                                         <View style={styles.inputG}>
                                             <Text style={styles.inputTitle} >Morada</Text>
                                             <TextInput style={styles.input} placeholder="ex: Rua do Morro, 123, Porto" value={address} onChangeText={(text) => setAddress(text)} />
-                                        </View>
-                                        <View style={styles.inputG}>
-                                            <Text style={styles.inputTitle} >Localização (Distrito)</Text>
-                                            <View style={styles.picker} >
-                                                <Picker selectedValue={location} onValueChange={(text, index) => setLocation(text)} >
-                                                    <Picker.Item label="Localização..." value="" style={styles.textInput} />
-                                                    {locations.map((location: any) =>{
-                                                        return <Picker.Item label={location.Designacao} value={location.Designacao} style={styles.textInput} key={location.Dicofre} />
-                                                    })}
-                                                </Picker>
-                                            </View>
                                         </View>
                                     </>
                                 ) : (

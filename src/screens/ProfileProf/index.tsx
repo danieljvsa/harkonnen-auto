@@ -39,6 +39,10 @@ export function ProfileProf(){
         }
     }
 
+    function goToProfile(){
+        navigation.navigate('ViewProfileProf' as never)
+    }
+
     return(
         <View style={styles.container}>
             <Image source={logoImg} style={styles.img} ></Image>
@@ -52,7 +56,7 @@ export function ProfileProf(){
                     <CardProfile title="Avaliações da Assistência..." />
                 )
                 }
-                <CardProfile title="Ver Perfil" />
+                <CardProfile title="Ver Perfil" onPress={goToProfile} />
                 <CardProfile title="Sair" onPress={signOut} />
             </View>
             <Menu style={styles.footer} />
