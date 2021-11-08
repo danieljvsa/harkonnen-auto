@@ -14,6 +14,7 @@ import { ServiceStatusReb } from '../screens/ServiceStatusReb'
 import { ChangePlansReb } from '../screens/ChangePlansReb'
 import { ViewProfile } from '../screens/ViewProfile'
 import { ViewProfileProf } from '../screens/ViewProfileProf'
+import { TrailersSearch } from '../screens/TrailersSearch'
 
 const {Navigator, Screen} = createStackNavigator()
 
@@ -33,6 +34,7 @@ export function AuthRoutes() {
             <Screen name="WorkshopSearch" component={WorkshopSearch} />
             <Screen name="ViewProfile" component={ViewProfile} />
             <Screen name="ViewProfileProf" component={ViewProfileProf} />
+            <Screen name="TrailersSearch" component={TrailersSearch} />
         </Navigator>
     )
 }

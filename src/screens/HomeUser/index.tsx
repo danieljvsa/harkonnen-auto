@@ -23,6 +23,10 @@ export function HomeUser(){
         navigation.navigate('WorkshopSearch' as never)
     }
 
+    function gotToTrailersSearch(){
+        navigation.navigate('TrailersSearch' as never)
+    }
+
     function goToProfile() {
         navigation.navigate('Profile' as never)
     }
@@ -35,19 +39,19 @@ export function HomeUser(){
                 { (currentUser?.account === "workshop" || currentUser?.account === "trailers") ? (
                     (currentUser.account === "workshop") ? ( <>
                         <Card src={Admin} title="Administrativo" />
-                        <Card src={Car} title="Assistência de Viagem" />
+                        <Card src={Car} title="Assistência de Viagem" onPress={gotToTrailersSearch} />
                         <Card src={CheckMark} title="Quiz" />
                         </>
                     ) : (  <>
                         <Card src={Admin} title="Administrativo" />
-                        <Card src={Wrench} title="Oficinas" />
+                        <Card src={Wrench} title="Oficinas" onPress={goToWorkshopSearch} />
                         <Card src={CheckMark} title="Quiz" />
                         </>
                     )
                 )
                 : (  <>
                     <Card src={Wrench} title="Oficinas" onPress={goToWorkshopSearch} />
-                    <Card src={Car} title="Assistência de Viagem" />
+                    <Card src={Car} title="Assistência de Viagem" onPress={gotToTrailersSearch} />
                     <Card src={CheckMark} title="Quiz" />
                     </>
                 )

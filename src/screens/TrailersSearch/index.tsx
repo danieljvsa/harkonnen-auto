@@ -12,8 +12,8 @@ import { FlatList, RectButton } from 'react-native-gesture-handler'
 import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
 
-export function WorkshopSearch(){
-    const {getWorkshopList, workshopList} = useContext(AuthContext)
+export function TrailersSearch(){
+    const {getTrailersList, trailersList} = useContext(AuthContext)
     const navigation = useNavigation()
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
@@ -25,9 +25,9 @@ export function WorkshopSearch(){
       CheckIfLocationEnabled();
       GetCurrentLocation();
       if(displayCurrentAddress != "Wait, we are fetching you location..."){
-        getWorkshopList(displayCurrentAddress)
+        getTrailersList(displayCurrentAddress)
       }
-  }, []);
+  }, [displayCurrentAddress]);
 
   async function GetCurrentLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -60,7 +60,7 @@ export function WorkshopSearch(){
           //console.log(address)
           setDisplayCurrentAddress(address);
           
-          getWorkshopList(displayCurrentAddress)
+          getTrailersList(displayCurrentAddress)
           
         }
       }
@@ -101,8 +101,8 @@ export function WorkshopSearch(){
               </RectButton>
             </View>
             <ScrollView>
-              {workshopList.map((workshop: any) => {
-                return <CardProfileProf title={workshop.username} image={workshop.image} key={workshop.id} />
+              {trailersList.map((trailer: any) => {
+                return <CardProfileProf title={trailer.username} image={trailer.image} key={trailer.id} />
               })}
             </ScrollView>
         </View>

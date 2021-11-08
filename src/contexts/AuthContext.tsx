@@ -3,6 +3,16 @@ import React, { createContext, useEffect, useState } from "react";
 import firebase from "../config/firebase";
 import 'react-native-get-random-values';
 import { v4 as uuid4 } from 'uuid';
+import * as Location from 'expo-location';
+import { Alert } from "react-native";
+
+
+
+type WorkshopList = {
+    id?: any,
+    image: string,
+    username: string,
+}
 
 type WorkshopProf = {
     id: string,
@@ -68,7 +78,13 @@ type AuthContextData = {
     currentClient: Client | null,
     getProfUser: () => void,
     currentWorkshopProf: WorkshopProf | null,
-    currentTrailerProf: TrailerProf | null 
+    currentTrailerProf: TrailerProf | null,
+    getWorkshopList: (location: string) => void,
+    getTrailersList: (location: string) => void, 
+    workshopList: Object[],
+    trailersList: Object[],
+    
+
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -83,9 +99,14 @@ export function AuthProvider({children}:any) {
     const [currentClient, setCurrentClient] = useState<Client | null>(null)
     const [currentWorkshopProf, setCurrentWorkshopProf] = useState<WorkshopProf | null>(null)
     const [currentTrailerProf, setCurrentTrailerProf] = useState<TrailerProf | null>(null)
+    const [workshopList, setWorkshopList] = useState([])
+    const [trailersList, setTrailersList] = useState([])
 
     useEffect(() => {
         getLocations()
+        
+        
+        
     },[])
     
     async function handleErrorSignUp(email: string, password: string, name: string, phone: string, account: string) {
@@ -384,9 +405,56 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    async function getWorkshopList(location: string) {
+        if(location != ''){
+            await firebase.database().ref('/users').on('value', (snapshot) => {
+                snapshot.forEach((snap) => {
+                    const userObject = snap.val()
+                    const account = userObject['account']
+                    const location = userObject['location']
+                    if (account === "workshop" && location === location){
+                        const workshops = [userObject] 
+                        for (let index = 1; index < workshops.length; index++) {
+                            
+                            if(workshops[index - 1] === workshops[index]){
+                                workshops[index].pop()
+                            }
+                            
+                        }
+                        setWorkshopList(workshops as never)
+                        console.log(workshopList)
+                    }
+                })
+            })
+        }
+    }
+
+    async function getTrailersList(location: string) {
+        if(location != ''){
+            await firebase.database().ref('/users').on('value', (snapshot) => {
+                snapshot.forEach((snap) => {
+                    const userObject = snap.val()
+                    const account = userObject['account']
+                    const location = userObject['location']
+                    if (account === "trailers" && location === location){
+                        const trailers = [userObject] 
+                        for (let index = 1; index < trailers.length; index++) {
+                            
+                            if(trailers[index - 1] === trailers[index]){
+                                trailers[index].pop()
+                            }
+                            
+                        }
+                        setTrailersList(trailers as never)
+                    }
+                })
+            })
+        }
+    }
+
 
     return(
-        <AuthContext.Provider value={{getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{getTrailersList, trailersList, workshopList, getWorkshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )
