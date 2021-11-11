@@ -12,22 +12,22 @@ import { FlatList, RectButton } from 'react-native-gesture-handler'
 import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
 
+import logoImg from '../../assets/logo.png'
+import arrowBack from '../../assets/arrow-back.png'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
 export function TrailersSearch(){
-    const {getTrailersList, trailersList} = useContext(AuthContext)
+    const {getTrailersList, trailersList, getProfUserbyId} = useContext(AuthContext)
     const navigation = useNavigation()
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
     const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Wait, we are fetching you location...');
     const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
   
-    
-    useEffect(() => {
-      CheckIfLocationEnabled();
-      GetCurrentLocation();
-      if(displayCurrentAddress != "Wait, we are fetching you location..."){
-        getTrailersList(displayCurrentAddress)
-      }
-  }, [displayCurrentAddress]);
+
+  function goBack() {
+    navigation.goBack()
+  }
 
   async function GetCurrentLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -57,7 +57,7 @@ export function TrailersSearch(){
         for (let item of response) {
           let address = `${item.region}`;
           
-          //console.log(address)
+          console.log(address)
           setDisplayCurrentAddress(address);
           
           getTrailersList(displayCurrentAddress)
@@ -84,9 +84,36 @@ export function TrailersSearch(){
     }
   };
 
-    function goToProfile() {
-        navigation.navigate('Profile' as never)
+    function goToProfDetails(userId: string) {
+      if(userId != ''){
+        getProfUserbyId(userId)
+        navigation.navigate('ProfDetailsTrailers' as never)
+      }
     }
+
+    const emptyData: readonly any[] | null | undefined = [];
+
+    const renderNullItem = () => null;
+
+    const ListFooterComponent = (
+      <ScrollView style={styles.list}>
+        <FlatList data={trailersList} renderItem={item => renderItem(item)} />
+      </ScrollView>
+    )
+
+    function handleGeo(){
+      CheckIfLocationEnabled();
+      GetCurrentLocation();
+      if(displayCurrentAddress != "Wait, we are fetching you location..."){
+        getTrailersList(displayCurrentAddress)
+      }
+    }
+
+
+    const renderItem = ({item, index}: any) => {
+      console.log(item)
+      return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
+    } 
 
     return(
       <KeyboardAvoidingView
@@ -94,17 +121,25 @@ export function TrailersSearch(){
           style={styles.scroll}
       >
         <View style={styles.container}>
-            <View>
-              <TextInput style={styles.input} placeholder="ex: Paul Atreides" value={search} onChangeText={(text) => setSearch(text)} />
-              <RectButton >
-                <Image source={target} />
+            <View style={styles.header}>
+                <RectButton style={styles.goBack} onPress={goBack} >
+                    <Image source={arrowBack} style={styles.arrowBack}  />
+                </RectButton>
+            </View>
+            <Image source={logoImg} style={styles.img} />
+            <View style={styles.search}>
+              <TextInput style={styles.inputSearch} placeholder="Pesquisar reboques" value={search} onChangeText={(text) => setSearch(text)} />
+              <RectButton style={styles.geoCont} onPress={handleGeo} >
+                <Image source={target} style={styles.geo} />
               </RectButton>
             </View>
-            <ScrollView>
-              {trailersList.map((trailer: any) => {
-                return <CardProfileProf title={trailer.username} image={trailer.image} key={trailer.id} />
-              })}
-            </ScrollView>
+              <FlatList
+                data={emptyData}
+                renderItem={renderNullItem}
+                ListFooterComponent={ListFooterComponent}
+                style={styles.listFlat}
+              />
+            
         </View>
       </KeyboardAvoidingView>
     )

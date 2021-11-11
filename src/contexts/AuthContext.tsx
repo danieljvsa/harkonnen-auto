@@ -8,34 +8,42 @@ import { Alert } from "react-native";
 
 
 
-type WorkshopList = {
-    id?: any,
-    image: string,
-    username: string,
-}
+
 
 type WorkshopProf = {
     id: string,
     username: string,
-    phone: string,
+    phone?: string,
     account: string,
-    image: string,
-    address: string,
-    fullReview: string, 
-    extraReview: string,
-    serviceCollection: string    
+    image?: string,
+    address?: string,
+    fullReview?: string, 
+    extraReview?: string,
+    serviceCollection?: string,
+    airConditioning?: string,
+    battery?: string,
+    brakes?: string,
+    damper?: string,
+    extraReviewCharge?: string,
+    fullReviewCharge?: string,
+    oil?: string,
+    serviceCollectionCharge?: string,
+    tires?: string    
 }
 
 type TrailerProf = {
     id: string,
     username: string,
-    phone: string,
+    phone?: string,
     account: string,
-    image: string,
-    address: string,
-    assistanceRequest: string, 
+    image?: string,
+    address?: string,
+    assistanceRequest?: string, 
     pickup: string, 
-    mechanicalAssistance: string
+    mechanicalAssistance: string,
+    assistanceRequestCharge?: string, 
+    pickupCharge?: string, 
+    mechanicalAssistanceCharge?: string
 }
 
 type User = {
@@ -83,8 +91,8 @@ type AuthContextData = {
     getTrailersList: (location: string) => void, 
     workshopList: Object[],
     trailersList: Object[],
-    
-
+    getProfUserbyId: (userId: string) => void,
+    location: string,
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -101,6 +109,7 @@ export function AuthProvider({children}:any) {
     const [currentTrailerProf, setCurrentTrailerProf] = useState<TrailerProf | null>(null)
     const [workshopList, setWorkshopList] = useState([])
     const [trailersList, setTrailersList] = useState([])
+    const [location, setLocation] = useState('')
 
     useEffect(() => {
         getLocations()
@@ -331,7 +340,7 @@ export function AuthProvider({children}:any) {
 
     async function updateServicesStatusReb(assistanceRequest: string, pickup: string, mechanicalAssistance: string){
         if (assistanceRequest != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({mechanicalAssistance: mechanicalAssistance})
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({assistanceRequest: assistanceRequest})
         }
         if (pickup != "") {
             await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({pickup: pickup})
@@ -407,54 +416,110 @@ export function AuthProvider({children}:any) {
 
     async function getWorkshopList(location: string) {
         if(location != ''){
-            await firebase.database().ref('/users').on('value', (snapshot) => {
+            await firebase.database().ref('/users').on('value', (snapshot) =>{
+                let workshops: any[] = []
                 snapshot.forEach((snap) => {
-                    const userObject = snap.val()
-                    const account = userObject['account']
-                    const location = userObject['location']
-                    if (account === "workshop" && location === location){
-                        const workshops = [userObject] 
-                        for (let index = 1; index < workshops.length; index++) {
-                            
-                            if(workshops[index - 1] === workshops[index]){
-                                workshops[index].pop()
-                            }
-                            
+                    let userObject = snap.val()
+                    userObject['id'] = snap.key
+                    let account = userObject['account']
+                    let region = userObject['location']
+                    console.log(location)
+                    if(region != undefined && account === 'workshop'){
+                        if(region === location){
+                            workshops.push(userObject)
                         }
-                        setWorkshopList(workshops as never)
-                        console.log(workshopList)
                     }
+                    
+                
+                    setWorkshopList(workshops as never)
+                    
                 })
+                console.log(workshopList)
+                /*for (let index = 0; index < array.length; index++) {
+                    if(account === "workshop" && region === location ){
+                    
+                }*/
             })
         }
     }
 
     async function getTrailersList(location: string) {
         if(location != ''){
-            await firebase.database().ref('/users').on('value', (snapshot) => {
+            await firebase.database().ref('/users').on('value', (snapshot) =>{
+                let trailers: any[] = []
                 snapshot.forEach((snap) => {
-                    const userObject = snap.val()
-                    const account = userObject['account']
-                    const location = userObject['location']
-                    if (account === "trailers" && location === location){
-                        const trailers = [userObject] 
-                        for (let index = 1; index < trailers.length; index++) {
-                            
-                            if(trailers[index - 1] === trailers[index]){
-                                trailers[index].pop()
-                            }
-                            
+                    let userObject = snap.val()
+                    userObject['id'] = snap.key
+                    let account = userObject['account']
+                    let region = userObject['location']
+                    //console.log(location)
+                    if(region != undefined && account === 'trailers'){
+                        if(region === location){
+                            trailers.push(userObject)
                         }
-                        setTrailersList(trailers as never)
                     }
+                    
+                
+                    setTrailersList(trailers as never)
+                    
                 })
+                //console.log(trailersList)
+                /*for (let index = 0; index < array.length; index++) {
+                    if(account === "workshop" && region === location ){
+                    
+                }*/
             })
         }
     }
 
+    async function getProfUserbyId(userId: string) {
+            await firebase.database().ref("/users/" + userId).get().then((snapshot) =>{
+                if (snapshot.exists()) {
+                    if(snapshot.val().account === "workshop"){
+                        setCurrentWorkshopProf({  
+                            id: (userId) ? userId : "777",
+                            username: snapshot.val().username,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,
+                            address: snapshot.val().address,
+                            fullReview: snapshot.child("services").child("status").val().fullReview,
+                            extraReview: snapshot.child("services").child("status").val().extraReview,
+                            serviceCollection: snapshot.child("services").child("status").val().serviceCollection,
+                            airConditioning: snapshot.child("services").child("charges").val().airConditioning,
+                            battery: snapshot.child("services").child("charges").val().battery,
+                            brakes: snapshot.child("services").child("charges").val().brakes,
+                            damper: snapshot.child("services").child("charges").val().damper,
+                            extraReviewCharge: snapshot.child("services").child("charges").val().extraReview,
+                            fullReviewCharge: snapshot.child("services").child("charges").val().fullReviewCharge,
+                            oil: snapshot.child("services").child("charges").val().oil,
+                            serviceCollectionCharge: snapshot.child("services").child("charges").val().serviceCollection,
+                            tires: snapshot.child("services").child("charges").val().tires
+                        })
+                    }else{
+                        setCurrentTrailerProf({  
+                            id: (userId) ? userId : "777",
+                            username: snapshot.val().username,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,
+                            address: snapshot.val().address,
+                            assistanceRequest: snapshot.child("services").child("status").val().assistanceRequest,
+                            pickup: snapshot.child("services").child("status").val().pickup,
+                            mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
+                            assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest,
+                            pickupCharge: snapshot.child("services").child("charges").val().pickup,
+                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
+                        })
+                    }
+                }else{
+                    console.log("No data avaiable")
+                }
+            })
+    }
 
     return(
-        <AuthContext.Provider value={{getTrailersList, trailersList, workshopList, getWorkshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{location, getProfUserbyId, getTrailersList, trailersList, workshopList, getWorkshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

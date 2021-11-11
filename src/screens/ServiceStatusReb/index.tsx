@@ -69,7 +69,7 @@ export function ServiceStatusReb(){
                                     </View>
                                 </View>
                                 <View style={styles.inputG}>
-                                    <Text style={styles.inputTitle} >Revisão Completa</Text>
+                                    <Text style={styles.inputTitle} >Assitência Mecância</Text>
                                     <View style={styles.picker} >
                                         <Picker selectedValue={mechanicalAssistance} onValueChange={(text, index) => setMechanicalAssistance(text)} >
                                             <Picker.Item label="Estado do serviço..." value="" style={styles.textInput} />                                           

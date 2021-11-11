@@ -4,6 +4,8 @@ import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidin
 
 import { ButtonIcon } from '../../components/ButtonIcon'
 import { styles } from './styles'
+import logoImg from '../../assets/logo.png'
+import arrowBack from '../../assets/arrow-back.png'
 
 import target from '../../assets/target.png'
 import AuthContext from '../../contexts/AuthContext'
@@ -13,7 +15,7 @@ import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
 
 export function WorkshopSearch(){
-    const {getWorkshopList, workshopList} = useContext(AuthContext)
+    const {getWorkshopList, workshopList, getProfUserbyId, location} = useContext(AuthContext)
     const navigation = useNavigation()
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
@@ -27,7 +29,11 @@ export function WorkshopSearch(){
       if(displayCurrentAddress != "Wait, we are fetching you location..."){
         getWorkshopList(displayCurrentAddress)
       }
-  }, []);
+  }, [displayCurrentAddress]);
+
+  function goBack() {
+    navigation.goBack()
+  }
 
   async function GetCurrentLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -84,9 +90,16 @@ export function WorkshopSearch(){
     }
   };
 
-    function goToProfile() {
-        navigation.navigate('Profile' as never)
+  function goToProfDetails(userId: string) {
+    if(userId != ''){
+      getProfUserbyId(userId)
+      navigation.navigate('ProfDetails' as never)
     }
+  }
+
+  const renderItem = (workshop: any) => {
+    return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />     
+  } 
 
     return(
       <KeyboardAvoidingView
@@ -94,16 +107,20 @@ export function WorkshopSearch(){
           style={styles.scroll}
       >
         <View style={styles.container}>
-            <View>
-              <TextInput style={styles.input} placeholder="ex: Paul Atreides" value={search} onChangeText={(text) => setSearch(text)} />
-              <RectButton >
-                <Image source={target} />
+        <View style={styles.header}>
+                <RectButton style={styles.goBack} onPress={goBack} >
+                    <Image source={arrowBack} style={styles.arrowBack}  />
+                </RectButton>
+            </View>
+            <Image source={logoImg} style={styles.img} />
+            <View style={styles.search}>
+              <TextInput style={styles.inputSearch} placeholder="Pesquisar oficinas" value={search} onChangeText={(text) => setSearch(text)} />
+              <RectButton style={styles.geoCont} >
+                <Image source={target} style={styles.geo} />
               </RectButton>
             </View>
-            <ScrollView>
-              {workshopList.map((workshop: any) => {
-                return <CardProfileProf title={workshop.username} image={workshop.image} key={workshop.id} />
-              })}
+            <ScrollView style={styles.list} >
+              <FlatList data={workshopList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
             </ScrollView>
         </View>
       </KeyboardAvoidingView>

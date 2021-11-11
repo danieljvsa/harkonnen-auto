@@ -69,7 +69,7 @@ export function ServiceStatus(){
                                     </View>
                                 </View>
                                 <View style={styles.inputG}>
-                                    <Text style={styles.inputTitle} >Revisão Completa</Text>
+                                    <Text style={styles.inputTitle} >Serviço de Coleta e Entrega</Text>
                                     <View style={styles.picker} >
                                         <Picker selectedValue={serviceCollection} onValueChange={(text, index) => setServiceCollection(text)} >
                                             <Picker.Item label="Estado do serviço..." value="" style={styles.textInput} />                                           
