@@ -19,6 +19,7 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 - Firebase
 - Context API
 - Expo Location (Geolocalização)
+- Typescript
 
 ## 🚀 Como executar
 
