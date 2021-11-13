@@ -14,10 +14,11 @@
 
 Esse projeto foi desenvolvido com as seguintes tecnologias:
 
-- ReactJS
-- Next.js
-- MirageJS (Fake API)
-- SCSS
+- React Native
+- Expo
+- Firebase
+- Context API
+- Expo Location (Geolocalização)
 
 ## 🚀 Como executar
 
@@ -29,7 +30,7 @@ $ cd harkonnen-auto
 $ npm install
 $ npm run start
 ```
-è necessário instalar o Expo CLI e o Expo Go para poder rodar a aplicação. 
+è necessário instalar o [Expo CLI](https://docs.expo.dev/workflow/expo-cli/) e o [Expo Go](https://expo.dev/client) para poder rodar a aplicação. 
 
 ## 💻 Projeto
 
