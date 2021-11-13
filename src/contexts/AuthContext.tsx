@@ -87,12 +87,12 @@ type AuthContextData = {
     getProfUser: () => void,
     currentWorkshopProf: WorkshopProf | null,
     currentTrailerProf: TrailerProf | null,
-    getWorkshopList: (location: string) => void,
-    getTrailersList: (location: string) => void, 
-    workshopList: Object[],
-    trailersList: Object[],
     getProfUserbyId: (userId: string) => void,
     location: string,
+    getWorkshopList: () => void,
+    getTrailersList: () => void,
+    workshopList: Object[],
+    trailersList: Object[],
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -414,49 +414,44 @@ export function AuthProvider({children}:any) {
         }
     }
 
-    async function getWorkshopList(location: string) {
-        if(location != ''){
+
+
+    async function getWorkshopList() {
+     
             await firebase.database().ref('/users').on('value', (snapshot) =>{
                 let workshops: any[] = []
                 snapshot.forEach((snap) => {
                     let userObject = snap.val()
                     userObject['id'] = snap.key
                     let account = userObject['account']
-                    let region = userObject['location']
-                    console.log(location)
-                    if(region != undefined && account === 'workshop'){
-                        if(region === location){
-                            workshops.push(userObject)
-                        }
+                    if(account === 'workshop'){
+                        workshops.push(userObject)
                     }
                     
                 
                     setWorkshopList(workshops as never)
                     
                 })
-                console.log(workshopList)
+                //console.log(workshopList)
                 /*for (let index = 0; index < array.length; index++) {
                     if(account === "workshop" && region === location ){
                     
                 }*/
             })
-        }
+        
     }
 
-    async function getTrailersList(location: string) {
-        if(location != ''){
+    async function getTrailersList() {
+        
             await firebase.database().ref('/users').on('value', (snapshot) =>{
                 let trailers: any[] = []
                 snapshot.forEach((snap) => {
                     let userObject = snap.val()
                     userObject['id'] = snap.key
                     let account = userObject['account']
-                    let region = userObject['location']
                     //console.log(location)
-                    if(region != undefined && account === 'trailers'){
-                        if(region === location){
-                            trailers.push(userObject)
-                        }
+                    if(account === 'trailers'){
+                        trailers.push(userObject)
                     }
                     
                 
@@ -469,7 +464,7 @@ export function AuthProvider({children}:any) {
                     
                 }*/
             })
-        }
+        
     }
 
     async function getProfUserbyId(userId: string) {
@@ -519,7 +514,7 @@ export function AuthProvider({children}:any) {
     }
 
     return(
-        <AuthContext.Provider value={{location, getProfUserbyId, getTrailersList, trailersList, workshopList, getWorkshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{ getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

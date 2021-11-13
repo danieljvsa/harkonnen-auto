@@ -15,7 +15,7 @@ import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
 
 export function WorkshopSearch(){
-    const {getWorkshopList, workshopList, getProfUserbyId, location} = useContext(AuthContext)
+    const {workshopList, getProfUserbyId, getWorkshopList} = useContext(AuthContext)
     const navigation = useNavigation()
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
@@ -23,16 +23,19 @@ export function WorkshopSearch(){
     const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
   
     
-    useEffect(() => {
-      CheckIfLocationEnabled();
-      GetCurrentLocation();
-      if(displayCurrentAddress != "Wait, we are fetching you location..."){
-        getWorkshopList(displayCurrentAddress)
-      }
+  useEffect(() => {
+    if(displayCurrentAddress === 'Wait, we are fetching you location...'){
+      getWorkshopList()
+    }
   }, [displayCurrentAddress]);
 
   function goBack() {
     navigation.goBack()
+  }
+
+  function handleGeo(){
+    CheckIfLocationEnabled();
+    GetCurrentLocation();
   }
 
   async function GetCurrentLocation() {
@@ -63,10 +66,10 @@ export function WorkshopSearch(){
         for (let item of response) {
           let address = `${item.region}`;
           
-          //console.log(address)
+          console.log(address)
           setDisplayCurrentAddress(address);
           
-          getWorkshopList(displayCurrentAddress)
+          //getWorkshopListGeo(address)
           
         }
       }
@@ -98,7 +101,18 @@ export function WorkshopSearch(){
   }
 
   const renderItem = (workshop: any) => {
-    return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />     
+    console.log(displayCurrentAddress)
+    if(displayCurrentAddress === 'Wait, we are fetching you location...'){
+      return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />
+    } else {
+      if(workshop.item.location === displayCurrentAddress){
+        return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />
+      }else if (search != ""){
+        return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} /> 
+      } else{
+        return <></>
+      }
+    }    
   } 
 
     return(
@@ -115,12 +129,12 @@ export function WorkshopSearch(){
             <Image source={logoImg} style={styles.img} />
             <View style={styles.search}>
               <TextInput style={styles.inputSearch} placeholder="Pesquisar oficinas" value={search} onChangeText={(text) => setSearch(text)} />
-              <RectButton style={styles.geoCont} >
+              <RectButton style={styles.geoCont} onPress={handleGeo} >
                 <Image source={target} style={styles.geo} />
               </RectButton>
             </View>
             <ScrollView style={styles.list} >
-              <FlatList data={workshopList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+              <FlatList data={ workshopList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
             </ScrollView>
         </View>
       </KeyboardAvoidingView>

@@ -7,7 +7,7 @@ import { styles } from './styles'
 
 import target from '../../assets/target.png'
 import AuthContext from '../../contexts/AuthContext'
-import { useNavigation } from '@react-navigation/native'
+import { useLinkBuilder, useNavigation } from '@react-navigation/native'
 import { FlatList, RectButton } from 'react-native-gesture-handler'
 import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
@@ -17,13 +17,19 @@ import arrowBack from '../../assets/arrow-back.png'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export function TrailersSearch(){
-    const {getTrailersList, trailersList, getProfUserbyId} = useContext(AuthContext)
+    const {trailersList, getProfUserbyId, getTrailersList} = useContext(AuthContext)
     const navigation = useNavigation()
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
     const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Wait, we are fetching you location...');
     const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
   
+
+  useEffect(() => {
+    if(displayCurrentAddress === 'Wait, we are fetching you location...'){
+      getTrailersList()
+    }
+  }, [displayCurrentAddress])
 
   function goBack() {
     navigation.goBack()
@@ -60,7 +66,7 @@ export function TrailersSearch(){
           console.log(address)
           setDisplayCurrentAddress(address);
           
-          getTrailersList(displayCurrentAddress)
+          //getTrailersListGeo(address)
           
         }
       }
@@ -95,24 +101,32 @@ export function TrailersSearch(){
 
     const renderNullItem = () => null;
 
+
     const ListFooterComponent = (
       <ScrollView style={styles.list}>
-        <FlatList data={trailersList} renderItem={item => renderItem(item)} />
+        <FlatList data={trailersList} renderItem={item => renderItem(item)}  />
       </ScrollView>
     )
 
     function handleGeo(){
       CheckIfLocationEnabled();
       GetCurrentLocation();
-      if(displayCurrentAddress != "Wait, we are fetching you location..."){
-        getTrailersList(displayCurrentAddress)
-      }
+      
     }
 
-
     const renderItem = ({item, index}: any) => {
-      console.log(item)
-      return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
+      console.log(displayCurrentAddress)
+      if(displayCurrentAddress === 'Wait, we are fetching you location...'){
+        return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
+      } else {
+        if(item.location === displayCurrentAddress){
+          return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
+        }else if (search != ""){
+          return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
+        } else{
+          return <></>
+        }
+      }    
     } 
 
     return(
