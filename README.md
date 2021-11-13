@@ -1,11 +1,11 @@
 <h1 align="center">
-  Naped
+  Harkonnnen Auto
 </h1>
 
 <p align="center">
-  <img src="https://img.shields.io/static/v1?label=Desafio&message=10&color=8257E5&labelColor=000000" alt="Desafio 10" />
+  <img src="https://img.shields.io/static/v1?label=App&message=Harkonnen_Auto&color=8257E5&labelColor=000000" alt="Harkonnnen Auto" />
   
-  <img src="https://img.shields.io/github/stars/danieljvsa/naped?label=stars&message=MIT&color=8257E5&labelColor=000000" alt="Stars">
+  <img src="https://img.shields.io/github/stars/danieljvsa/harkonnen-auto?label=stars&message=MIT&color=8257E5&labelColor=000000" alt="Stars">
 
   <img  src="https://img.shields.io/static/v1?label=license&message=MIT&color=8257E5&labelColor=000000" alt="License">   
 </p>
@@ -24,8 +24,8 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 Clone o projeto e acesse a pasta do mesmo.
 
 ```bash
-$ git clone https://github.com/danieljvsa/harkonnenauto
-$ cd harkonnenauto
+$ git clone https://github.com/danieljvsa/harkonnen-auto
+$ cd harkonnen-auto
 $ npm install
 $ npm run start
 ```
