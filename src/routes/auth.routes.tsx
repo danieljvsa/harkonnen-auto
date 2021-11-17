@@ -17,6 +17,7 @@ import { ViewProfileProf } from '../screens/ViewProfileProf'
 import { TrailersSearch } from '../screens/TrailersSearch'
 import { ProfDetails } from '../screens/ProfDetails'
 import { ProfDetailsTrailers } from '../screens/ProfDetailsTrailers'
+import { AppointmentInitial } from '../screens/AppointmentInitial'
 
 const {Navigator, Screen} = createStackNavigator()
 
@@ -39,6 +40,7 @@ export function AuthRoutes() {
             <Screen name="TrailersSearch" component={TrailersSearch} />
             <Screen name="ProfDetails" component={ProfDetails} />
             <Screen name="ProfDetailsTrailers" component={ProfDetailsTrailers} />
+            <Screen name="AppointmentInitial" component={AppointmentInitial} />
         </Navigator>
     )
 }

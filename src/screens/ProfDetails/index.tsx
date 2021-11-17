@@ -33,6 +33,9 @@ export function ProfDetails(){
         navigation.goBack()
     }
 
+    function goToAppointment(){
+        navigation.navigate('AppointmentInitial' as never)
+    }
    
 
     return(
@@ -77,7 +80,7 @@ export function ProfDetails(){
                                 </RectButton>
                             </View>
                             <View style={styles.button}>
-                                <ButtonEval title="Marcar Reparação" />
+                                <ButtonEval title="Marcar Reparação" onPress={goToAppointment}  />
                             </View>
                         </View>
                     </View>
