@@ -117,11 +117,17 @@ export function TrailersSearch(){
     const renderItem = ({item, index}: any) => {
       console.log(displayCurrentAddress)
       if(displayCurrentAddress === 'Wait, we are fetching you location...'){
-        return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
+        if (search != ""){
+          if(item.username.toLowerCase().includes(search.toLowerCase())){
+            return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />
+          } else {
+            return <></>
+          }
+        }else{
+          return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />
+        }      
       } else {
         if(item.location === displayCurrentAddress){
-          return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
-        }else if (search != ""){
           return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
         } else{
           return <></>
@@ -134,13 +140,16 @@ export function TrailersSearch(){
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.scroll}
       >
-        <View style={styles.container}>
+         <ScrollView style={styles.scroll}>
+          <View style={styles.container}>
             <View style={styles.header}>
                 <RectButton style={styles.goBack} onPress={goBack} >
                     <Image source={arrowBack} style={styles.arrowBack}  />
                 </RectButton>
             </View>
-            <Image source={logoImg} style={styles.img} />
+            <View style={{marginTop: 60}} >
+              <Text style={styles.img}>Reboques</Text>
+            </View>
             <View style={styles.search}>
               <TextInput style={styles.inputSearch} placeholder="Pesquisar reboques" value={search} onChangeText={(text) => setSearch(text)} />
               <RectButton style={styles.geoCont} onPress={handleGeo} >
@@ -155,6 +164,7 @@ export function TrailersSearch(){
               />
             
         </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     )
 }

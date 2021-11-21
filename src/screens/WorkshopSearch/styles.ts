@@ -7,14 +7,15 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.colors.background,
-        height: 1000
+        //height: 1000
     },
     img:{
-        //marginBottom: 40,
-        
-        resizeMode: 'contain',
+        textAlign: 'center',
+        fontSize: 36,
+        fontFamily: theme.fonts.text,
+        color: theme.colors.title,
         height: 75,
-        marginTop: 40,
+        //marginTop: 40,
     },
     title:{
         textAlign: 'center',
@@ -32,7 +33,7 @@ export const styles = StyleSheet.create({
     scroll:{
         flex: 1,
         backgroundColor: theme.colors.background,
-        height: 1000
+        //height: 1000
     },
     inputSearch: {
         width: 238,
@@ -53,7 +54,7 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         marginRight: 30,
         marginLeft: 30,
-        marginTop: -200,
+        marginTop: 0,
     },
     geoCont: {
         flex: 1,
@@ -85,8 +86,8 @@ export const styles = StyleSheet.create({
     list: {
         flex: 1,
         alignSelf: 'stretch',
-        marginTop: -200,
-        height: 900,
+        marginTop: 20,
+        //height: 900,
     },
     header: {
         height: 20,

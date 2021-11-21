@@ -103,14 +103,20 @@ export function WorkshopSearch(){
   const renderItem = (workshop: any) => {
     console.log(displayCurrentAddress)
     if(displayCurrentAddress === 'Wait, we are fetching you location...'){
-      return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />
+      if (search != ""){
+        if(workshop.item.username.toLowerCase().includes(search.toLowerCase())){
+          return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} /> 
+        } else{
+          return <></>
+        }
+      }else{
+        return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />
+      } 
     } else {
       if(workshop.item.location === displayCurrentAddress){
         return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />
-      }else if (search != ""){
-        return <CardProfileProf title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} /> 
       } else{
-        return <></>
+      return <></>
       }
     }    
   } 
@@ -120,13 +126,16 @@ export function WorkshopSearch(){
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.scroll}
       >
-        <View style={styles.container}>
-        <View style={styles.header}>
+        <ScrollView style={styles.scroll}>
+          <View style={styles.container}>
+            <View style={styles.header}>
                 <RectButton style={styles.goBack} onPress={goBack} >
                     <Image source={arrowBack} style={styles.arrowBack}  />
                 </RectButton>
             </View>
-            <Image source={logoImg} style={styles.img} />
+            <View style={{marginTop: 60}} >
+              <Text style={styles.img}>Oficinas</Text>
+            </View>
             <View style={styles.search}>
               <TextInput style={styles.inputSearch} placeholder="Pesquisar oficinas" value={search} onChangeText={(text) => setSearch(text)} />
               <RectButton style={styles.geoCont} onPress={handleGeo} >
@@ -136,7 +145,8 @@ export function WorkshopSearch(){
             <ScrollView style={styles.list} >
               <FlatList data={ workshopList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
             </ScrollView>
-        </View>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     )
 }
