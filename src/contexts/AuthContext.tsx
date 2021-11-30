@@ -7,7 +7,16 @@ import * as Location from 'expo-location';
 import { Alert } from "react-native";
 
 
-
+type AppointmentWorkshopInitial = {
+    serviceType: string,
+    date: string,
+    hour: string,
+    model: string,
+    brand: string,
+    address?: string,
+    totalPrice?: string,
+    time_stamp?: string
+}
 
 
 type WorkshopProf = {
@@ -93,6 +102,9 @@ type AuthContextData = {
     getTrailersList: () => void,
     workshopList: Object[],
     trailersList: Object[],
+    appointmentWorkshop: AppointmentWorkshopInitial | null
+    handleAppoitmentWorkshop: (day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string) => void
+    handleAppointmentWorkshopMark: (images: any[], obs: string) => void
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -110,6 +122,7 @@ export function AuthProvider({children}:any) {
     const [workshopList, setWorkshopList] = useState([])
     const [trailersList, setTrailersList] = useState([])
     const [location, setLocation] = useState('')
+    const [appointmentWorkshop, setAppoitmentWorkshop] = useState<AppointmentWorkshopInitial | null>(null)
 
     useEffect(() => {
         getLocations()
@@ -513,8 +526,92 @@ export function AuthProvider({children}:any) {
             })
     }
 
+    async function handleAppoitmentWorkshop(day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string) {
+        let formattedDate = day + '/' + month + '/' + year
+        setAppoitmentWorkshop({
+            serviceType: serviceType,
+            date: formattedDate,
+            hour: hour,
+            brand: brand,
+            model: model
+        })
+        console.log(appointmentWorkshop)
+    }
+
+    function toObject(arr: any[]) {
+        var rv: any = {};
+        for (var i = 0; i < arr.length; ++i)
+          if (arr[i] !== undefined) rv[i] = arr[i];
+        return rv;
+      }
+
+    async function handleAppointmentWorkshopMark(images: any[], obs: string){
+        let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
+        let clientKey = clientRef.key
+        clientRef.set({
+            id: clientKey,
+            currentUserId: currentUser?.id,
+            currentWorkshopProf: currentWorkshopProf?.id, 
+            serviceType: appointmentWorkshop?.serviceType,
+            date: appointmentWorkshop?.date,
+            hour: appointmentWorkshop?.hour,
+            brand: appointmentWorkshop?.brand,
+            model: appointmentWorkshop?.model,
+            obs: obs
+        })
+        let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
+        let companyKey = companyRef.key
+            companyRef.set({
+                id: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+            })
+        for (let index = 0; index < images.length; index++) {
+            const fileExtension = images[index].split('.').pop()
+            let response = await fetch(images[index])
+            let uuid = uuid4()
+
+            const fileName = `${uuid}.${fileExtension}`
+            let storageRef = firebase.storage().ref(`users/images/${fileName}`)
+            let blob = await response.blob()
+            storageRef.put(blob).on(
+                firebase.storage.TaskEvent.STATE_CHANGED,
+                snapshot => {
+                    console.log("snapshot:" + snapshot.state)
+
+                    if(snapshot.state === firebase.storage.TaskState.SUCCESS){
+                        console.log('success')
+                    }
+                },
+                error => {
+                    console.log("Error image: " + error.message)
+                },
+                () => {
+                    storageRef.getDownloadURL().then( downloadUrl => {
+                        console.log("File avaiable at: " + downloadUrl)
+                        if(clientKey != null && companyKey != null){
+                            firebase.database().ref("/appointments/" + currentUser?.id).child(clientKey).child('images').child('' + index + '').set({
+                                downloadUrl
+                            })
+                            firebase.database().ref("/appointments/" + currentWorkshopProf?.id).child(companyKey).child('images').child('' + index + '').set({
+                                downloadUrl
+                            })
+                        }
+                    })
+                }
+            )
+        }
+        
+    }
+
     return(
-        <AuthContext.Provider value={{ getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

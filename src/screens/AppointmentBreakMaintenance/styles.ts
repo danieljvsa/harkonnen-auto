@@ -10,21 +10,23 @@ export const styles = StyleSheet.create({
     },
     input:{
         //width: 312,
-        height: 50,
+        height: 170,
         backgroundColor: theme.colors.card,
         borderRadius: 30,
         fontSize: 20,
         color: theme.colors.input,
         paddingTop: 13,
         paddingBottom: 6,
+        paddingRight: 25,
         paddingLeft: 25,
         fontFamily: theme.fonts.text,
-        maxHeight: 50,
+        maxHeight: 170,
+        //marginBottom: 10
     },
     inputDiv: {
-        marginLeft: 34,
-        marginRight: 34,
-        marginBottom: 13
+        marginLeft: 24,
+        marginRight: 24,
+        //marginBottom: 13
     },
     inputTitle: {
         fontSize: 20,
@@ -39,8 +41,9 @@ export const styles = StyleSheet.create({
     scroll:{
         flex: 1,
         //backgroundColor: theme.colors.background,
-        marginTop: -20,
+        marginTop: 0,
         alignSelf: 'stretch',
+        height: 1000
     },
     img:{
         marginBottom: 117,
@@ -50,8 +53,19 @@ export const styles = StyleSheet.create({
     text:{
         //textAlign: 'center',
         fontSize: 20,
-        color: theme.colors.input,
-        //marginTop: 18,
+        color: theme.colors.heading,
+        marginTop: 15,
+        marginBottom: 15,
+        marginLeft: 25,
+        fontFamily: theme.fonts.text,
+    },
+    textInputTitle:{
+        //textAlign: 'center',
+        fontSize: 20,
+        color: theme.colors.heading,
+        marginTop: 15,
+        marginBottom: 10,
+        //marginLeft: 25,
         fontFamily: theme.fonts.text,
     },
     monthText:{
@@ -115,10 +129,31 @@ export const styles = StyleSheet.create({
         
     },
     imageUploaded:{
-        alignSelf: 'stretch',
-        textAlign: 'center',
-        height: 190,
-        
+        width: 80,
+        height: 80,
+        marginLeft: 12,
+        marginRight: 12,
+        marginTop: 12,
+    },
+    imagesBox: {
+        width: 312,
+        height: 240,
+        backgroundColor: theme.colors.card,
+        alignSelf: 'center',
+        borderRadius: 8,
+    },
+    cross:{
+        width: 24,
+        height: 24,
+        alignSelf: 'flex-end'
+    },
+    uploaded:{
+        width: 40,
+        height: 40,
+        borderRadius: 8,
+        alignSelf: 'center',
+        marginTop: 5,
+        marginBottom: 5
     },
     headerUploaded: {
         backgroundColor: '#FFFF',

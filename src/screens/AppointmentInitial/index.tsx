@@ -51,7 +51,7 @@ export function AppointmentInitial(){
     const [model, setModel] = useState('')
     //const [show, setShow] = useState(true)
     const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
-    const {updateName, currentUser, updateEmail, updatePhone, updateImage, updateAddress, locations, updateLocation} = useContext(AuthContext)
+    const {appointmentWorkshop, handleAppoitmentWorkshop} = useContext(AuthContext)
 
     useEffect(() => {
         let today = new Date();
@@ -220,8 +220,10 @@ export function AppointmentInitial(){
     
           let formattedNow = `${nowYear}-${nowMonth}-${nowDay} ${nowHour}:${nowMinutes}:${nowSeconds}`;
     
-          
-    
+          handleAppoitmentWorkshop(selectedDay, selectedMonth, selectedYear, selectedHour, service, model, brand)
+        if(service === "breakMaintenance"){
+            navigation.navigate('AppointmentBreakMaintenance' as never)
+        }
           
         }
       };
@@ -410,7 +412,7 @@ export function AppointmentInitial(){
                                 <TextInput style={styles.input} value={brand} onChangeText={(text) => setBrand(text)} />
                             </View>
                         </ScrollView>
-                        <ButtonIcon title="Salvar"  />
+                        <ButtonIcon title="Avançar" onPress={handleFinishClick} />
                     </View>
             </KeyboardAvoidingView>
     )
