@@ -37,7 +37,8 @@ type WorkshopProf = {
     fullReviewCharge?: string,
     oil?: string,
     serviceCollectionCharge?: string,
-    tires?: string    
+    tires?: string,
+    engine?: string     
 }
 
 type TrailerProf = {
@@ -86,7 +87,7 @@ type AuthContextData = {
     updateImage: (image: string) => void,
     updateAddress: (address: string) => void,
     updateLocation: (location: string) => void,
-    updateServicesCharges: (fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string) => void,
+    updateServicesCharges: (fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string, engine: string) => void,
     locations: Object[],
     updateServicesStatus: (fullReview: string, extraReview: string, serviceCollection: string) => void,
     updateServicesChargesReb: (assistanceRequest: string, pickup: string, mechanicalAssistance: string) => void,
@@ -104,7 +105,8 @@ type AuthContextData = {
     trailersList: Object[],
     appointmentWorkshop: AppointmentWorkshopInitial | null
     handleAppoitmentWorkshop: (day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string) => void
-    handleAppointmentWorkshopMark: (images: any[], obs: string) => void
+    handleAppointmentWorkshopMark: (images: any[], obs: string) => void,
+    handlePreventiveAppoitment: (isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, obs: any, address: any ) => void
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -296,7 +298,7 @@ export function AuthProvider({children}:any) {
         await firebase.database().ref('/users/' + currentUser?.id).update({location: location})
     }
 
-    async function updateServicesCharges(fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string){
+    async function updateServicesCharges(fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string, engine: string){
         if (fullReview != "") {
             await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({fullReview: fullReview})
         }
@@ -323,6 +325,9 @@ export function AuthProvider({children}:any) {
         }
         if (serviceCollection != "") {
             await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({serviceCollection: serviceCollection})
+        }
+        if (engine != "") {
+            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({engine: engine})
         }
     }
 
@@ -400,7 +405,17 @@ export function AuthProvider({children}:any) {
                         address: snapshot.val().address,
                         fullReview: snapshot.child("services").child("status").val().fullReview,
                         extraReview: snapshot.child("services").child("status").val().extraReview,
-                        serviceCollection: snapshot.child("services").child("status").val().serviceCollection
+                        serviceCollection: snapshot.child("services").child("status").val().serviceCollection,
+                        extraReviewCharge: snapshot.child("services").child("charges").val().extraReview,
+                        fullReviewCharge: snapshot.child("services").child("charges").val().fullReview,
+                        serviceCollectionCharge: snapshot.child("services").child("charges").val().serviceCollection,
+                        airConditioning: snapshot.child("services").child("charges").val().airConditioning,
+                        battery: snapshot.child("services").child("charges").val().battery,
+                        brakes: snapshot.child("services").child("charges").val().brakes,
+                        damper: snapshot.child("services").child("charges").val().damper,
+                        oil: snapshot.child("services").child("charges").val().oil,
+                        tires: snapshot.child("services").child("charges").val().tires,
+                        engine: snapshot.child("services").child("charges").val().engine,    
                     })
                 }else{
                     console.log("No data avaiable")
@@ -418,7 +433,10 @@ export function AuthProvider({children}:any) {
                         address: snapshot.val().address,
                         assistanceRequest: snapshot.child("services").child("status").val().assistanceRequest,
                         pickup: snapshot.child("services").child("status").val().pickup,
-                        mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance
+                        mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
+                        assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest, 
+                        pickupCharge: snapshot.child("services").child("charges").val().pickup, 
+                        mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
                     })
                 }else{
                     console.log("No data avaiable")
@@ -499,7 +517,7 @@ export function AuthProvider({children}:any) {
                             brakes: snapshot.child("services").child("charges").val().brakes,
                             damper: snapshot.child("services").child("charges").val().damper,
                             extraReviewCharge: snapshot.child("services").child("charges").val().extraReview,
-                            fullReviewCharge: snapshot.child("services").child("charges").val().fullReviewCharge,
+                            fullReviewCharge: snapshot.child("services").child("charges").val().fullReview,
                             oil: snapshot.child("services").child("charges").val().oil,
                             serviceCollectionCharge: snapshot.child("services").child("charges").val().serviceCollection,
                             tires: snapshot.child("services").child("charges").val().tires
@@ -610,8 +628,61 @@ export function AuthProvider({children}:any) {
         
     }
 
+    async function handlePreventiveAppoitment(isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, obs: any, address: any ) {
+        let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
+        let clientKey = clientRef.key
+        clientRef.set({
+            id: clientKey,
+            currentUserId: currentUser?.id,
+            currentWorkshopProf: currentWorkshopProf?.id, 
+            serviceType: appointmentWorkshop?.serviceType,
+            date: appointmentWorkshop?.date,
+            hour: appointmentWorkshop?.hour,
+            brand: appointmentWorkshop?.brand,
+            model: appointmentWorkshop?.model,
+            obs: obs,
+            isAirConditioning: isAirConditioning,
+            isBattery: isBattery,
+            isDamper: isDamper,
+            isBrakes: isBrakes,
+            isEngine: isEngine,
+            isExtraReview: isExtraReview,
+            isFullReview: isFullReview,
+            isOil: isOil,
+            isServiceCollection: isServiceCollection,
+            isTires: isTires,
+            totalCharge: totalCharge,
+            address: address
+        })
+        let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
+        let companyKey = companyRef.key
+            companyRef.set({
+                id: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+                isAirConditioning: isAirConditioning,
+                isBattery: isBattery,
+                isDamper: isDamper,
+                isBrakes: isBrakes,
+                isEngine: isEngine,
+                isExtraReview: isExtraReview,
+                isFullReview: isFullReview,
+                isOil: isOil,
+                isServiceCollection: isServiceCollection,
+                isTires: isTires,
+                totalCharge: totalCharge,
+                address: address
+            })
+    }
+
     return(
-        <AuthContext.Provider value={{handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

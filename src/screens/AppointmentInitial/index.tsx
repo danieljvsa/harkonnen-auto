@@ -223,6 +223,8 @@ export function AppointmentInitial(){
           handleAppoitmentWorkshop(selectedDay, selectedMonth, selectedYear, selectedHour, service, model, brand)
         if(service === "breakMaintenance"){
             navigation.navigate('AppointmentBreakMaintenance' as never)
+        } else {
+            navigation.navigate('AppointmentPreventiveMaintenance' as never)
         }
           
         }

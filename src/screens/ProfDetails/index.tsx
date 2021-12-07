@@ -70,6 +70,27 @@ export function ProfDetails(){
                                     <Text style={styles.title}>
                                         {currentWorkshopProf?.username}
                                     </Text>
+                                    <Text style={styles.desc}>
+                                        {currentWorkshopProf?.address}
+                                    </Text>
+                                </View>
+                                <View style={{marginBottom: 10}}>
+                                    <Text style={styles.secHeading}>Serviços</Text>
+                                    {(currentWorkshopProf?.fullReview) ? 
+                                        <Text style={styles.secText}>Revisão Completa</Text>
+                                    : <></>
+                                    }
+                                    {(currentWorkshopProf?.extraReview) ? 
+                                        <Text style={styles.secText}>Revisão Extra</Text>
+                                    : <></>
+                                    }
+                                    {(currentWorkshopProf?.serviceCollection) ? 
+                                        <Text style={styles.secText}>Serviço de Pickup</Text>
+                                    : <></>
+                                    }
+                                </View>
+                                <View>
+                                    <Text style={styles.secHeading}>Avaliações</Text>
                                 </View>
                             </View>
                         </ScrollView>

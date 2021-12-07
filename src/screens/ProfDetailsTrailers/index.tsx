@@ -67,6 +67,27 @@ export function ProfDetailsTrailers(){
                                     <Text style={styles.title}>
                                         {currentTrailerProf?.username}
                                     </Text>
+                                    <Text style={styles.desc}>
+                                        {currentTrailerProf?.address}
+                                    </Text>
+                                </View>
+                                <View style={{marginBottom: 10}}>
+                                    <Text style={styles.secHeading}>Serviços</Text>
+                                    {(currentTrailerProf?.assistanceRequest) ? 
+                                        <Text style={styles.secText}>Pedido de Assistência</Text>
+                                    : <></>
+                                    }
+                                    {(currentTrailerProf?.mechanicalAssistance) ? 
+                                        <Text style={styles.secText}>Assitência Mecânica</Text>
+                                    : <></>
+                                    }
+                                    {(currentTrailerProf?.pickup) ? 
+                                        <Text style={styles.secText}>Serviço de Pickup</Text>
+                                    : <></>
+                                    }
+                                </View>
+                                <View>
+                                    <Text style={styles.secHeading}>Avaliações</Text>
                                 </View>
                             </View>
                         </ScrollView>

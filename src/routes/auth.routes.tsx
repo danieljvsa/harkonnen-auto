@@ -19,6 +19,7 @@ import { ProfDetails } from '../screens/ProfDetails'
 import { ProfDetailsTrailers } from '../screens/ProfDetailsTrailers'
 import { AppointmentInitial } from '../screens/AppointmentInitial'
 import { AppointmentBreakMaintenance } from '../screens/AppointmentBreakMaintenance'
+import { AppointmentPreventiveMaintenance } from '../screens/AppointmentPreventiveMaintenance'
 
 const {Navigator, Screen} = createStackNavigator()
 
@@ -43,6 +44,7 @@ export function AuthRoutes() {
             <Screen name="ProfDetailsTrailers" component={ProfDetailsTrailers} />
             <Screen name="AppointmentInitial" component={AppointmentInitial} />
             <Screen name="AppointmentBreakMaintenance" component={AppointmentBreakMaintenance} />
+            <Screen name="AppointmentPreventiveMaintenance" component={AppointmentPreventiveMaintenance} />
         </Navigator>
     )
 }

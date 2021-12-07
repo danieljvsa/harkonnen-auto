@@ -23,6 +23,7 @@ export function ChangePlans(){
     const [airConditioning, setAirConditioning] = useState('')
     const [tires, setTires] = useState('')
     const [brakes, setBrakes] = useState('')
+    const [engine, setEngine] = useState('')
     const [serviceCollection, setServiceCollection] = useState('')
     const {updateServicesCharges} = useContext(AuthContext)
 
@@ -31,7 +32,7 @@ export function ChangePlans(){
     }
 
     function updateReviewPrices(){
-        updateServicesCharges(fullReview, extraReview, oil, damper, battery, airConditioning, tires, brakes, serviceCollection)
+        updateServicesCharges(fullReview, extraReview, oil, damper, battery, airConditioning, tires, brakes, serviceCollection, engine)
     }
 
     return(
@@ -81,6 +82,10 @@ export function ChangePlans(){
                                 <View style={styles.inputG} >
                                     <Text style={styles.inputTitle} >Travões</Text>
                                     <TextInput style={styles.input} placeholder="ex: 87.00" value={brakes} onChangeText={(text) => setBrakes(text)} />
+                                </View>
+                                <View style={styles.inputG} >
+                                    <Text style={styles.inputTitle} >Motor</Text>
+                                    <TextInput style={styles.input} placeholder="ex: 87.00" value={engine} onChangeText={(text) => setEngine(text)} />
                                 </View>
                                 <View style={styles.inputG} >
                                     <Text style={styles.inputTitle} >Recolha e Entrega</Text>
