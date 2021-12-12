@@ -7,6 +7,78 @@ import * as Location from 'expo-location';
 import { Alert } from "react-native";
 
 
+type AppointmentBreakMaintenance = {
+    id: string,
+    id_company: string,
+    currentUserId: string,
+    currentWorkshopProf: string, 
+    serviceType: string,
+    date: string,
+    hour: string,
+    brand: string,
+    model: string,
+    obs: string,
+    username: string,
+    images: string[]
+}
+
+type AppointmentPreventiveMaintenance = {
+    id: string,
+    id_company: string,
+    currentUserId: string,
+    currentWorkshopProf: string, 
+    serviceType: string,
+    date: string,
+    hour: string,
+    brand: string,
+    model: string,
+    obs: string,
+    username: string,
+    isAirConditioning: boolean,
+    isBattery: boolean,
+    isDamper: boolean,
+    isBrakes: boolean,
+    isEngine: boolean,
+    isExtraReview: boolean,
+    isFullReview: boolean,
+    isOil: boolean,
+    isServiceCollection: boolean,
+    isTires: boolean,
+    totalCharge: number,
+    address: string,
+}
+
+type AppointmentTrailerPickup = {
+    id: string,
+    id_company: string,
+    currentUserId: string,
+    currentWorkshopProf: string, 
+    serviceType: string,
+    date: string,
+    hour: string,
+    brand: string,
+    model: string,
+    obs: string,
+    username: string,
+    totalCharge: number,
+    addressCollection: string, 
+    addressDelivery: string,
+}
+
+type AppointmentTrailer = {
+    id: string,
+    id_company: string,
+    currentUserId: string,
+    currentWorkshopProf: string, 
+    serviceType: string,
+    date: string,
+    brand: string,
+    model: string,
+    obs: string,
+    username: string,
+    totalCharge: number,
+}
+
 type AppointmentWorkshopInitial = {
     serviceType: string,
     date: string,
@@ -103,10 +175,19 @@ type AuthContextData = {
     getTrailersList: () => void,
     workshopList: Object[],
     trailersList: Object[],
+    appoitmentsList: Object[],
     appointmentWorkshop: AppointmentWorkshopInitial | null
     handleAppoitmentWorkshop: (day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string) => void
-    handleAppointmentWorkshopMark: (images: any[], obs: string) => void,
-    handlePreventiveAppoitment: (isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, obs: any, address: any ) => void
+    handleAppointmentWorkshopMark: (images: any[], obs: string, companyName: string, userName: string) => void,
+    handlePreventiveAppoitment: (isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, obs: any, address: any, companyName: string, userName: string) => void,
+    handleAppointmentsTrailerPickup: (day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, obs: string, totalCharge: any, addressCollection: string, addressDelivery:string, companyName: string, userName: string) => void,
+    handleAppointmentsTrailer: (date: string, brand: string, model: string, service: string, obs: string, totalCharge: any, companyName: string, userName: string) => void,
+    getAppointmentsList: () => void,
+    getAppointmentById: (id: string, id_company: string) => void,
+    appointmentBreakMaintenance: AppointmentBreakMaintenance | null,
+    appointmentPreventiveMaintenance: AppointmentPreventiveMaintenance | null,
+    appointmentTrailerPickup: AppointmentTrailerPickup | null,
+    appointmentTrailer: AppointmentTrailer | null,
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -123,8 +204,14 @@ export function AuthProvider({children}:any) {
     const [currentTrailerProf, setCurrentTrailerProf] = useState<TrailerProf | null>(null)
     const [workshopList, setWorkshopList] = useState([])
     const [trailersList, setTrailersList] = useState([])
+    const [appoitmentsList, setAppoitmentsList] = useState([])
     const [location, setLocation] = useState('')
     const [appointmentWorkshop, setAppoitmentWorkshop] = useState<AppointmentWorkshopInitial | null>(null)
+    const [appointmentBreakMaintenance, setAppointmentBreakMaintenance] = useState<AppointmentBreakMaintenance | null>(null)
+    const [appointmentPreventiveMaintenance, setAppointmentPreventiveMaintenance] = useState<AppointmentPreventiveMaintenance | null>(null)
+    const [appointmentTrailerPickup, setAppointmentTrailerPickup] = useState<AppointmentTrailerPickup | null>(null)
+    const [appointmentTrailer, setAppointmentTrailer] = useState<AppointmentTrailer | null>(null)
+
 
     useEffect(() => {
         getLocations()
@@ -498,6 +585,32 @@ export function AuthProvider({children}:any) {
         
     }
 
+    async function getAppointmentsList() {
+        
+        await firebase.database().ref('/appointments/' + currentUser?.id).on('value', (snapshot) =>{
+            let appoitments: any[] = []
+            snapshot.forEach((snap) => {
+                let userObject = snap.val()
+                
+                //console.log(location)
+                
+                appoitments.push(userObject)
+                
+                
+            
+                setAppoitmentsList(appoitments as never)
+                
+            })
+            //console.log(trailersList)
+            /*for (let index = 0; index < array.length; index++) {
+                if(account === "workshop" && region === location ){
+                
+            }*/
+        })
+        console.log(appoitmentsList)
+    
+}
+
     async function getProfUserbyId(userId: string) {
             await firebase.database().ref("/users/" + userId).get().then((snapshot) =>{
                 if (snapshot.exists()) {
@@ -556,18 +669,14 @@ export function AuthProvider({children}:any) {
         console.log(appointmentWorkshop)
     }
 
-    function toObject(arr: any[]) {
-        var rv: any = {};
-        for (var i = 0; i < arr.length; ++i)
-          if (arr[i] !== undefined) rv[i] = arr[i];
-        return rv;
-      }
-
-    async function handleAppointmentWorkshopMark(images: any[], obs: string){
+    async function handleAppointmentWorkshopMark(images: any[], obs: string, companyName: string, userName: string){
         let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
         let clientKey = clientRef.key
+        let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
+        let companyKey = companyRef.key
         clientRef.set({
             id: clientKey,
+            id_company: companyKey,
             currentUserId: currentUser?.id,
             currentWorkshopProf: currentWorkshopProf?.id, 
             serviceType: appointmentWorkshop?.serviceType,
@@ -575,21 +684,23 @@ export function AuthProvider({children}:any) {
             hour: appointmentWorkshop?.hour,
             brand: appointmentWorkshop?.brand,
             model: appointmentWorkshop?.model,
-            obs: obs
+            obs: obs,
+            username: companyName
         })
-        let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
-        let companyKey = companyRef.key
-            companyRef.set({
-                id: companyKey,
-                currentUserId: currentUser?.id,
-                currentWorkshopProf: currentWorkshopProf?.id, 
-                serviceType: appointmentWorkshop?.serviceType,
-                date: appointmentWorkshop?.date,
-                hour: appointmentWorkshop?.hour,
-                brand: appointmentWorkshop?.brand,
-                model: appointmentWorkshop?.model,
-                obs: obs,
-            })
+        companyRef.set({
+            id: clientKey,
+            id_company: companyKey,
+            currentUserId: currentUser?.id,
+            currentWorkshopProf: currentWorkshopProf?.id, 
+            serviceType: appointmentWorkshop?.serviceType,
+            date: appointmentWorkshop?.date,
+            hour: appointmentWorkshop?.hour,
+            brand: appointmentWorkshop?.brand,
+            model: appointmentWorkshop?.model,
+            obs: obs,
+            username: userName
+        })
+        //console.log(currentUser?.username)
         for (let index = 0; index < images.length; index++) {
             const fileExtension = images[index].split('.').pop()
             let response = await fetch(images[index])
@@ -628,11 +739,14 @@ export function AuthProvider({children}:any) {
         
     }
 
-    async function handlePreventiveAppoitment(isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, obs: any, address: any ) {
+    async function handlePreventiveAppoitment(isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, obs: any, address: any, companyName: string, userName: string) {
         let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
         let clientKey = clientRef.key
+        let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
+        let companyKey = companyRef.key
         clientRef.set({
             id: clientKey,
+            id_company: companyKey,
             currentUserId: currentUser?.id,
             currentWorkshopProf: currentWorkshopProf?.id, 
             serviceType: appointmentWorkshop?.serviceType,
@@ -652,37 +766,298 @@ export function AuthProvider({children}:any) {
             isServiceCollection: isServiceCollection,
             isTires: isTires,
             totalCharge: totalCharge,
-            address: address
+            address: address,
+            username: companyName
         })
-        let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
+        companyRef.set({
+            id: clientKey,
+            id_company: companyKey,
+            currentUserId: currentUser?.id,
+            currentWorkshopProf: currentWorkshopProf?.id, 
+            serviceType: appointmentWorkshop?.serviceType,
+            date: appointmentWorkshop?.date,
+            hour: appointmentWorkshop?.hour,
+            brand: appointmentWorkshop?.brand,
+            model: appointmentWorkshop?.model,
+            obs: obs,
+            isAirConditioning: isAirConditioning,
+            isBattery: isBattery,
+            isDamper: isDamper,
+            isBrakes: isBrakes,
+            isEngine: isEngine,
+            isExtraReview: isExtraReview,
+            isFullReview: isFullReview,
+            isOil: isOil,
+            isServiceCollection: isServiceCollection,
+            isTires: isTires,
+            totalCharge: totalCharge,
+            address: address,
+            username: userName
+        })
+    }
+
+    async function handleAppointmentsTrailerPickup(day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, obs: string, totalCharge: any, addressCollection: string, addressDelivery:string, companyName: string, userName: string) {
+        let formattedDate = day + '/' + month + '/' + year
+        let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
+        let clientKey = clientRef.key
+        let companyRef = await firebase.database().ref("/appointments/" + currentTrailerProf?.id).push()
         let companyKey = companyRef.key
-            companyRef.set({
-                id: companyKey,
-                currentUserId: currentUser?.id,
-                currentWorkshopProf: currentWorkshopProf?.id, 
-                serviceType: appointmentWorkshop?.serviceType,
-                date: appointmentWorkshop?.date,
-                hour: appointmentWorkshop?.hour,
-                brand: appointmentWorkshop?.brand,
-                model: appointmentWorkshop?.model,
-                obs: obs,
-                isAirConditioning: isAirConditioning,
-                isBattery: isBattery,
-                isDamper: isDamper,
-                isBrakes: isBrakes,
-                isEngine: isEngine,
-                isExtraReview: isExtraReview,
-                isFullReview: isFullReview,
-                isOil: isOil,
-                isServiceCollection: isServiceCollection,
-                isTires: isTires,
-                totalCharge: totalCharge,
-                address: address
+        clientRef.set({
+            id: clientKey,
+            id_company: companyKey,
+            currentUserId: currentUser?.id,
+            currentWorkshopProf: currentTrailerProf?.id, 
+            serviceType: serviceType,
+            date: formattedDate,
+            hour: hour,
+            brand: brand,
+            model: model,
+            obs: obs,
+            totalCharge: totalCharge,
+            addressCollection: addressCollection, 
+            addressDelivery: addressDelivery,
+            username: companyName
+        })        
+        companyRef.set({
+            id: clientKey,
+            id_company: companyKey,
+            currentUserId: currentUser?.id,
+            currentWorkshopProf: currentTrailerProf?.id, 
+            serviceType: serviceType,
+            date: formattedDate,
+            hour: hour,
+            brand: brand,
+            model: model,
+            obs: obs,
+            totalCharge: totalCharge,
+            addressCollection: addressCollection, 
+            addressDelivery: addressDelivery,
+            username: userName
+        })
+    }
+
+    async function handleAppointmentsTrailer(date: any, brand: string, model: string, service: string, obs: string, totalCharge: any, companyName: string, userName: string) {
+        let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
+        let clientKey = clientRef.key
+        let companyRef = await firebase.database().ref("/appointments/" + currentTrailerProf?.id).push()
+        let companyKey = companyRef.key
+        clientRef.set({
+            id: clientKey,
+            id_company: companyKey,
+            currentUserId: currentUser?.id,
+            currentWorkshopProf: currentTrailerProf?.id, 
+            serviceType: service,
+            date: date,
+            brand: brand,
+            model: model,
+            obs: obs,
+            totalCharge: totalCharge,
+            username: companyName
+        })
+        companyRef.set({
+            id: clientKey,
+            id_company: companyKey,
+            currentUserId: currentUser?.id,
+            currentWorkshopProf: currentTrailerProf?.id, 
+            serviceType: service,
+            date: date,
+            brand: brand,
+            model: model,
+            obs: obs,
+            totalCharge: totalCharge,
+            username: userName
+        })
+    }
+
+    async function getAppointmentById(id: string, id_company: string) {
+        let images: string[] = []
+        if(currentUser?.account === 'user'){
+            await firebase.database().ref('/appointments/' + currentUser?.id).child(id).on('value', (snapshot) =>{
+                if(snapshot.val().serviceType === 'preventiveMaintenance'){
+                    setAppointmentPreventiveMaintenance({
+                        id: snapshot.val().id,
+                        id_company: snapshot.val().id_company,
+                        serviceType: snapshot.val().serviceType,
+                        currentUserId: snapshot.val().currentUserId,
+                        currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                        date: snapshot.val().date,
+                        hour: snapshot.val().hour,
+                        brand: snapshot.val().brand,
+                        model: snapshot.val().model,
+                        obs: snapshot.val().obs,
+                        username: snapshot.val().username,
+                        isAirConditioning: snapshot.val().isAirConditioning,
+                        isBattery: snapshot.val().isBattery,
+                        isDamper: snapshot.val().isDamper,
+                        isBrakes: snapshot.val().isBrakes,
+                        isEngine: snapshot.val().isEngine,
+                        isExtraReview: snapshot.val().isExtraReview,
+                        isFullReview: snapshot.val().isFullReview,
+                        isOil: snapshot.val().isOil,
+                        isServiceCollection: snapshot.val().isServiceCollection,
+                        isTires: snapshot.val().isTires,
+                        totalCharge: snapshot.val().totalCharge,
+                        address: snapshot.val().address,
+                    })
+                }
+                else if(snapshot.val().serviceType === 'breakMaintenance'){
+                    for (let index = 0; index < 6; index++) {
+                        firebase.database().ref('/appointments/' + currentUser?.id + id + 'images').child('' + index + '').get().then((snapshot) => {
+                            images[index] = snapshot.val().downloadUrl
+                        })
+                        
+                    }
+                    setAppointmentBreakMaintenance({
+                        id: snapshot.val().id,
+                        id_company: snapshot.val().id_company,
+                        serviceType: snapshot.val().serviceType,
+                        currentUserId: snapshot.val().currentUserId,
+                        currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                        date: snapshot.val().date,
+                        hour: snapshot.val().hour,
+                        brand: snapshot.val().brand,
+                        model: snapshot.val().model,
+                        obs: snapshot.val().obs,
+                        username: snapshot.val().username,
+                        images: images
+                    })
+                    images = []
+                }
+                else if(snapshot.val().serviceType === 'assistanceRequest' || snapshot.val().serviceType === 'mechanicalAssistance'){
+                    setAppointmentTrailer({
+                        id: snapshot.val().id,
+                        id_company: snapshot.val().id_company,
+                        serviceType: snapshot.val().serviceType,
+                        currentUserId: snapshot.val().currentUserId,
+                        currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                        date: snapshot.val().date,
+                        brand: snapshot.val().brand,
+                        model: snapshot.val().model,
+                        obs: snapshot.val().obs,
+                        username: snapshot.val().username,
+                        totalCharge: snapshot.val().totalCharge,
+                    })
+                }
+                else if(snapshot.val().serviceType === 'pickup'){
+                    setAppointmentTrailerPickup({
+                        id: snapshot.val().id,
+                        id_company: snapshot.val().id_company,
+                        serviceType: snapshot.val().serviceType,
+                        currentUserId: snapshot.val().currentUserId,
+                        currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                        date: snapshot.val().date,
+                        hour: snapshot.val().hour,
+                        brand: snapshot.val().brand,
+                        model: snapshot.val().model,
+                        obs: snapshot.val().obs,
+                        username: snapshot.val().username,
+                        totalCharge: snapshot.val().totalCharge,
+                        addressCollection: snapshot.val().addressCollection,
+                        addressDelivery: snapshot.val().addressDelivery
+                    })
+                }
+                //console.log(trailersList)
+                /*for (let index = 0; index < array.length; index++) {
+                    if(account === "workshop" && region === location ){
+                    
+                }*/
             })
+        }else {
+            await firebase.database().ref('/appointments/' + currentUser?.id).child(id_company).on('value', (snapshot) =>{
+                if(snapshot.val().serviceType === 'preventiveMaintenance'){
+                    setAppointmentPreventiveMaintenance({
+                        id: snapshot.val().id,
+                        id_company: snapshot.val().id_company,
+                        serviceType: snapshot.val().serviceType,
+                        currentUserId: snapshot.val().currentUserId,
+                        currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                        date: snapshot.val().date,
+                        hour: snapshot.val().hour,
+                        brand: snapshot.val().brand,
+                        model: snapshot.val().model,
+                        obs: snapshot.val().obs,
+                        username: snapshot.val().username,
+                        isAirConditioning: snapshot.val().isAirConditioning,
+                        isBattery: snapshot.val().isBattery,
+                        isDamper: snapshot.val().isDamper,
+                        isBrakes: snapshot.val().isBrakes,
+                        isEngine: snapshot.val().isEngine,
+                        isExtraReview: snapshot.val().isExtraReview,
+                        isFullReview: snapshot.val().isFullReview,
+                        isOil: snapshot.val().isOil,
+                        isServiceCollection: snapshot.val().isServiceCollection,
+                        isTires: snapshot.val().isTires,
+                        totalCharge: snapshot.val().totalCharge,
+                        address: snapshot.val().address,
+                    })
+                }
+                else if(snapshot.val().serviceType === 'breakMaintenance'){
+                    for (let index = 0; index < 6; index++) {
+                        firebase.database().ref('/appointments/' + currentUser?.id + id + 'images').child('' + index + '').get().then((snapshot) => {
+                            images[index] = snapshot.val().downloadUrl
+                        })
+                        
+                    }
+                    setAppointmentBreakMaintenance({
+                        id: snapshot.val().id,
+                        id_company: snapshot.val().id_company,
+                        serviceType: snapshot.val().serviceType,
+                        currentUserId: snapshot.val().currentUserId,
+                        currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                        date: snapshot.val().date,
+                        hour: snapshot.val().hour,
+                        brand: snapshot.val().brand,
+                        model: snapshot.val().model,
+                        obs: snapshot.val().obs,
+                        username: snapshot.val().username,
+                        images: images
+                    })
+                    images = []
+                }
+                else if(snapshot.val().serviceType === 'assistanceRequest' || snapshot.val().serviceType === 'mechanicalAssistance'){
+                    setAppointmentTrailer({
+                        id: snapshot.val().id,
+                        id_company: snapshot.val().id_company,
+                        serviceType: snapshot.val().serviceType,
+                        currentUserId: snapshot.val().currentUserId,
+                        currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                        date: snapshot.val().date,
+                        brand: snapshot.val().brand,
+                        model: snapshot.val().model,
+                        obs: snapshot.val().obs,
+                        username: snapshot.val().username,
+                        totalCharge: snapshot.val().totalCharge,
+                    })
+                }
+                else if(snapshot.val().serviceType === 'pickup'){
+                    setAppointmentTrailerPickup({
+                        id: snapshot.val().id,
+                        id_company: snapshot.val().id_company,
+                        serviceType: snapshot.val().serviceType,
+                        currentUserId: snapshot.val().currentUserId,
+                        currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                        date: snapshot.val().date,
+                        hour: snapshot.val().hour,
+                        brand: snapshot.val().brand,
+                        model: snapshot.val().model,
+                        obs: snapshot.val().obs,
+                        username: snapshot.val().username,
+                        totalCharge: snapshot.val().totalCharge,
+                        addressCollection: snapshot.val().addressCollection,
+                        addressDelivery: snapshot.val().addressDelivery
+                    })
+                }
+                //console.log(trailersList)
+                /*for (let index = 0; index < array.length; index++) {
+                    if(account === "workshop" && region === location ){
+                    
+                }*/
+            })
+        }
     }
 
     return(
-        <AuthContext.Provider value={{handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{ getAppointmentById, appointmentTrailerPickup,appointmentTrailer, appointmentPreventiveMaintenance, appointmentBreakMaintenance, getAppointmentsList, appoitmentsList, handleAppointmentsTrailer, handleAppointmentsTrailerPickup, handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

@@ -33,7 +33,9 @@ export function ProfDetailsTrailers(){
         navigation.goBack()
     }
 
-   
+    function goToAppointment(){
+        navigation.navigate('AppointmentInitialTrailer' as never)
+    }
 
     return(
         <KeyboardAvoidingView
@@ -99,7 +101,7 @@ export function ProfDetailsTrailers(){
                                     </RectButton>
                                 </View>
                                 <View style={styles.button}>
-                                    <ButtonEval title="Pedir Reboque" />
+                                    <ButtonEval title="Pedir Reboque" onPress={goToAppointment} />
                                 </View>
                         </View>
                     </View>

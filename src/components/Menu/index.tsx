@@ -27,12 +27,16 @@ export function Menu({...rest} : RectButtonProps){
         navigation.navigate('HomeUser' as never)
     }
 
+    function gotToAppoitments() {
+        navigation.navigate('Appointments' as never)
+    }
+
     return(
         <View style={styles.container} >
             <RectButton onPress={handleHome} {...rest} >
                 <Image source={home} />
             </RectButton>
-            <RectButton {...rest}>
+            <RectButton onPress={gotToAppoitments} {...rest}>
                 <Image source={calendar} />
             </RectButton>
             {(currentUser?.account === "workshop" || currentUser?.account === "trailers") ? (

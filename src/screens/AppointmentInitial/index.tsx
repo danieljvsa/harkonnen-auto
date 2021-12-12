@@ -198,7 +198,10 @@ export function AppointmentInitial(){
           selectedYear > 0 &&
           selectedMonth >= 0 &&
           selectedDay > 0 &&
-          selectedHour !== null
+          selectedHour !== null &&
+          service != '' &&
+          brand != '' &&
+          model != ''
         ) {
           let hour = selectedHour.split(':');
           let formattedHour = Number(hour[0]);
@@ -220,7 +223,7 @@ export function AppointmentInitial(){
     
           let formattedNow = `${nowYear}-${nowMonth}-${nowDay} ${nowHour}:${nowMinutes}:${nowSeconds}`;
     
-          handleAppoitmentWorkshop(selectedDay, selectedMonth, selectedYear, selectedHour, service, model, brand)
+          handleAppoitmentWorkshop(selectedDay, (selectedMonth+1), selectedYear, selectedHour, service, model, brand)
         if(service === "breakMaintenance"){
             navigation.navigate('AppointmentBreakMaintenance' as never)
         } else {

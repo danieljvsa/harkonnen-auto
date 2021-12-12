@@ -46,7 +46,7 @@ export function AppointmentPreventiveMaintenance(){
     const [countBrakes, setCountBrakes] = useState(0)
     const [countEngine, setCountEngine] = useState(0)
     
-    const {currentWorkshopProf, handlePreventiveAppoitment} = useContext(AuthContext)
+    const {currentWorkshopProf, handlePreventiveAppoitment, currentUser} = useContext(AuthContext)
 
     useEffect(() => {
         totaAmount()
@@ -57,8 +57,10 @@ export function AppointmentPreventiveMaintenance(){
     }
 
     function handleSave(obs: string) {
-        handlePreventiveAppoitment(isFullReview, isExtraReview, isServiceCollection, isOil, isDamper, isBattery, isAirConditioning, isTires, isBrakes, isEngine, totalCharge, obs, address )
-        navigation.navigate('WorkshopSearch' as never)
+        if(currentWorkshopProf?.username && currentUser?.username){
+            handlePreventiveAppoitment(isFullReview, isExtraReview, isServiceCollection, isOil, isDamper, isBattery, isAirConditioning, isTires, isBrakes, isEngine, totalCharge, obs, address, currentWorkshopProf?.username, currentUser?.username )
+            navigation.navigate('WorkshopSearch' as never)
+        }
     }
 
     async function totaAmount(){

@@ -25,7 +25,7 @@ export function AppointmentBreakMaintenance(){
     const [images, setImages] = useState<any[]>([])
     const [obs, setObs] = useState('')
     
-    const {handleAppointmentWorkshopMark} = useContext(AuthContext)
+    const {handleAppointmentWorkshopMark, currentUser, currentWorkshopProf} = useContext(AuthContext)
 
     useEffect(() => {}, [images])
 
@@ -88,8 +88,10 @@ export function AppointmentBreakMaintenance(){
     }
 
     function handleSave(images: any [], obs: string) {
-        handleAppointmentWorkshopMark(images, obs)
-        navigation.navigate('WorkshopSearch' as never)
+        if(currentWorkshopProf?.username && currentUser?.username){
+            handleAppointmentWorkshopMark(images, obs, currentWorkshopProf?.username, currentUser?.username)
+            navigation.navigate('WorkshopSearch' as never)
+        }
     }
 
     return(
