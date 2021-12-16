@@ -95,5 +95,40 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         //margin: 0,
     },
-
+    containerCard:{
+        width: 300,
+        marginLeft: 30,
+        marginRight: 30,
+        height: 150,
+        backgroundColor: theme.colors.card,
+        borderRadius: 12,
+        //alignItems: 'center',
+        marginBottom: 33
+    },
+    content: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+       // paddingTop: 18,
+        //paddingBottom: 18,
+       // paddingLeft: 30
+    },
+    cardTitle: {
+        color: theme.colors.title,
+        fontSize: 20,
+        flex: 1,
+        
+        fontFamily: theme.fonts.text,
+        marginTop: 20,
+        marginLeft: 20
+    },
+    cardText: {
+        color: theme.colors.input,
+        fontSize: 18,
+        flex: 1,
+        
+        fontFamily: theme.fonts.text,
+        marginLeft: 20
+    },
 })

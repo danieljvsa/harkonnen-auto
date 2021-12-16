@@ -7,7 +7,35 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.colors.background,
-        //height: 5000
+    },
+    checkboxDiv:{
+        marginLeft: 24,
+        marginRight: 24,
+        marginBottom: 10,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+    },
+    checkboxDivCh:{
+        marginLeft: 50,
+        marginRight: 24,
+        marginBottom: 10,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+    },
+    checkbox: {
+        width: 24,
+        height: 24,
+        marginRight: 16,
+        borderRadius: 8
+    },
+    textCheck: {
+        paddingTop: 1.5,
+        fontSize: 18,
+        fontFamily: theme.fonts.text,
     },
     input:{
         //width: 312,
@@ -24,10 +52,28 @@ export const styles = StyleSheet.create({
         maxHeight: 170,
         //marginBottom: 10
     },
+    inputMod:{
+        height: 50,
+        backgroundColor: theme.colors.card,
+        borderRadius: 30,
+        fontSize: 20,
+        color: theme.colors.input,
+        paddingTop: 13,
+        paddingBottom: 6,
+        paddingRight: 25,
+        paddingLeft: 25,
+        fontFamily: theme.fonts.text,
+        maxHeight: 170,
+    },
+    inputModText: {
+        fontSize: 18,
+        fontFamily: theme.fonts.text,
+        marginBottom: 10,
+    },
     inputDiv: {
         marginLeft: 24,
         marginRight: 24,
-        marginBottom: 13
+        //marginBottom: 13
     },
     inputTitle: {
         fontSize: 20,
@@ -44,8 +90,7 @@ export const styles = StyleSheet.create({
         //backgroundColor: theme.colors.background,
         marginTop: 0,
         alignSelf: 'stretch',
-        //height: 9000
-        //marginBottom: 20
+        height: 3000
     },
     img:{
         marginBottom: 117,

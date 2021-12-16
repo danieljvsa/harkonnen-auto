@@ -1,7 +1,7 @@
 
 import React, { useContext, useEffect, useState } from 'react'
 import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
-
+import { theme } from '../../global/styles/theme'
 import { ButtonIcon } from '../../components/ButtonIcon'
 import { styles } from './styles'
 import logoImg from '../../assets/logo.png'
@@ -17,6 +17,8 @@ import { CardProfileProf } from '../../components/CardProfileProf'
 export function Appointments(){
     const {workshopList, getAppointmentById, getAppointmentsList, appoitmentsList, currentUser} = useContext(AuthContext)
     const navigation = useNavigation()
+    const [isDetail, setIsDetail] = useState(false)
+    const [count, setCount] = useState(0)
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
     const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Wait, we are fetching you location...');
@@ -31,63 +33,69 @@ export function Appointments(){
 
   useEffect(() => {
     getAppointmentsList()
-  }, [])
+  }, [isDetail])
 
   
 
-  function goToAppointmentDetails(id: string, companyId: string) {
+  function goToAppointmentDetails(id: string, companyId: string, currentUserId: string, currentWorkshopProf: string) {
     if(id != '' && companyId != ''){
       getAppointmentById(id, companyId)
-      navigation.navigate('AppointmentDetails' as never, {id: id, id_company: companyId} as never)
+      setIsDetail(true)
+      navigation.navigate('AppointmentDetails' as never, {id: id, id_company: companyId, currentUserId: currentUserId, currentWorkshopProf: currentWorkshopProf} as never)
     }
   }
 
   const renderItem = (appoitment: any) => {  
     if(appoitment){
         if(appoitment.item.serviceType === 'preventiveMaintenance'){
+          
           return (
-            <RectButton key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company)} >
-              <Text>Manutenção Preventiva</Text>
-              <Text>{appoitment.item.date} {appoitment.item.hour}</Text>
-              <Text>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: appoitment.item.username}</Text>
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)} >
+              <Text style={styles.cardTitle} >Manutenção Preventiva</Text>
+              <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         }
         else if(appoitment.item.serviceType === 'breakMaintenance'){
+          
           return (
-            <RectButton key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company)}>
-              <Text>Manutenção de Rutura</Text>
-              <Text>{appoitment.item.date} {appoitment.item.hour}</Text>
-              <Text>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: appoitment.item.username}</Text>
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
+              <Text style={styles.cardTitle} >Manutenção de Rutura</Text>
+              <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         }
         else if(appoitment.item.serviceType === 'assistanceRequest'){
+          
           return (
-            <RectButton key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company)}>
-              <Text>Pedido de Assistência</Text>
-              <Text>Prioridade: Muito Alta</Text>
-              <Text>{appoitment.item.date}</Text>
-              <Text>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: appoitment.item.username}</Text>
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
+              <Text style={styles.cardTitle} >Pedido de Assistência</Text>
+              <Text style={{color: theme.colors.errorMessage, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginLeft: 20}} >Prioridade: Muito Alta</Text>
+              <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         }
         else if(appoitment.item.serviceType === 'mechanicalAssistance'){
+          
           return (
-            <RectButton key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company)}>
-              <Text>Assitência Mecânica</Text>
-              <Text>Prioridade: Alta</Text>
-              <Text>{appoitment.item.date}</Text>
-              <Text>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: appoitment.item.username}</Text>
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
+              <Text style={styles.cardTitle} >Assitência Mecânica</Text>
+              <Text style={{color: theme.colors.errorMessage, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginLeft: 20}} >Prioridade: Alta</Text>
+              <Text style={styles.cardText}>Data e Hora: {appoitment.item.date}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         }
         else if(appoitment.item.serviceType === 'pickup'){
+          
           return (
-            <RectButton key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company)}>
-              <Text>Serviços de Pickup</Text>
-              <Text>{appoitment.item.date} {appoitment.item.hour}</Text>
-              <Text>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: appoitment.item.username}</Text>
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
+              <Text style={styles.cardTitle} >Serviços de Pickup</Text>
+              <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         } else{

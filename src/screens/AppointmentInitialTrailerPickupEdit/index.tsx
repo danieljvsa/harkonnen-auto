@@ -37,9 +37,10 @@ const months = [
 
   const hoursList = ['8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '20:00']
 
-export function AppointmentInitialTrailer(){
+export function AppointmentInitialTrailerPickupEdit({route}: any){
     const navigation = useNavigation()
-    const [service, setService] = useState('')
+    const {appointment} = route.params
+    const [service, setService] = useState(appointment.serviceType || '')
     const [selectedYear, setSelectedYear] = useState(0);
     const [selectedMonth, setSelectedMonth] = useState(1);
     const [selectedDay, setSelectedDay] = useState(0);
@@ -47,15 +48,15 @@ export function AppointmentInitialTrailer(){
     const [listDays, setListDays] = useState([]);
     const [listHours, setListHours] = useState([]);
     const [finishButtonActive, setFinishButtonActive] = useState(false)
-    const [brand, setBrand] = useState('')
-    const [model, setModel] = useState('')
-    const [addressCollection, setAddressCollection] = useState('')
-    const [addressDelivery, setAddressDelivery] = useState('')
-    const [totalCharge, setTotalCharge] = useState(0)
-    const [obs, setObs] = useState('')
+    const [brand, setBrand] = useState(appointment.brand || '')
+    const [model, setModel] = useState(appointment.model || '')
+    const [addressCollection, setAddressCollection] = useState(appointment.addressCollection || '')
+    const [addressDelivery, setAddressDelivery] = useState(appointment.addressDelivery || '')
+    const [totalCharge, setTotalCharge] = useState(appointment.totalCharge || 0)
+    const [obs, setObs] = useState(appointment.obs || '')
     //const [show, setShow] = useState(true)
     const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
-    const {handleAppointmentsTrailerPickup, handleAppointmentsTrailer, currentTrailerProf, currentUser} = useContext(AuthContext)
+    const {handleUpdatePickup, handleAppointmentsTrailer, currentTrailerProf, currentUser} = useContext(AuthContext)
 
     useEffect(() => {
         if(service != ""){
@@ -223,8 +224,7 @@ export function AppointmentInitialTrailer(){
           selectedHour !== null &&
           service === 'pickup' &&
           brand != '' &&
-          model != '' && 
-          totalCharge != 0
+          model != ''
         ) {
             console.log(service)
           let hour = selectedHour.split(':');
@@ -247,34 +247,13 @@ export function AppointmentInitialTrailer(){
     
           let formattedNow = `${nowYear}-${nowMonth}-${nowDay} ${nowHour}:${nowMinutes}:${nowSeconds}`;
           console.log(service)
-            if(service === 'pickup'){
-                if(currentTrailerProf?.username && currentUser?.username){
-                    handleAppointmentsTrailerPickup(selectedDay, (selectedMonth+1), selectedYear, selectedHour, service, model, brand, obs, totalCharge, addressCollection, addressDelivery, currentTrailerProf?.username, currentUser?.username)
-                    navigation.navigate('TrailersSearch' as never)
-                }
-            }
             
-        } else{
-            let now: any = new Date();
-            let nowYear: any = now.getFullYear();
-            let nowMonth: any = now.getMonth() + 1;
-            let nowDay: any = now.getDate();
-            let nowHour: any = now.getHours();
-            let nowMinutes: any = now.getMinutes();
-            let nowSeconds: any = now.getSeconds();
-        
-            nowMonth = nowMonth < 10 ? '0' + nowMonth : nowMonth;
-            nowDay = nowDay < 10 ? '0' + nowDay : nowDay;
-            nowHour = nowHour < 10 ? '0' + nowHour : nowHour;
-            nowMinutes = nowMinutes < 10 ? '0' + nowMinutes : nowMinutes;
-            nowSeconds = nowSeconds < 10 ? '0' + nowSeconds : nowSeconds;
-        
-            let formattedNow = `${nowYear}-${nowMonth}-${nowDay} ${nowHour}:${nowMinutes}:${nowSeconds}`;
-            if(currentTrailerProf?.username && currentUser?.username){
-                handleAppointmentsTrailer(formattedNow, brand, model, service, obs, totalCharge, currentTrailerProf?.username, currentUser?.username)
-                navigation.navigate('TrailersSearch' as never)
+            if(appointment){
+                handleUpdatePickup(appointment.id_company, appointment.id, selectedDay, (selectedMonth+1), selectedYear, selectedHour, 'pickup', model, brand, appointment.currentUserId, obs, appointment.currentWorkshopProf, totalCharge, addressCollection, addressDelivery)
+                navigation.navigate('HomeUser' as never)
             }
         }
+    
       };
     
       const handleLeftDateClick = () => {
@@ -346,19 +325,8 @@ export function AppointmentInitialTrailer(){
                                 <Text style={styles.text} >Serviço</Text>
                                 <View style={styles.picker} >
                                     <Picker mode="dropdown" selectedValue={service} onValueChange={(text, index) => setService(text)} >
-                                        <Picker.Item label="Tipo de serviço..." value="" style={styles.textInput} />
-                                        {(currentTrailerProf?.assistanceRequest) ? 
-                                            <Picker.Item label="Pedido de Assistência" value="assistanceRequest" style={styles.textInput} />
-                                        : <Picker.Item label="Pedido de Assistência" value="" style={styles.textInput} />
-                                        }
-                                        {(currentTrailerProf?.mechanicalAssistance) ? 
-                                            <Picker.Item label="Assitência Mecânica" value="mechanicalAssistance" style={styles.textInput} />
-                                        : <Picker.Item label="Assitência Mecânica" value="" style={styles.textInput} />
-                                        }
-                                        {(currentTrailerProf?.pickup) ? 
-                                            <Picker.Item label="Serviço de Pickup" value="pickup" style={styles.textInput} />
-                                        : <Picker.Item label="Serviço de Pickup" value="" style={styles.textInput} />
-                                        }
+                                        <Picker.Item label="Tipo de serviço..." value="" style={styles.textInput} />  
+                                        <Picker.Item label="Serviço de Pickup" value="pickup" style={styles.textInput} />
                                     </Picker>
                                 </View>
                             </View>

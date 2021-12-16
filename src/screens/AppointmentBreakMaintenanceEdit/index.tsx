@@ -20,13 +20,14 @@ import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
 import { theme } from '../../global/styles/theme';
 
-export function AppointmentBreakMaintenance(){
+export function AppointmentBreakMaintenanceEdit({route}: any){
     const navigation = useNavigation()
-    const [images, setImages] = useState<any[]>([])
-    const [obs, setObs] = useState('')
+    const {appointment, commitment} = route.params
+    const [images, setImages] = useState<any[]>(appointment.images || [])
+    const [obs, setObs] = useState(appointment.obs || '')
     
-    const {handleAppointmentWorkshopMark, currentUser, currentWorkshopProf} = useContext(AuthContext)
-
+    const {handleUpdateBreakMaintenance} = useContext(AuthContext)
+    console.log(appointment.images)
     useEffect(() => {}, [images])
 
     function goBack() {
@@ -74,7 +75,7 @@ export function AppointmentBreakMaintenance(){
     const renderItem = (image: any) => {
         if(images.length > 0){
             return ( <>
-                <ImageBackground source={{uri: image.item}} key={image.index} style={styles.imageUploaded} >
+                <ImageBackground source={{uri: (image.item.downloadUrl) ? image.item.downloadUrl : image.item}} key={image.index} style={styles.imageUploaded} >
                     <RectButton onPress={() => deleteImage(image.item)} >
                         <Image source={cross} style={styles.cross} />
                     </RectButton>
@@ -87,11 +88,11 @@ export function AppointmentBreakMaintenance(){
 
     }
 
-    function handleSave(images: any [], obs: string) {
-        if(currentWorkshopProf?.username && currentUser?.username){
-            handleAppointmentWorkshopMark(images, obs, currentWorkshopProf?.username, currentUser?.username)
-            navigation.navigate('WorkshopSearch' as never)
-        }
+    function handleSave() {
+        
+        handleUpdateBreakMaintenance(appointment.id_company, appointment.id, commitment.day, commitment.month, commitment.year, commitment.hour, commitment.service, commitment.model, commitment.brand, appointment.currentUserId, obs, images, appointment.currentWorkshopProf)
+        navigation.navigate('Appointments' as never)
+        
     }
 
     return(
@@ -99,11 +100,10 @@ export function AppointmentBreakMaintenance(){
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.scroll}
         >
-            <ScrollView style={styles.scroll}>
                     <View style={styles.container}>
                         <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
                         <View style={styles.header}  >  
-                            <View>
+                            <View style={styles.header}  >
                                 <RectButton style={styles.goBack} onPress={goBack} >
                                     <Image source={arrowBack} style={styles.arrowBack}  />
                                 </RectButton>
@@ -134,9 +134,8 @@ export function AppointmentBreakMaintenance(){
                                 <TextInput multiline={true} placeholder={'Deixe aqui algumas considerações sobre o problema do seu veículo...'} numberOfLines={8} value={obs} onChangeText={(text) => setObs(text)} style={styles.input} />
                             </View>
                         </ScrollView>
-                        <ButtonIcon title="Marcar" onPress={() => handleSave(images, obs)} />
+                        <ButtonIcon title="Marcar" onPress={() => handleSave()} />
                     </View>
-                </ScrollView>
             </KeyboardAvoidingView>
     )
 }

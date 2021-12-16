@@ -7,7 +7,6 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.colors.background,
-        //height: 5000
     },
     input:{
         //width: 312,
@@ -27,7 +26,7 @@ export const styles = StyleSheet.create({
     inputDiv: {
         marginLeft: 24,
         marginRight: 24,
-        marginBottom: 13
+        //marginBottom: 13
     },
     inputTitle: {
         fontSize: 20,
@@ -44,8 +43,7 @@ export const styles = StyleSheet.create({
         //backgroundColor: theme.colors.background,
         marginTop: 0,
         alignSelf: 'stretch',
-        //height: 9000
-        //marginBottom: 20
+        height: 1000
     },
     img:{
         marginBottom: 117,

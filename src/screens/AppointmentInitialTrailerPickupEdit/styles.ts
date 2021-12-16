@@ -7,9 +7,21 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.colors.background,
-        //height: 5000
     },
     input:{
+        //width: 312,
+        height: 50,
+        backgroundColor: theme.colors.card,
+        borderRadius: 30,
+        fontSize: 20,
+        color: theme.colors.input,
+        paddingTop: 13,
+        paddingBottom: 6,
+        paddingLeft: 25,
+        fontFamily: theme.fonts.text,
+        maxHeight: 50,
+    },
+    inputTextArea:{
         //width: 312,
         height: 170,
         backgroundColor: theme.colors.card,
@@ -24,9 +36,18 @@ export const styles = StyleSheet.create({
         maxHeight: 170,
         //marginBottom: 10
     },
+    textInputTitle:{
+        //textAlign: 'center',
+        fontSize: 20,
+        color: theme.colors.heading,
+        marginTop: 15,
+        marginBottom: 10,
+        //marginLeft: 25,
+        fontFamily: theme.fonts.text,
+    },
     inputDiv: {
-        marginLeft: 24,
-        marginRight: 24,
+        marginLeft: 34,
+        marginRight: 34,
         marginBottom: 13
     },
     inputTitle: {
@@ -42,10 +63,8 @@ export const styles = StyleSheet.create({
     scroll:{
         flex: 1,
         //backgroundColor: theme.colors.background,
-        marginTop: 0,
+        marginTop: -20,
         alignSelf: 'stretch',
-        //height: 9000
-        //marginBottom: 20
     },
     img:{
         marginBottom: 117,
@@ -55,19 +74,8 @@ export const styles = StyleSheet.create({
     text:{
         //textAlign: 'center',
         fontSize: 20,
-        color: theme.colors.heading,
-        marginTop: 15,
-        marginBottom: 15,
-        marginLeft: 25,
-        fontFamily: theme.fonts.text,
-    },
-    textInputTitle:{
-        //textAlign: 'center',
-        fontSize: 20,
-        color: theme.colors.heading,
-        marginTop: 15,
-        marginBottom: 10,
-        //marginLeft: 25,
+        color: theme.colors.input,
+        //marginTop: 18,
         fontFamily: theme.fonts.text,
     },
     monthText:{
@@ -131,31 +139,10 @@ export const styles = StyleSheet.create({
         
     },
     imageUploaded:{
-        width: 80,
-        height: 80,
-        marginLeft: 12,
-        marginRight: 12,
-        marginTop: 12,
-    },
-    imagesBox: {
-        width: 312,
-        height: 240,
-        backgroundColor: theme.colors.card,
-        alignSelf: 'center',
-        borderRadius: 8,
-    },
-    cross:{
-        width: 24,
-        height: 24,
-        alignSelf: 'flex-end'
-    },
-    uploaded:{
-        width: 40,
-        height: 40,
-        borderRadius: 8,
-        alignSelf: 'center',
-        marginTop: 5,
-        marginBottom: 5
+        alignSelf: 'stretch',
+        textAlign: 'center',
+        height: 190,
+        
     },
     headerUploaded: {
         backgroundColor: '#FFFF',

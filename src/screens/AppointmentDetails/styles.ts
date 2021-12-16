@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
         fontSize: 36,
         fontFamily: theme.fonts.text,
         color: theme.colors.title,
-        height: 75,
+        height: 50,
         //marginTop: 40,
     },
     title:{
@@ -86,7 +86,7 @@ export const styles = StyleSheet.create({
     list: {
         flex: 1,
         alignSelf: 'stretch',
-        marginTop: 20,
+        marginTop: 0,
         //height: 900,
     },
     header: {
@@ -95,5 +95,45 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         //margin: 0,
     },
-
+    input:{
+        width: 312,
+        height: 50,
+        backgroundColor: theme.colors.card,
+        borderRadius: 30,
+        fontSize: 20,
+        color: theme.colors.input,
+        paddingTop: 13,
+        paddingBottom: 6,
+        paddingLeft: 25,
+        fontFamily: theme.fonts.text,
+        maxHeight: 50,
+    },
+    inputTitle: {
+        fontSize: 20,
+        color: theme.colors.title,
+        fontFamily: theme.fonts.text,
+        marginBottom: 8,
+    },
+    cardTitle: {
+        color: theme.colors.title,
+        fontSize: 28,
+        flex: 1,
+        textAlign: 'center',
+        fontFamily: theme.fonts.text,
+        marginTop: 20,
+        //marginLeft: 20,
+        marginBottom: 30
+    },
+    cardText: {
+        color: theme.colors.input,
+        fontSize: 20,
+        flex: 1,
+        fontFamily: theme.fonts.text,
+        marginLeft: 20,
+        marginBottom: 10
+    },
+    inputG: {
+        alignSelf: 'center',
+        //marginBottom: 22,
+    }
 })
