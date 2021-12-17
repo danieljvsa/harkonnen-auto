@@ -97,8 +97,8 @@ export function AppointmentDetails({route}: any){
                   <Text style={styles.cardText}>Marca: {appointmentBreakMaintenance?.brand}</Text>
                   <Text style={styles.cardText}>Observações: </Text>
                   <Text style={styles.cardText}>{(appointmentBreakMaintenance?.obs != '') ? appointmentBreakMaintenance?.obs : 'Não existem observações...'}</Text>
-                  <Text style={styles.cardText}>{(appointmentBreakMaintenance?.totalCharge !== undefined) ? `Orçamento: ${appointmentBreakMaintenance?.totalCharge}€` : 'Não existe ainda valor acordado.' }</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user') ? `Marcado por ${appointmentBreakMaintenance?.username}`: `Empresa: ${appointmentBreakMaintenance?.username}`}</Text></RectButton>
+                  <Text style={styles.cardText}>{(appointmentBreakMaintenance?.totalCharge !== undefined) ? `Orçamento: ${appointmentBreakMaintenance?.totalCharge}€` : 'Orçamento: Não existe ainda valor acordado.' }</Text>
+                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointmentBreakMaintenance?.currentUserId) ? `Marcado por ${appointmentBreakMaintenance?.username}`: `Empresa: ${appointmentBreakMaintenance?.username}`}</Text></RectButton>
                 </View> : <></>
               }
               {(appointmentPreventiveMaintenance?.id === id && appointmentPreventiveMaintenance?.id_company === id_company) ? 
@@ -111,7 +111,7 @@ export function AppointmentDetails({route}: any){
                   <Text style={styles.cardText}>Observações: </Text> 
                   <Text style={styles.cardText}>{(appointmentPreventiveMaintenance?.obs != '') ? appointmentPreventiveMaintenance?.obs : 'Não existem observações...'}</Text>
                   <Text style={styles.cardText}>Orçamento: {appointmentPreventiveMaintenance?.totalCharge}€</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user') ? `Marcado por ${appointmentPreventiveMaintenance?.username}`: `Empresa: ${appointmentPreventiveMaintenance?.username}`}</Text></RectButton>
+                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointmentPreventiveMaintenance?.currentUserId) ? `Marcado por ${appointmentPreventiveMaintenance?.username}`: `Empresa: ${appointmentPreventiveMaintenance?.username}`}</Text></RectButton>
                 </View> : <></>
               }
               {(appointmentTrailer?.id === id && appointmentTrailer?.id_company === id_company) ? 
@@ -123,7 +123,7 @@ export function AppointmentDetails({route}: any){
                   <Text style={styles.cardText}>Observações: </Text>
                   <Text style={styles.cardText}>{(appointmentTrailer?.obs != '') ? appointmentTrailer?.obs : 'Não existem observações...'}</Text>
                   <Text style={styles.cardText}>Preço: {appointmentTrailer?.totalCharge}€</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user') ? `Marcado por ${appointmentTrailer?.username}`: `Empresa: ${appointmentTrailer?.username}`}</Text></RectButton>       
+                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointmentTrailer?.currentUserId) ? `Marcado por ${appointmentTrailer?.username}`: `Empresa: ${appointmentTrailer?.username}`}</Text></RectButton>       
                 </View> : <></>
               }
               {(appointmentTrailerPickup?.id === id && appointmentTrailerPickup?.id_company === id_company) ? 
@@ -136,7 +136,7 @@ export function AppointmentDetails({route}: any){
                   <Text style={styles.cardText}>Observações: </Text>
                   <Text style={styles.cardText}>{(appointmentTrailerPickup?.obs != '') ? appointmentTrailerPickup?.obs : 'Não existem observações...'}</Text>
                   <Text style={styles.cardText}>Orçamento: {appointmentTrailerPickup?.totalCharge}€</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user') ? `Marcado por ${appointmentTrailerPickup?.username}`: `Empresa: ${appointmentTrailerPickup?.username}`}</Text></RectButton>
+                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointmentTrailerPickup?.currentUserId) ? `Marcado por ${appointmentTrailerPickup?.username}`: `Empresa: ${appointmentTrailerPickup?.username}`}</Text></RectButton>
                 </View> : <></>
               }
               {(currentUser?.account === 'workshop' && isOption) ? (
@@ -163,6 +163,14 @@ export function AppointmentDetails({route}: any){
                 (appointmentBreakMaintenance?.id === id && appointmentBreakMaintenance?.id_company === id_company || appointmentPreventiveMaintenance?.id === id && appointmentPreventiveMaintenance?.id_company === id_company) ? <>
                   <ButtonIcon title="Editar" onPress={() => handlePrice()} /> 
                 </> : <></>
+              ) : <></> }
+              {(currentUser?.account === 'workshop' && appointmentTrailerPickup?.currentUserId === currentUser.id && appointmentTrailer?.id != id && appointmentTrailer?.id_company != id_company) ? ( <>
+                  <ButtonIcon title="Editar" onPress={() => handleEdit()} /> 
+                </>
+              ) : <></> }
+              {(currentUser?.account === 'trailers' && appointmentBreakMaintenance?.currentUserId === currentUser.id || appointmentPreventiveMaintenance?.currentUserId === currentUser?.id ) ? ( <>
+                  <ButtonIcon title="Editar" onPress={() => handleEdit()} /> 
+                </>
               ) : <></> }
               <RectButton style={{}} onPress={() => deleteAppointmentById()}>
                 <Image style={{width: 50, height: 50}} source={cross} />

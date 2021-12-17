@@ -40,7 +40,7 @@ export function ProfileProf(){
     }
 
     function goToProfile(){
-        navigation.navigate('ViewProfileProf' as never)
+        navigation.navigate('ViewProfile' as never)
     }
 
     return(

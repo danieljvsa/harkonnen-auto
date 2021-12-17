@@ -184,7 +184,7 @@ type AuthContextData = {
     handleAppointmentsTrailerPickup: (day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, obs: string, totalCharge: any, addressCollection: string, addressDelivery:string, companyName: string, userName: string) => void,
     handleAppointmentsTrailer: (date: string, brand: string, model: string, service: string, obs: string, totalCharge: any, companyName: string, userName: string) => void,
     getAppointmentsList: () => void,
-    getAppointmentById: (id: string, id_company: string) => void,
+    getAppointmentById: (id: string, id_company: string, currentUserId: string) => void,
     appointmentBreakMaintenance: AppointmentBreakMaintenance | null,
     appointmentPreventiveMaintenance: AppointmentPreventiveMaintenance | null,
     appointmentTrailerPickup: AppointmentTrailerPickup | null,
@@ -875,9 +875,9 @@ export function AuthProvider({children}:any) {
         })
     }
 
-    async function getAppointmentById(id: string, id_company: string) {
+    async function getAppointmentById(id: string, id_company: string, currentUserId: string) {
         let images: string[] = []
-        if(currentUser?.account === 'user'){
+        if(currentUser?.account === 'user' || currentUser?.id === currentUserId){
             await firebase.database().ref('/appointments/' + currentUser?.id).child(id).on('value', (snapshot) =>{
                 if(snapshot.exists()){
                     if(snapshot.val().serviceType === 'preventiveMaintenance'){

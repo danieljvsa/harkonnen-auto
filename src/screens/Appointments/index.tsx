@@ -39,7 +39,7 @@ export function Appointments(){
 
   function goToAppointmentDetails(id: string, companyId: string, currentUserId: string, currentWorkshopProf: string) {
     if(id != '' && companyId != ''){
-      getAppointmentById(id, companyId)
+      getAppointmentById(id, companyId, currentUserId)
       setIsDetail(true)
       navigation.navigate('AppointmentDetails' as never, {id: id, id_company: companyId, currentUserId: currentUserId, currentWorkshopProf: currentWorkshopProf} as never)
     }
@@ -53,7 +53,7 @@ export function Appointments(){
             <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)} >
               <Text style={styles.cardTitle} >Manutenção Preventiva</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
-              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user' && currentUser?.id != appoitment.item.currentUserId) ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         }
@@ -63,7 +63,7 @@ export function Appointments(){
             <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
               <Text style={styles.cardTitle} >Manutenção de Rutura</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
-              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user' && currentUser?.id != appoitment.item.currentUserId) ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         }
@@ -74,7 +74,7 @@ export function Appointments(){
               <Text style={styles.cardTitle} >Pedido de Assistência</Text>
               <Text style={{color: theme.colors.errorMessage, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginLeft: 20}} >Prioridade: Muito Alta</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
-              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user' && currentUser?.id != appoitment.item.currentUserId) ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         }
@@ -85,7 +85,7 @@ export function Appointments(){
               <Text style={styles.cardTitle} >Assitência Mecânica</Text>
               <Text style={{color: theme.colors.errorMessage, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginLeft: 20}} >Prioridade: Alta</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date}</Text>
-              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user' && currentUser?.id != appoitment.item.currentUserId) ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         }
@@ -95,7 +95,7 @@ export function Appointments(){
             <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
               <Text style={styles.cardTitle} >Serviços de Pickup</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
-              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user') ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
+              <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user' && currentUser?.id != appoitment.item.currentUserId) ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
             </RectButton> 
             ) 
         } else{
