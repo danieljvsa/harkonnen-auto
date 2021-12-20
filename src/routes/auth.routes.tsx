@@ -27,6 +27,9 @@ import { AppointmentInitialEdit } from '../screens/AppointmentInitialEdit'
 import { AppointmentBreakMaintenanceEdit } from '../screens/AppointmentBreakMaintenanceEdit'
 import { AppointmentInitialTrailerPickupEdit } from '../screens/AppointmentInitialTrailerPickupEdit'
 import { AppointmentPreventiveMaintenanceEdit } from '../screens/AppointmentPreventiveMaintenanceEdit'
+import { EvaluationCreate } from '../screens/EvaluationCreate'
+import { EvaluationEdit } from '../screens/EvaluationEdit'
+import { Evaluations } from '../screens/Evaluations'
 
 const {Navigator, Screen} = createStackNavigator()
 
@@ -59,6 +62,9 @@ export function AuthRoutes() {
             <Screen name="AppointmentPreventiveMaintenanceEdit" component={AppointmentPreventiveMaintenanceEdit} />
             <Screen name="AppointmentBreakMaintenanceEdit" component={AppointmentBreakMaintenanceEdit} />
             <Screen name="AppointmentInitialTrailerPickupEdit" component={AppointmentInitialTrailerPickupEdit} />
+            <Screen name="EvaluationCreate" component={EvaluationCreate} />        
+            <Screen name="EvaluationEdit" component={EvaluationEdit} />
+            <Screen name="Evaluations" component={Evaluations} />
         </Navigator>
     )
 }

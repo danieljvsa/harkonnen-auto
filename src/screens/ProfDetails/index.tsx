@@ -1,9 +1,10 @@
 
 
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView, ImageBackground } from 'react-native'
+import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView, ImageBackground, FlatList } from 'react-native'
 import firebase from "../../config/firebase";
 import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types'
+import { theme } from '../../global/styles/theme'
 
 import uploadImg from '../../assets/upload.png'
 import arrowBack from '../../assets/arrow-back.png'
@@ -25,9 +26,15 @@ export function ProfDetails(){
     const [phone, setPhone] = useState('')
     const [address, setAddress] = useState('')
     const [image, setImage] = useState('')
-    const {getProfUser, currentTrailerProf, currentWorkshopProf, currentUser} = useContext(AuthContext)
+    const {getProfUser, evaluationsList, getEvaluationsList, currentWorkshopProf, handleExistEvaluation} = useContext(AuthContext)
 
-    console.log(currentWorkshopProf)
+    //console.log(currentWorkshopProf)
+    useEffect(() => {
+        if(currentWorkshopProf){
+            getEvaluationsList(currentWorkshopProf?.id);
+            console.log(evaluationsList)
+        }
+    }, [])
 
     function goBack() {
         navigation.goBack()
@@ -36,7 +43,36 @@ export function ProfDetails(){
     function goToAppointment(){
         navigation.navigate('AppointmentInitial' as never)
     }
-   
+    
+    function goToEvaluation() {
+        if(currentWorkshopProf){
+            handleExistEvaluation(currentWorkshopProf?.id, currentWorkshopProf)
+        }
+    }
+
+    function goToEvaluationList(){
+        navigation.navigate('Evaluations' as never, {company: currentWorkshopProf} as never)
+    }
+
+    const renderItem = (evaluation: any) => {
+        if (evaluation.index === 0) {
+            return (
+                <View>
+                    <Text style={{color: theme.colors.heading, fontSize: 20, fontFamily: theme.fonts.text, paddingTop: 0, paddingLeft: 26}}>{evaluation.item.username}</Text>
+                    <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+                </View>  
+            )
+        } else if (evaluation.index === 1){
+            return (
+                <View>
+                    <Text style={{color: theme.colors.heading, fontSize: 20, fontFamily: theme.fonts.text, paddingTop: 0, paddingLeft: 26}}>{evaluation.item.username}</Text>
+                    <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+                </View>  
+            )
+        } else {
+            return <></>
+        }
+    }
 
     return(
         <KeyboardAvoidingView
@@ -91,12 +127,15 @@ export function ProfDetails(){
                                 </View>
                                 <View>
                                     <Text style={styles.secHeading}>Avaliações</Text>
+                                    <RectButton onPress={goToEvaluationList}>
+                                        <FlatList data={evaluationsList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+                                    </RectButton>
                                 </View>
                             </View>
                         </ScrollView>
                         <View style={styles.buttonDiv} >                
                             <View style={styles.eval}>
-                                <RectButton >
+                                <RectButton onPress={goToEvaluation} >
                                     <Image source={CheckMark} style={styles.imgEval} />
                                 </RectButton>
                             </View>

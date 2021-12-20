@@ -46,7 +46,7 @@ export function SignIn(){
                                     <Text></Text>
                                 </View>
                             )}
-                            <ButtonIcon title="Acessar" onPress={signIn} />
+                            <ButtonIcon title="Acessar" onPress={() => signIn()} />
                             <Text style={styles.text} onPress={goToSignUp} >
                                 Não tenho uma conta. Toque para criar uma agora.
                             </Text>

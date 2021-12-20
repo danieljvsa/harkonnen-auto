@@ -1,9 +1,10 @@
 
 
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView, ImageBackground } from 'react-native'
+import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView, ImageBackground, FlatList } from 'react-native'
 import firebase from "../../config/firebase";
 import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types'
+import { theme } from '../../global/styles/theme'
 
 import uploadImg from '../../assets/upload.png'
 import arrowBack from '../../assets/arrow-back.png'
@@ -25,9 +26,15 @@ export function ProfDetailsTrailers(){
     const [phone, setPhone] = useState('')
     const [address, setAddress] = useState('')
     const [image, setImage] = useState('')
-    const {getProfUser, currentTrailerProf, currentWorkshopProf, currentUser} = useContext(AuthContext)
+    const {evaluationsList, getEvaluationsList, currentTrailerProf, handleExistEvaluation} = useContext(AuthContext)
 
-    console.log(currentTrailerProf)
+    useEffect(() => {
+        if(currentTrailerProf){
+            getEvaluationsList(currentTrailerProf?.id);
+            console.log(evaluationsList)
+        }
+    }, [])
+
 
     function goBack() {
         navigation.goBack()
@@ -35,6 +42,36 @@ export function ProfDetailsTrailers(){
 
     function goToAppointment(){
         navigation.navigate('AppointmentInitialTrailer' as never)
+    }
+
+    function goToEvaluation() {
+        if(currentTrailerProf){
+            handleExistEvaluation(currentTrailerProf?.id, currentTrailerProf)
+        }
+    }
+
+    function goToEvaluationList(){
+        navigation.navigate('Evaluations' as never, {company: currentTrailerProf} as never)
+    }
+
+    const renderItem = (evaluation: any) => {
+        if (evaluation.index === 0) {
+            return (
+                <View>
+                    <Text style={{color: theme.colors.heading, fontSize: 20, fontFamily: theme.fonts.text, paddingTop: 0, paddingLeft: 26}}>{evaluation.item.username}</Text>
+                    <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+                </View>  
+            )
+        } else if (evaluation.index === 1){
+            return (
+                <View>
+                    <Text style={{color: theme.colors.heading, fontSize: 20, fontFamily: theme.fonts.text, paddingTop: 0, paddingLeft: 26}}>{evaluation.item.username}</Text>
+                    <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+                </View>  
+            )
+        } else {
+            return <></>
+        }
     }
 
     return(
@@ -90,13 +127,16 @@ export function ProfDetailsTrailers(){
                                 </View>
                                 <View>
                                     <Text style={styles.secHeading}>Avaliações</Text>
+                                    <RectButton onPress={goToEvaluationList}>
+                                        <FlatList data={evaluationsList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+                                    </RectButton>
                                 </View>
                             </View>
                         </ScrollView>
                         <View style={styles.buttonDiv} >
                         
-                                <View style={styles.eval}>
-                                    <RectButton >
+                                <View style={styles.eval} >
+                                    <RectButton onPress={goToEvaluation} >
                                         <Image source={CheckMark} style={styles.imgEval} />
                                     </RectButton>
                                 </View>

@@ -7,6 +7,13 @@ import * as Location from 'expo-location';
 import { Alert } from "react-native";
 
 
+type Evaluation = {
+    id: string,
+    stars: string,
+    obs: string,
+    username: string,
+}
+
 type AppointmentBreakMaintenance = {
     id: string,
     id_company: string,
@@ -177,6 +184,7 @@ type AuthContextData = {
     workshopList: Object[],
     trailersList: Object[],
     appoitmentsList: Object[],
+    evaluationsList: any[],
     appointmentWorkshop: AppointmentWorkshopInitial | null
     handleAppoitmentWorkshop: (day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string) => void
     handleAppointmentWorkshopMark: (images: any[], obs: string, companyName: string, userName: string) => void,
@@ -194,6 +202,11 @@ type AuthContextData = {
     handleUpdatePreventiveMaintenance: (id_company: string, id: string, day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, currentUserId: string, obs: string, currentWorkshopProf: string, isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, address: any) => void
     handleUpdatePickup: (id_company: string, id: string, day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, currentUserId: string, obs: string, currentWorkshopProf: string, totalCharge: any, addressCollection: string, addressDelivery:string) => void,
     handleTotalCharge: (id_company: string, id: string, totalCharge: any,currentUserId: string, currentWorkshopProf: string) => void,
+    handleExistEvaluation: (companyId: string, company: any) => void,
+    handleUpdateEvaluation: (companyId: string, stars: string, obs: string) => void,
+    handleCreateEvaluation: (companyId: string, stars: string, obs: string) => void,
+    getEvaluationsList: (companyId: string) => void,
+    evaluation: Evaluation | null
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -211,13 +224,16 @@ export function AuthProvider({children}:any) {
     const [workshopList, setWorkshopList] = useState([])
     const [trailersList, setTrailersList] = useState([])
     const [appoitmentsList, setAppoitmentsList] = useState([])
+    const [evaluationsList, setEvaluationsList] = useState([])
     const [location, setLocation] = useState('')
     const [appointmentWorkshop, setAppoitmentWorkshop] = useState<AppointmentWorkshopInitial | null>(null)
     const [appointmentBreakMaintenance, setAppointmentBreakMaintenance] = useState<AppointmentBreakMaintenance | null>(null)
     const [appointmentPreventiveMaintenance, setAppointmentPreventiveMaintenance] = useState<AppointmentPreventiveMaintenance | null>(null)
     const [appointmentTrailerPickup, setAppointmentTrailerPickup] = useState<AppointmentTrailerPickup | null>(null)
     const [appointmentTrailer, setAppointmentTrailer] = useState<AppointmentTrailer | null>(null)
-
+    const [evaluationAverage, setEvaluationAverage] = useState(0)
+    const [evaluation, setEvaluation] = useState<Evaluation | null>(null)
+    
 
     useEffect(() => {
         getLocations()
@@ -301,6 +317,7 @@ export function AuthProvider({children}:any) {
         if(isDuplicated === false){
             await firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
+                console.log(email, password)
                 // Signed in
                 var user = userCredential.user;
                 let userId = user?.uid
@@ -324,6 +341,7 @@ export function AuthProvider({children}:any) {
             })
             .catch((error) => {
                 setRegisterError(true)
+                console.log(error)
                 //var errorCode = error.code;
                 //var errorMessage = error.message;
                 // ..
@@ -1257,8 +1275,126 @@ export function AuthProvider({children}:any) {
     })
    }
 
+   async function handleExistEvaluation(companyId: string, company: any) {
+        if(currentUser){
+            await firebase.database().ref("/evaluations/" + companyId).get().then((snapshoot) => {
+                if (snapshoot.hasChild(currentUser.id)) {
+                    setEvaluation({
+                        id: snapshoot.child(currentUser.id).val().id,
+                        stars: snapshoot.child(currentUser.id).val().stars,
+                        obs: snapshoot.child(currentUser.id).val().obs,
+                        username: snapshoot.child(currentUser.id).val().username
+                    })
+                    navigation.navigate('EvaluationEdit' as never, {company: company} as never)
+                } else {
+                    navigation.navigate('EvaluationCreate' as never, {company: company} as never)
+                }
+            })
+        }
+   }
+
+   async function handleUpdateEvaluation(companyId: string, stars: string, obs: string){
+        if(currentUser){
+            await firebase.database().ref("/evaluations/" + companyId).child(currentUser.id).update({
+                stars: stars,
+                obs: obs
+            })
+
+            await firebase.database().ref('/evaluations/' + companyId).on('value', (snapshot) =>{
+                let evalTotal = 0
+                let evalCount = 0
+                snapshot.forEach((snap) => {
+                    let userObject = snap.val()
+                    
+                    //console.log(location)
+                    evalTotal = evalTotal + parseInt(userObject['stars'])
+                    evalCount = evalCount + 1
+                    
+                })
+
+                setEvaluationAverage(evalTotal / evalCount)
+                
+                
+                //console.log(trailersList)
+                /*for (let index = 0; index < array.length; index++) {
+                    if(account === "workshop" && region === location ){
+                    
+                }*/
+            })
+
+            await firebase.database().ref('/users/' + companyId).update({
+                evaluationAgerage: evaluationAverage
+            })
+        }
+   }
+
+   async function handleCreateEvaluation(companyId: string, stars: string, obs: string) {
+        if(currentUser){
+            let evaluationRef = await firebase.database().ref("/evaluations/" + companyId).child(currentUser?.id)
+            await evaluationRef.set({
+                id: currentUser.id,
+                stars: stars,
+                obs: obs,
+                username: currentUser.username
+            })
+
+            await firebase.database().ref('/evaluations/' + companyId).on('value', (snapshot) =>{
+                let evalTotal = 0
+                let evalCount = 0
+                snapshot.forEach((snap) => {
+                    let userObject = snap.val()
+                    
+                    //console.log(location)
+                    evalTotal = evalTotal + parseInt(userObject['stars'])
+                    evalCount = evalCount + 1
+                    
+                })
+
+                setEvaluationAverage(evalTotal / evalCount)
+                
+                
+                //console.log(trailersList)
+                /*for (let index = 0; index < array.length; index++) {
+                    if(account === "workshop" && region === location ){
+                    
+                }*/
+            })
+
+            await firebase.database().ref('/users/' + companyId).update({
+                evaluationAgerage: evaluationAverage
+            })
+        }
+   }
+
+   async function getEvaluationsList(companyId: string) {
+    await firebase.database().ref('/evaluations/' + companyId).on('value', (snapshot) =>{
+        //console.log(snapshot.val())
+        let evaluations: any[] = []
+        snapshot.forEach((snap) => {
+            let userObject = snap.val()
+            
+            //console.log(location)
+            evaluations.push(userObject)
+            //console.log(userObject)
+
+            setEvaluationsList(evaluations as never)
+            
+        })
+
+        //console.log(evaluationsList)
+        
+        
+        
+        //console.log(trailersList)
+        /*for (let index = 0; index < array.length; index++) {
+            if(account === "workshop" && region === location ){
+            
+        }*/
+    })
+   }
+
     return(
-        <AuthContext.Provider value={{handleTotalCharge, handleUpdatePickup, handleUpdatePreventiveMaintenance, deleteAppointment, handleUpdateBreakMaintenance, getAppointmentById, appointmentTrailerPickup,appointmentTrailer, appointmentPreventiveMaintenance, appointmentBreakMaintenance, getAppointmentsList, appoitmentsList, handleAppointmentsTrailer, handleAppointmentsTrailerPickup, handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{evaluationsList, evaluation, getEvaluationsList, handleUpdateEvaluation, handleExistEvaluation, handleCreateEvaluation, handleTotalCharge, handleUpdatePickup, handleUpdatePreventiveMaintenance, deleteAppointment, handleUpdateBreakMaintenance, getAppointmentById, appointmentTrailerPickup,appointmentTrailer, appointmentPreventiveMaintenance, appointmentBreakMaintenance, getAppointmentsList, appoitmentsList, handleAppointmentsTrailer, handleAppointmentsTrailerPickup, handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

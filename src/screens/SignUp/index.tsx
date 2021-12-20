@@ -59,7 +59,7 @@ export function SignUp(){
                                     <Text></Text>
                                 </View>
                             )}
-                            <ButtonIcon title="Acessar" onPress={signUp} />
+                            <ButtonIcon title="Acessar" onPress={() => signUp()} />
                             <Text style={styles.text} onPress={goToLogin} >
                                 Já tenho uma conta. Toque para entrar.
                             </Text>

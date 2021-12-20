@@ -143,7 +143,7 @@ export function WorkshopSearch(){
               </RectButton>
             </View>
             <ScrollView style={styles.list} >
-              <FlatList data={ workshopList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+              <FlatList data={workshopList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
             </ScrollView>
           </View>
         </ScrollView>
