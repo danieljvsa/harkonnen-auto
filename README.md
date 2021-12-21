@@ -14,6 +14,25 @@
   <img src="https://github.com/danieljvsa/harkonnen-auto/blob/main/assets/image/splash.png" height="500" width="300" align="center"/>
 </div>
 
+## Ajustes e melhorias
+
+O projeto ainda está em desenvolvimento e as próximas atualizações serão voltadas nas seguintes tarefas:
+
+- [x] Criação de requisitos do projeto 
+- [x] Criação do design 
+- [x] Autenticação do sistema 
+- [x] Menu da aplicação 
+- [x] Configurações de perfil (Utilizador)
+- [x] Configurações de perfil (Empresas)    
+- [x] Procurar e listar empresas (por nome) 
+- [x] Procurar e Listar empresas (por geolocalização)
+- [x] Criação dos agendamentos (Oficinas); 
+- [x] Criação dos agendamentos (Reboques); 
+- [ ] Sistema de avaliação (Empresas); 
+- [ ] Sistema de avalição (Utilizador); 
+- [ ] Sistema administrativo (Empresas); 
+- [ ] Sistema de quiz; 
+
 ## 🧪 Tecnologias
 
 Esse projeto foi desenvolvido com as seguintes tecnologias:
@@ -35,7 +54,7 @@ $ cd harkonnen-auto
 $ npm install
 $ npm run start
 ```
-è necessário instalar o [Expo CLI](https://docs.expo.dev/workflow/expo-cli/) e o [Expo Go](https://expo.dev/client) para poder rodar a aplicação. 
+Lembrar que é necessário instalar o [Expo CLI](https://docs.expo.dev/workflow/expo-cli/) e o [Expo Go](https://expo.dev/client) para poder rodar a aplicação. 
 
 ## 💻 Projeto
 
