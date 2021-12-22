@@ -30,20 +30,25 @@ export function HomeUser(){
     function goToProfile() {
         navigation.navigate('Profile' as never)
     }
+    function goToAdmin() {
+        if(currentUser?.account === 'trailers' || currentUser?.account === 'workshop'){
+            navigation.navigate('AdminScreen' as never)
+        }
+    }
 
     return(
         <View style={styles.container}>
             <Image source={logoImg} style={styles.img} ></Image>
             <View style={styles.menu} >
                 <Text style={styles.title} >Agende os seus serviços</Text>
-                { (currentUser?.account === "workshop" || currentUser?.account === "trailers") ? (
-                    (currentUser.account === "workshop") ? ( <>
-                        <Card src={Admin} title="Administrativo" />
+                { (currentUser?.account === "workshop" || currentUser?.account === "trailers" || currentUser?.account === 'employee') ? (
+                    (currentUser.account === "workshop" || currentUser.services === 'workshop') ? ( <>
+                        <Card src={Admin} title="Administrativo" onPress={goToAdmin} />
                         <Card src={Car} title="Assistência de Viagem" onPress={gotToTrailersSearch} />
                         <Card src={CheckMark} title="Quiz" />
                         </>
                     ) : (  <>
-                        <Card src={Admin} title="Administrativo" />
+                        <Card src={Admin} title="Administrativo" onPress={goToAdmin} />
                         <Card src={Wrench} title="Oficinas" onPress={goToWorkshopSearch} />
                         <Card src={CheckMark} title="Quiz" />
                         </>

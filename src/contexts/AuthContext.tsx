@@ -141,8 +141,11 @@ type User = {
     username: string,
     email: string,
     password : string,
-    phone: string,
-    account: string
+    phone?: string,
+    account: string,
+    companyId?: string,
+    services?: string,
+    enterpriseName?: string 
 }
 
 type Client = {
@@ -156,6 +159,7 @@ type Client = {
 type AuthContextData = {
     handleSignIn: (email: string, password: string) => void,
     handleSignUp: (email: string, password: string, name: string, phone: string, account: string) => void,
+    handleSignUpEmployee: (email: string, password: string, name: string, companyId: string, account: string, enterpriseName: string) => void,
     errorLogin: boolean,
     errorRegister: boolean,
     isDuplicated: boolean,
@@ -179,8 +183,10 @@ type AuthContextData = {
     currentTrailerProf: TrailerProf | null,
     getProfUserbyId: (userId: string) => void,
     location: string,
+    getEmployeeList: () => void,
     getWorkshopList: () => void,
     getTrailersList: () => void,
+    employeeList: Object[],
     workshopList: Object[],
     trailersList: Object[],
     appoitmentsList: Object[],
@@ -206,7 +212,8 @@ type AuthContextData = {
     handleUpdateEvaluation: (companyId: string, stars: string, obs: string) => void,
     handleCreateEvaluation: (companyId: string, stars: string, obs: string) => void,
     getEvaluationsList: (companyId: string) => void,
-    evaluation: Evaluation | null
+    evaluation: Evaluation | null,
+    deleteEmployee: (id: string) => void,
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -221,6 +228,7 @@ export function AuthProvider({children}:any) {
     const [currentClient, setCurrentClient] = useState<Client | null>(null)
     const [currentWorkshopProf, setCurrentWorkshopProf] = useState<WorkshopProf | null>(null)
     const [currentTrailerProf, setCurrentTrailerProf] = useState<TrailerProf | null>(null)
+    const [employeeList, setEmployeeList] = useState([])
     const [workshopList, setWorkshopList] = useState([])
     const [trailersList, setTrailersList] = useState([])
     const [appoitmentsList, setAppoitmentsList] = useState([])
@@ -233,6 +241,7 @@ export function AuthProvider({children}:any) {
     const [appointmentTrailer, setAppointmentTrailer] = useState<AppointmentTrailer | null>(null)
     const [evaluationAverage, setEvaluationAverage] = useState(0)
     const [evaluation, setEvaluation] = useState<Evaluation | null>(null)
+    const [deleteUser, setDeleteUser] = useState<User | null>(null)
     
 
     useEffect(() => {
@@ -244,6 +253,14 @@ export function AuthProvider({children}:any) {
     
     async function handleErrorSignUp(email: string, password: string, name: string, phone: string, account: string) {
         if(name == "" || email == "" || password == "" || phone == "" || account == ""){
+            setRegisterError(true)
+        }else(
+            setRegisterError(false)
+        )
+    }
+
+    async function handleErrorSignUpEmployee(email: string, password: string, name: string, companyId: string) {
+        if(name == "" || email == "" || password == "" || companyId == "" ){
             setRegisterError(true)
         }else(
             setRegisterError(false)
@@ -285,23 +302,39 @@ export function AuthProvider({children}:any) {
                 if(userId){
                     firebase.database().ref("users").child(userId).get().then((snapshot) => {
                         if (snapshot.exists()) {
-                            setCurrentUser({
-                                id: (userId) ? (userId) : ("7777"),
-                                username: snapshot.val().username,
-                                email: snapshot.val().email,
-                                password: snapshot.val().password,
-                                phone: snapshot.val().phone,
-                                account: snapshot.val().account,
-                            });
+                            if(snapshot.val().account === 'employee'){
+                                setCurrentUser({
+                                    id: (userId) ? (userId) : ("7777"),
+                                    username: snapshot.val().username,
+                                    email: snapshot.val().email,
+                                    password: snapshot.val().password,
+                                    account: snapshot.val().account,
+                                    companyId: snapshot.val().companyId,
+                                    services: snapshot.val().services,
+                                    enterpriseName: snapshot.val().enterpriseName
+                                });
+                                navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
+                            }else{
+                                setCurrentUser({
+                                    id: (userId) ? (userId) : ("7777"),
+                                    username: snapshot.val().username,
+                                    email: snapshot.val().email,
+                                    password: snapshot.val().password,
+                                    phone: snapshot.val().phone,
+                                    account: snapshot.val().account,
+                                });
+                                navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
+                            }
                             //console.log(currentUser)
                         } else {
-                        console.log("No data available");
+                            console.log("No data available");
+                            setLoginError(true)
                         }
                     }).catch((error) => {
                         console.error(error);
                     });
                 }
-                navigation.navigate('HomeUser' as never, {idUser: user?.uid} as never)
+                
                 // ...
             })
             .catch((error) => {
@@ -349,6 +382,37 @@ export function AuthProvider({children}:any) {
         }
     }   
 
+    async function signUpEmployee(email: string, password: string, name: string, companyId: string, account: string, enterpriseName: string){
+        if(isDuplicated === false){
+            await firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                console.log(email, password)
+                // Signed in
+                var user = userCredential.user;
+                let userId = user?.uid
+                firebase.database().ref('users/' + user?.uid).set({
+                    id: userId,
+                    username: name,
+                    email: email,
+                    password : password,
+                    account: 'employee',
+                    companyId: companyId,
+                    services: account,
+                    enterpriseName: enterpriseName
+                });
+                navigation.navigate('AdminScreen' as never)
+                // ...
+            })
+            .catch((error) => {
+                setRegisterError(true)
+                console.log(error)
+                //var errorCode = error.code;
+                //var errorMessage = error.message;
+                // ..
+            });
+        }
+    }  
+
     function handleSignIn(email: string, password: string) {
         handleErrorSignIn(email,password)
         signIn(email,password)
@@ -360,16 +424,33 @@ export function AuthProvider({children}:any) {
         signUp(email, password, name, phone, account)
     }
 
+    function handleSignUpEmployee(email: string, password: string, name: string, companyId: string, account: string, enterpriseName: string){
+        handleErrorSignUpEmployee(email, password, name, companyId)
+        signUpEmployee(email, password, name, companyId, account, enterpriseName)
+    }
+
     async function updateName(name: string){
-        await firebase.database().ref('/users/' + currentUser?.id).update({username: name})
+        if(currentUser?.account === 'employee'){
+            await firebase.database().ref('/users/' + currentUser?.companyId).update({username: name})
+        } else {
+            await firebase.database().ref('/users/' + currentUser?.id).update({username: name})
+        }
     }
 
     async function updateEmail(email: string){
-        await firebase.database().ref('/users/' + currentUser?.id).update({email: email})
+        if(currentUser?.account === 'employee'){
+            await firebase.database().ref('/users/' + currentUser?.companyId).update({email: email})
+        } else {
+            await firebase.database().ref('/users/' + currentUser?.id).update({email: email})
+        }
     }
 
     async function updatePhone(phone: string){
-        await firebase.database().ref('/users/' + currentUser?.id).update({phone: phone})
+        if(currentUser?.account === 'employee'){
+            await firebase.database().ref('/users/' + currentUser?.companyId).update({phone: phone})
+        } else {
+            await firebase.database().ref('/users/' + currentUser?.id).update({phone: phone})
+        }
     }
 
     async function updateImage(image: any){
@@ -395,88 +476,168 @@ export function AuthProvider({children}:any) {
             () => {
                 storageRef.getDownloadURL().then( downloadUrl => {
                     console.log("File avaiable at: " + downloadUrl)
-                    firebase.database().ref('/users/' + currentUser?.id).update({image: downloadUrl})
+                    if(currentUser?.account === 'employee'){
+                        firebase.database().ref('/users/' + currentUser?.companyId).update({image: downloadUrl})
+                    } else {
+                        firebase.database().ref('/users/' + currentUser?.id).update({image: downloadUrl})
+                    }
                 })
             }
         )
     }
     
     async function updateAddress(address: string){
-        await firebase.database().ref('/users/' + currentUser?.id).update({address: address})
+        if(currentUser?.account === 'employee'){
+            await firebase.database().ref('/users/' + currentUser?.companyId).update({address: address})
+        }else {
+            await firebase.database().ref('/users/' + currentUser?.id).update({address: address})
+        }
     }
 
     async function updateLocation(location: string){
-        await firebase.database().ref('/users/' + currentUser?.id).update({location: location})
+        if(currentUser?.account === 'employee'){
+            await firebase.database().ref('/users/' + currentUser?.companyId).update({location: location})
+        }else {
+            await firebase.database().ref('/users/' + currentUser?.id).update({location: location})
+        }
     }
 
     async function updateServicesCharges(fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string, engine: string){
-        if (fullReview != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({fullReview: fullReview})
-        }
-        if (extraReview != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({extraReview: extraReview})
-        }
-        if (oil != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({oil: oil})
-        }
-        if (damper != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({damper: damper})
-        }
-        if (battery != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({battery: battery})
-        }
-        if (airConditioning != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({airConditioning: airConditioning})
-        }
-        if (tires != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({tires: tires})
-        }
-        if (brakes != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({brakes: brakes})
-        }
-        if (serviceCollection != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({serviceCollection: serviceCollection})
-        }
-        if (engine != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({engine: engine})
+        if(currentUser?.account === 'employee'){
+            if (fullReview != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({fullReview: fullReview})
+            }
+            if (extraReview != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({extraReview: extraReview})
+            }
+            if (oil != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({oil: oil})
+            }
+            if (damper != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({damper: damper})
+            }
+            if (battery != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({battery: battery})
+            }
+            if (airConditioning != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({airConditioning: airConditioning})
+            }
+            if (tires != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({tires: tires})
+            }
+            if (brakes != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({brakes: brakes})
+            }
+            if (serviceCollection != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({serviceCollection: serviceCollection})
+            }
+            if (engine != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({engine: engine})
+            }
+        } else {
+            if (fullReview != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({fullReview: fullReview})
+            }
+            if (extraReview != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({extraReview: extraReview})
+            }
+            if (oil != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({oil: oil})
+            }
+            if (damper != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({damper: damper})
+            }
+            if (battery != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({battery: battery})
+            }
+            if (airConditioning != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({airConditioning: airConditioning})
+            }
+            if (tires != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({tires: tires})
+            }
+            if (brakes != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({brakes: brakes})
+            }
+            if (serviceCollection != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({serviceCollection: serviceCollection})
+            }
+            if (engine != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({engine: engine})
+            }
         }
     }
 
     async function updateServicesStatus(fullReview: string, extraReview: string, serviceCollection: string){
-        if (fullReview != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({fullReview: fullReview})
-        }
-        if (extraReview != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({extraReview: extraReview})
-        }
-        if (serviceCollection != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({serviceCollection: serviceCollection})
+        if(currentUser?.account === 'employee'){
+            if (fullReview != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/status/').update({fullReview: fullReview})
+            }
+            if (extraReview != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/status/').update({extraReview: extraReview})
+            }
+            if (serviceCollection != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/status/').update({serviceCollection: serviceCollection})
+            }
+        } else {
+            if (fullReview != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({fullReview: fullReview})
+            }
+            if (extraReview != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({extraReview: extraReview})
+            }
+            if (serviceCollection != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({serviceCollection: serviceCollection})
+            }
         }
     }
 
     async function updateServicesChargesReb(assistanceRequest: string, pickup: string, mechanicalAssistance: string){
-        if (assistanceRequest != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({assistanceRequest: assistanceRequest})
-        }
-        if (pickup != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({pickup: pickup})
-        }
-        if (mechanicalAssistance != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({mechanicalAssistance: mechanicalAssistance})
-        }
-        
+        if(currentUser?.account === 'employee'){
+            if (assistanceRequest != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({assistanceRequest: assistanceRequest})
+            }
+            if (pickup != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({pickup: pickup})
+            }
+            if (mechanicalAssistance != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/charges/').update({mechanicalAssistance: mechanicalAssistance})
+            }
+        } else {
+            if (assistanceRequest != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({assistanceRequest: assistanceRequest})
+            }
+            if (pickup != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({pickup: pickup})
+            }
+            if (mechanicalAssistance != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/charges/').update({mechanicalAssistance: mechanicalAssistance})
+            }
+        }   
     }
 
     async function updateServicesStatusReb(assistanceRequest: string, pickup: string, mechanicalAssistance: string){
-        if (assistanceRequest != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({assistanceRequest: assistanceRequest})
-        }
-        if (pickup != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({pickup: pickup})
-        }
-        if (mechanicalAssistance != "") {
-            await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({mechanicalAssistance: mechanicalAssistance})
-        }
+        if(currentUser?.account === 'employee'){
+            if (assistanceRequest != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/status/').update({assistanceRequest: assistanceRequest})
+            }
+            if (pickup != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/status/').update({pickup: pickup})
+            }
+            if (mechanicalAssistance != "") {
+                await firebase.database().ref('/users/' + currentUser?.companyId + '/services/status/').update({mechanicalAssistance: mechanicalAssistance})
+            }
+        } else {
+            if (assistanceRequest != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({assistanceRequest: assistanceRequest})
+            }
+            if (pickup != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({pickup: pickup})
+            }
+            if (mechanicalAssistance != "") {
+                await firebase.database().ref('/users/' + currentUser?.id + '/services/status/').update({mechanicalAssistance: mechanicalAssistance})
+            }
+        }   
     }
 
     async function getLocations() {
@@ -556,7 +717,31 @@ export function AuthProvider({children}:any) {
         }
     }
 
-
+    async function getEmployeeList() {
+     
+        await firebase.database().ref('/users').on('value', (snapshot) =>{
+            let employee: any[] = []
+            snapshot.forEach((snap) => {
+                let userObject = snap.val()
+                userObject['id'] = snap.key
+                let account = userObject['account']
+                if(account === 'employee'){
+                    employee.push(userObject)
+                    //console.log(employee)
+                }
+                
+            
+                setEmployeeList(employee as never)
+                //console.log(employeeList)
+            })
+            //console.log(employeeList)
+            /*for (let index = 0; index < array.length; index++) {
+                if(account === "workshop" && region === location ){
+                
+            }*/
+        })
+    
+    }
 
     async function getWorkshopList() {
      
@@ -610,29 +795,50 @@ export function AuthProvider({children}:any) {
     }
 
     async function getAppointmentsList() {
-        
-        await firebase.database().ref('/appointments/' + currentUser?.id).on('value', (snapshot) =>{
-            let appoitments: any[] = []
-            snapshot.forEach((snap) => {
-                let userObject = snap.val()
+        if (currentUser?.account === 'employee') {
+            await firebase.database().ref('/appointments/' + currentUser?.companyId).on('value', (snapshot) =>{
+                let appoitments: any[] = []
+                snapshot.forEach((snap) => {
+                    let userObject = snap.val()
+                    
+                    //console.log(location)
+                    
+                    appoitments.push(userObject)
+                    
+                    
                 
-                //console.log(location)
-                
-                appoitments.push(userObject)
-                
-                
-            
-                setAppoitmentsList(appoitments as never)
-                
+                    setAppoitmentsList(appoitments as never)
+                    
+                })
+                //console.log(trailersList)
+                /*for (let index = 0; index < array.length; index++) {
+                    if(account === "workshop" && region === location ){
+                    
+                }*/
             })
-            //console.log(trailersList)
-            /*for (let index = 0; index < array.length; index++) {
-                if(account === "workshop" && region === location ){
+            //console.log(appoitmentsList)
+        } else {
+            await firebase.database().ref('/appointments/' + currentUser?.id).on('value', (snapshot) =>{
+                let appoitments: any[] = []
+                snapshot.forEach((snap) => {
+                    let userObject = snap.val()
+                    
+                    //console.log(location)
+                    
+                    appoitments.push(userObject)
+                    
+                    
                 
-            }*/
-        })
-        //console.log(appoitmentsList)
-    
+                    setAppoitmentsList(appoitments as never)
+                    
+                })
+                //console.log(trailersList)
+                /*for (let index = 0; index < array.length; index++) {
+                    if(account === "workshop" && region === location ){
+                    
+                }*/
+            })
+        }
 }
 
     async function getProfUserbyId(userId: string) {
@@ -694,203 +900,401 @@ export function AuthProvider({children}:any) {
     }
 
     async function handleAppointmentWorkshopMark(images: any[], obs: string, companyName: string, userName: string){
-        let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
-        let clientKey = clientRef.key
-        let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
-        let companyKey = companyRef.key
-        clientRef.set({
-            id: clientKey,
-            id_company: companyKey,
-            currentUserId: currentUser?.id,
-            currentWorkshopProf: currentWorkshopProf?.id, 
-            serviceType: appointmentWorkshop?.serviceType,
-            date: appointmentWorkshop?.date,
-            hour: appointmentWorkshop?.hour,
-            brand: appointmentWorkshop?.brand,
-            model: appointmentWorkshop?.model,
-            obs: obs,
-            username: companyName
-        })
-        companyRef.set({
-            id: clientKey,
-            id_company: companyKey,
-            currentUserId: currentUser?.id,
-            currentWorkshopProf: currentWorkshopProf?.id, 
-            serviceType: appointmentWorkshop?.serviceType,
-            date: appointmentWorkshop?.date,
-            hour: appointmentWorkshop?.hour,
-            brand: appointmentWorkshop?.brand,
-            model: appointmentWorkshop?.model,
-            obs: obs,
-            username: userName
-        })
-        //console.log(currentUser?.username)
-        for (let index = 0; index < images.length; index++) {
-            const fileExtension = images[index].split('.').pop()
-            let response = await fetch(images[index])
-            let uuid = uuid4()
+        if(currentUser?.account === 'employee'){
+            let clientRef = await firebase.database().ref("/appointments/" + currentUser?.companyId).push()
+            let clientKey = clientRef.key
+            let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
+            let companyKey = companyRef.key
+            clientRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.companyId,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+                username: companyName
+            })
+            companyRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.companyId,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+                username: userName
+            })
+            //console.log(currentUser?.username)
+            for (let index = 0; index < images.length; index++) {
+                const fileExtension = images[index].split('.').pop()
+                let response = await fetch(images[index])
+                let uuid = uuid4()
 
-            const fileName = `${uuid}.${fileExtension}`
-            let storageRef = firebase.storage().ref(`users/images/${fileName}`)
-            let blob = await response.blob()
-            storageRef.put(blob).on(
-                firebase.storage.TaskEvent.STATE_CHANGED,
-                snapshot => {
-                    console.log("snapshot:" + snapshot.state)
+                const fileName = `${uuid}.${fileExtension}`
+                let storageRef = firebase.storage().ref(`users/images/${fileName}`)
+                let blob = await response.blob()
+                storageRef.put(blob).on(
+                    firebase.storage.TaskEvent.STATE_CHANGED,
+                    snapshot => {
+                        console.log("snapshot:" + snapshot.state)
 
-                    if(snapshot.state === firebase.storage.TaskState.SUCCESS){
-                        console.log('success')
-                    }
-                },
-                error => {
-                    console.log("Error image: " + error.message)
-                },
-                () => {
-                    storageRef.getDownloadURL().then( downloadUrl => {
-                        console.log("File avaiable at: " + downloadUrl)
-                        if(clientKey != null && companyKey != null){
-                            firebase.database().ref("/appointments/" + currentUser?.id).child(clientKey).child('images').child('' + index + '').set({
-                                downloadUrl
-                            })
-                            firebase.database().ref("/appointments/" + currentWorkshopProf?.id).child(companyKey).child('images').child('' + index + '').set({
-                                downloadUrl
-                            })
+                        if(snapshot.state === firebase.storage.TaskState.SUCCESS){
+                            console.log('success')
                         }
-                    })
-                }
-            )
+                    },
+                    error => {
+                        console.log("Error image: " + error.message)
+                    },
+                    () => {
+                        storageRef.getDownloadURL().then( downloadUrl => {
+                            console.log("File avaiable at: " + downloadUrl)
+                            if(clientKey != null && companyKey != null){
+                                firebase.database().ref("/appointments/" + currentUser?.companyId).child(clientKey).child('images').child('' + index + '').set({
+                                    downloadUrl
+                                })
+                                firebase.database().ref("/appointments/" + currentWorkshopProf?.id).child(companyKey).child('images').child('' + index + '').set({
+                                    downloadUrl
+                                })
+                            }
+                        })
+                    }
+                )
+            }
+        } else {
+            let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
+            let clientKey = clientRef.key
+            let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
+            let companyKey = companyRef.key
+            clientRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+                username: companyName
+            })
+            companyRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+                username: userName
+            })
+            //console.log(currentUser?.username)
+            for (let index = 0; index < images.length; index++) {
+                const fileExtension = images[index].split('.').pop()
+                let response = await fetch(images[index])
+                let uuid = uuid4()
+
+                const fileName = `${uuid}.${fileExtension}`
+                let storageRef = firebase.storage().ref(`users/images/${fileName}`)
+                let blob = await response.blob()
+                storageRef.put(blob).on(
+                    firebase.storage.TaskEvent.STATE_CHANGED,
+                    snapshot => {
+                        console.log("snapshot:" + snapshot.state)
+
+                        if(snapshot.state === firebase.storage.TaskState.SUCCESS){
+                            console.log('success')
+                        }
+                    },
+                    error => {
+                        console.log("Error image: " + error.message)
+                    },
+                    () => {
+                        storageRef.getDownloadURL().then( downloadUrl => {
+                            console.log("File avaiable at: " + downloadUrl)
+                            if(clientKey != null && companyKey != null){
+                                firebase.database().ref("/appointments/" + currentUser?.id).child(clientKey).child('images').child('' + index + '').set({
+                                    downloadUrl
+                                })
+                                firebase.database().ref("/appointments/" + currentWorkshopProf?.id).child(companyKey).child('images').child('' + index + '').set({
+                                    downloadUrl
+                                })
+                            }
+                        })
+                    }
+                )
+            }
         }
-        
     }
 
     async function handlePreventiveAppoitment(isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, obs: any, address: any, companyName: string, userName: string) {
-        let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
-        let clientKey = clientRef.key
-        let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
-        let companyKey = companyRef.key
-        clientRef.set({
-            id: clientKey,
-            id_company: companyKey,
-            currentUserId: currentUser?.id,
-            currentWorkshopProf: currentWorkshopProf?.id, 
-            serviceType: appointmentWorkshop?.serviceType,
-            date: appointmentWorkshop?.date,
-            hour: appointmentWorkshop?.hour,
-            brand: appointmentWorkshop?.brand,
-            model: appointmentWorkshop?.model,
-            obs: obs,
-            isAirConditioning: isAirConditioning,
-            isBattery: isBattery,
-            isDamper: isDamper,
-            isBrakes: isBrakes,
-            isEngine: isEngine,
-            isExtraReview: isExtraReview,
-            isFullReview: isFullReview,
-            isOil: isOil,
-            isServiceCollection: isServiceCollection,
-            isTires: isTires,
-            totalCharge: totalCharge,
-            address: address,
-            username: companyName
-        })
-        companyRef.set({
-            id: clientKey,
-            id_company: companyKey,
-            currentUserId: currentUser?.id,
-            currentWorkshopProf: currentWorkshopProf?.id, 
-            serviceType: appointmentWorkshop?.serviceType,
-            date: appointmentWorkshop?.date,
-            hour: appointmentWorkshop?.hour,
-            brand: appointmentWorkshop?.brand,
-            model: appointmentWorkshop?.model,
-            obs: obs,
-            isAirConditioning: isAirConditioning,
-            isBattery: isBattery,
-            isDamper: isDamper,
-            isBrakes: isBrakes,
-            isEngine: isEngine,
-            isExtraReview: isExtraReview,
-            isFullReview: isFullReview,
-            isOil: isOil,
-            isServiceCollection: isServiceCollection,
-            isTires: isTires,
-            totalCharge: totalCharge,
-            address: address,
-            username: userName
-        })
+        if(currentUser?.account === 'employee'){
+            let clientRef = await firebase.database().ref("/appointments/" + currentUser?.companyId).push()
+            let clientKey = clientRef.key
+            let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
+            let companyKey = companyRef.key
+            clientRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.companyId,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+                isAirConditioning: isAirConditioning,
+                isBattery: isBattery,
+                isDamper: isDamper,
+                isBrakes: isBrakes,
+                isEngine: isEngine,
+                isExtraReview: isExtraReview,
+                isFullReview: isFullReview,
+                isOil: isOil,
+                isServiceCollection: isServiceCollection,
+                isTires: isTires,
+                totalCharge: totalCharge,
+                address: address,
+                username: companyName
+            })
+            companyRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.companyId,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+                isAirConditioning: isAirConditioning,
+                isBattery: isBattery,
+                isDamper: isDamper,
+                isBrakes: isBrakes,
+                isEngine: isEngine,
+                isExtraReview: isExtraReview,
+                isFullReview: isFullReview,
+                isOil: isOil,
+                isServiceCollection: isServiceCollection,
+                isTires: isTires,
+                totalCharge: totalCharge,
+                address: address,
+                username: userName
+            })
+        } else {
+            let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
+            let clientKey = clientRef.key
+            let companyRef = await firebase.database().ref("/appointments/" + currentWorkshopProf?.id).push()
+            let companyKey = companyRef.key
+            clientRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+                isAirConditioning: isAirConditioning,
+                isBattery: isBattery,
+                isDamper: isDamper,
+                isBrakes: isBrakes,
+                isEngine: isEngine,
+                isExtraReview: isExtraReview,
+                isFullReview: isFullReview,
+                isOil: isOil,
+                isServiceCollection: isServiceCollection,
+                isTires: isTires,
+                totalCharge: totalCharge,
+                address: address,
+                username: companyName
+            })
+            companyRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentWorkshopProf?.id, 
+                serviceType: appointmentWorkshop?.serviceType,
+                date: appointmentWorkshop?.date,
+                hour: appointmentWorkshop?.hour,
+                brand: appointmentWorkshop?.brand,
+                model: appointmentWorkshop?.model,
+                obs: obs,
+                isAirConditioning: isAirConditioning,
+                isBattery: isBattery,
+                isDamper: isDamper,
+                isBrakes: isBrakes,
+                isEngine: isEngine,
+                isExtraReview: isExtraReview,
+                isFullReview: isFullReview,
+                isOil: isOil,
+                isServiceCollection: isServiceCollection,
+                isTires: isTires,
+                totalCharge: totalCharge,
+                address: address,
+                username: userName
+            })
+        }
     }
 
     async function handleAppointmentsTrailerPickup(day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, obs: string, totalCharge: any, addressCollection: string, addressDelivery:string, companyName: string, userName: string) {
-        let formattedDate = day + '/' + month + '/' + year
-        let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
-        let clientKey = clientRef.key
-        let companyRef = await firebase.database().ref("/appointments/" + currentTrailerProf?.id).push()
-        let companyKey = companyRef.key
-        clientRef.set({
-            id: clientKey,
-            id_company: companyKey,
-            currentUserId: currentUser?.id,
-            currentWorkshopProf: currentTrailerProf?.id, 
-            serviceType: serviceType,
-            date: formattedDate,
-            hour: hour,
-            brand: brand,
-            model: model,
-            obs: obs,
-            totalCharge: totalCharge,
-            addressCollection: addressCollection, 
-            addressDelivery: addressDelivery,
-            username: companyName
-        })        
-        companyRef.set({
-            id: clientKey,
-            id_company: companyKey,
-            currentUserId: currentUser?.id,
-            currentWorkshopProf: currentTrailerProf?.id, 
-            serviceType: serviceType,
-            date: formattedDate,
-            hour: hour,
-            brand: brand,
-            model: model,
-            obs: obs,
-            totalCharge: totalCharge,
-            addressCollection: addressCollection, 
-            addressDelivery: addressDelivery,
-            username: userName
-        })
+        if(currentUser?.account === 'employee'){
+            let formattedDate = day + '/' + month + '/' + year
+            let clientRef = await firebase.database().ref("/appointments/" + currentUser?.companyId).push()
+            let clientKey = clientRef.key
+            let companyRef = await firebase.database().ref("/appointments/" + currentTrailerProf?.id).push()
+            let companyKey = companyRef.key
+            clientRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.companyId,
+                currentWorkshopProf: currentTrailerProf?.id, 
+                serviceType: serviceType,
+                date: formattedDate,
+                hour: hour,
+                brand: brand,
+                model: model,
+                obs: obs,
+                totalCharge: totalCharge,
+                addressCollection: addressCollection, 
+                addressDelivery: addressDelivery,
+                username: companyName
+            })        
+            companyRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.companyId,
+                currentWorkshopProf: currentTrailerProf?.id, 
+                serviceType: serviceType,
+                date: formattedDate,
+                hour: hour,
+                brand: brand,
+                model: model,
+                obs: obs,
+                totalCharge: totalCharge,
+                addressCollection: addressCollection, 
+                addressDelivery: addressDelivery,
+                username: userName
+            })
+        } else {
+            let formattedDate = day + '/' + month + '/' + year
+            let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
+            let clientKey = clientRef.key
+            let companyRef = await firebase.database().ref("/appointments/" + currentTrailerProf?.id).push()
+            let companyKey = companyRef.key
+            clientRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentTrailerProf?.id, 
+                serviceType: serviceType,
+                date: formattedDate,
+                hour: hour,
+                brand: brand,
+                model: model,
+                obs: obs,
+                totalCharge: totalCharge,
+                addressCollection: addressCollection, 
+                addressDelivery: addressDelivery,
+                username: companyName
+            })        
+            companyRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentTrailerProf?.id, 
+                serviceType: serviceType,
+                date: formattedDate,
+                hour: hour,
+                brand: brand,
+                model: model,
+                obs: obs,
+                totalCharge: totalCharge,
+                addressCollection: addressCollection, 
+                addressDelivery: addressDelivery,
+                username: userName
+            })
+        }
     }
 
     async function handleAppointmentsTrailer(date: any, brand: string, model: string, service: string, obs: string, totalCharge: any, companyName: string, userName: string) {
-        let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
-        let clientKey = clientRef.key
-        let companyRef = await firebase.database().ref("/appointments/" + currentTrailerProf?.id).push()
-        let companyKey = companyRef.key
-        clientRef.set({
-            id: clientKey,
-            id_company: companyKey,
-            currentUserId: currentUser?.id,
-            currentWorkshopProf: currentTrailerProf?.id, 
-            serviceType: service,
-            date: date,
-            brand: brand,
-            model: model,
-            obs: obs,
-            totalCharge: totalCharge,
-            username: companyName
-        })
-        companyRef.set({
-            id: clientKey,
-            id_company: companyKey,
-            currentUserId: currentUser?.id,
-            currentWorkshopProf: currentTrailerProf?.id, 
-            serviceType: service,
-            date: date,
-            brand: brand,
-            model: model,
-            obs: obs,
-            totalCharge: totalCharge,
-            username: userName
-        })
+        if(currentUser?.account === 'employee'){
+            let clientRef = await firebase.database().ref("/appointments/" + currentUser?.companyId).push()
+            let clientKey = clientRef.key
+            let companyRef = await firebase.database().ref("/appointments/" + currentTrailerProf?.id).push()
+            let companyKey = companyRef.key
+            clientRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.companyId,
+                currentWorkshopProf: currentTrailerProf?.id, 
+                serviceType: service,
+                date: date,
+                brand: brand,
+                model: model,
+                obs: obs,
+                totalCharge: totalCharge,
+                username: companyName
+            })
+            companyRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.companyId,
+                currentWorkshopProf: currentTrailerProf?.id, 
+                serviceType: service,
+                date: date,
+                brand: brand,
+                model: model,
+                obs: obs,
+                totalCharge: totalCharge,
+                username: userName
+            })
+        } else {
+            let clientRef = await firebase.database().ref("/appointments/" + currentUser?.id).push()
+            let clientKey = clientRef.key
+            let companyRef = await firebase.database().ref("/appointments/" + currentTrailerProf?.id).push()
+            let companyKey = companyRef.key
+            clientRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentTrailerProf?.id, 
+                serviceType: service,
+                date: date,
+                brand: brand,
+                model: model,
+                obs: obs,
+                totalCharge: totalCharge,
+                username: companyName
+            })
+            companyRef.set({
+                id: clientKey,
+                id_company: companyKey,
+                currentUserId: currentUser?.id,
+                currentWorkshopProf: currentTrailerProf?.id, 
+                serviceType: service,
+                date: date,
+                brand: brand,
+                model: model,
+                obs: obs,
+                totalCharge: totalCharge,
+                username: userName
+            })
+        }
     }
 
     async function getAppointmentById(id: string, id_company: string, currentUserId: string) {
@@ -993,7 +1397,101 @@ export function AuthProvider({children}:any) {
                     
                 }*/
             })
-        }else {
+        }else if (currentUser?.account === 'employee') {
+            await firebase.database().ref('/appointments/' + currentUser?.companyId).child(id_company).on('value', (snapshot) =>{
+                if(snapshot.exists()){
+                    if(snapshot.val().serviceType === 'preventiveMaintenance'){
+                        setAppointmentPreventiveMaintenance({
+                            id: snapshot.val().id,
+                            id_company: snapshot.val().id_company,
+                            serviceType: snapshot.val().serviceType,
+                            currentUserId: snapshot.val().currentUserId,
+                            currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                            date: snapshot.val().date,
+                            hour: snapshot.val().hour,
+                            brand: snapshot.val().brand,
+                            model: snapshot.val().model,
+                            obs: snapshot.val().obs,
+                            username: snapshot.val().username,
+                            isAirConditioning: snapshot.val().isAirConditioning,
+                            isBattery: snapshot.val().isBattery,
+                            isDamper: snapshot.val().isDamper,
+                            isBrakes: snapshot.val().isBrakes,
+                            isEngine: snapshot.val().isEngine,
+                            isExtraReview: snapshot.val().isExtraReview,
+                            isFullReview: snapshot.val().isFullReview,
+                            isOil: snapshot.val().isOil,
+                            isServiceCollection: snapshot.val().isServiceCollection,
+                            isTires: snapshot.val().isTires,
+                            totalCharge: snapshot.val().totalCharge,
+                            address: snapshot.val().address,
+                        })
+                    }
+                    else if(snapshot.val().serviceType === 'breakMaintenance'){
+                        /*for (let index = 0; index < 6; index++) {
+                            firebase.database().ref('/appointments/' + currentUser?.id + id + 'images').child('' + index + '').get().then((snapshot) => {
+                                images[index] = snapshot.val().downloadUrl
+                            })
+                            
+                        }*/
+                        setAppointmentBreakMaintenance({
+                            id: snapshot.val().id,
+                            id_company: snapshot.val().id_company,
+                            serviceType: snapshot.val().serviceType,
+                            currentUserId: snapshot.val().currentUserId,
+                            currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                            date: snapshot.val().date,
+                            hour: snapshot.val().hour,
+                            brand: snapshot.val().brand,
+                            model: snapshot.val().model,
+                            obs: snapshot.val().obs,
+                            username: snapshot.val().username,
+                            images: snapshot.val().images,
+                            totalCharge: snapshot.val().totalCharge,
+                        })
+                        images = []
+                    }
+                    else if(snapshot.val().serviceType === 'assistanceRequest' || snapshot.val().serviceType === 'mechanicalAssistance'){
+                        setAppointmentTrailer({
+                            id: snapshot.val().id,
+                            id_company: snapshot.val().id_company,
+                            serviceType: snapshot.val().serviceType,
+                            currentUserId: snapshot.val().currentUserId,
+                            currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                            date: snapshot.val().date,
+                            brand: snapshot.val().brand,
+                            model: snapshot.val().model,
+                            obs: snapshot.val().obs,
+                            username: snapshot.val().username,
+                            totalCharge: snapshot.val().totalCharge,
+                        })
+                    }
+                    else if(snapshot.val().serviceType === 'pickup'){
+                        setAppointmentTrailerPickup({
+                            id: snapshot.val().id,
+                            id_company: snapshot.val().id_company,
+                            serviceType: snapshot.val().serviceType,
+                            currentUserId: snapshot.val().currentUserId,
+                            currentWorkshopProf: snapshot.val().currentWorkshopProf,
+                            date: snapshot.val().date,
+                            hour: snapshot.val().hour,
+                            brand: snapshot.val().brand,
+                            model: snapshot.val().model,
+                            obs: snapshot.val().obs,
+                            username: snapshot.val().username,
+                            totalCharge: snapshot.val().totalCharge,
+                            addressCollection: snapshot.val().addressCollection,
+                            addressDelivery: snapshot.val().addressDelivery
+                        })
+                    }
+                }
+                //console.log(trailersList)
+                /*for (let index = 0; index < array.length; index++) {
+                    if(account === "workshop" && region === location ){
+                    
+                }*/
+            })
+        } else {
             await firebase.database().ref('/appointments/' + currentUser?.id).child(id_company).on('value', (snapshot) =>{
                 if(snapshot.exists()){
                     if(snapshot.val().serviceType === 'preventiveMaintenance'){
@@ -1180,6 +1678,17 @@ export function AuthProvider({children}:any) {
         console.log(appoitmentsList)
     }
 
+    async function deleteEmployee(id: string) {
+        await firebase.database().ref('/users/').child(id).remove()
+        let app: any[] = employeeList
+        for (let index = 0; index < appoitmentsList.length; index++) {
+            if(app[index].id === id){
+              app.splice(index, 1)
+            } 
+            setEmployeeList(app as never)  
+        }
+    }
+
     async function handleUpdatePreventiveMaintenance(id_company: string, id: string, day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, currentUserId: string, obs: string, currentWorkshopProf: string, isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, address: any) {
         let formattedDate = day + '/' + month + '/' + year
         await firebase.database().ref('/appointments/' + currentUserId).child(id).update({
@@ -1330,39 +1839,75 @@ export function AuthProvider({children}:any) {
 
    async function handleCreateEvaluation(companyId: string, stars: string, obs: string) {
         if(currentUser){
-            let evaluationRef = await firebase.database().ref("/evaluations/" + companyId).child(currentUser?.id)
-            await evaluationRef.set({
-                id: currentUser.id,
-                stars: stars,
-                obs: obs,
-                username: currentUser.username
-            })
-
-            await firebase.database().ref('/evaluations/' + companyId).on('value', (snapshot) =>{
-                let evalTotal = 0
-                let evalCount = 0
-                snapshot.forEach((snap) => {
-                    let userObject = snap.val()
-                    
-                    //console.log(location)
-                    evalTotal = evalTotal + parseInt(userObject['stars'])
-                    evalCount = evalCount + 1
-                    
+            if(currentUser.account === 'employee' && currentUser?.companyId){
+                let evaluationRef = await firebase.database().ref("/evaluations/" + companyId).child(currentUser?.companyId)
+                await evaluationRef.set({
+                    id: currentUser.id,
+                    stars: stars,
+                    obs: obs,
+                    username: currentUser.username
                 })
-
-                setEvaluationAverage(evalTotal / evalCount)
-                
-                
-                //console.log(trailersList)
-                /*for (let index = 0; index < array.length; index++) {
-                    if(account === "workshop" && region === location ){
+    
+                await firebase.database().ref('/evaluations/' + companyId).on('value', (snapshot) =>{
+                    let evalTotal = 0
+                    let evalCount = 0
+                    snapshot.forEach((snap) => {
+                        let userObject = snap.val()
+                        
+                        //console.log(location)
+                        evalTotal = evalTotal + parseInt(userObject['stars'])
+                        evalCount = evalCount + 1
+                        
+                    })
+    
+                    setEvaluationAverage(evalTotal / evalCount)
                     
-                }*/
-            })
-
-            await firebase.database().ref('/users/' + companyId).update({
-                evaluationAgerage: evaluationAverage
-            })
+                    
+                    //console.log(trailersList)
+                    /*for (let index = 0; index < array.length; index++) {
+                        if(account === "workshop" && region === location ){
+                        
+                    }*/
+                })
+    
+                await firebase.database().ref('/users/' + companyId).update({
+                    evaluationAgerage: evaluationAverage
+                })
+            } else {
+                let evaluationRef = await firebase.database().ref("/evaluations/" + companyId).child(currentUser?.id)
+                await evaluationRef.set({
+                    id: currentUser.id,
+                    stars: stars,
+                    obs: obs,
+                    username: currentUser.username
+                })
+    
+                await firebase.database().ref('/evaluations/' + companyId).on('value', (snapshot) =>{
+                    let evalTotal = 0
+                    let evalCount = 0
+                    snapshot.forEach((snap) => {
+                        let userObject = snap.val()
+                        
+                        //console.log(location)
+                        evalTotal = evalTotal + parseInt(userObject['stars'])
+                        evalCount = evalCount + 1
+                        
+                    })
+    
+                    setEvaluationAverage(evalTotal / evalCount)
+                    
+                    
+                    //console.log(trailersList)
+                    /*for (let index = 0; index < array.length; index++) {
+                        if(account === "workshop" && region === location ){
+                        
+                    }*/
+                })
+    
+                await firebase.database().ref('/users/' + companyId).update({
+                    evaluationAgerage: evaluationAverage
+                })
+            }
         }
    }
 
@@ -1394,7 +1939,7 @@ export function AuthProvider({children}:any) {
    }
 
     return(
-        <AuthContext.Provider value={{evaluationsList, evaluation, getEvaluationsList, handleUpdateEvaluation, handleExistEvaluation, handleCreateEvaluation, handleTotalCharge, handleUpdatePickup, handleUpdatePreventiveMaintenance, deleteAppointment, handleUpdateBreakMaintenance, getAppointmentById, appointmentTrailerPickup,appointmentTrailer, appointmentPreventiveMaintenance, appointmentBreakMaintenance, getAppointmentsList, appoitmentsList, handleAppointmentsTrailer, handleAppointmentsTrailerPickup, handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{deleteEmployee, employeeList, getEmployeeList, handleSignUpEmployee, evaluationsList, evaluation, getEvaluationsList, handleUpdateEvaluation, handleExistEvaluation, handleCreateEvaluation, handleTotalCharge, handleUpdatePickup, handleUpdatePreventiveMaintenance, deleteAppointment, handleUpdateBreakMaintenance, getAppointmentById, appointmentTrailerPickup,appointmentTrailer, appointmentPreventiveMaintenance, appointmentBreakMaintenance, getAppointmentsList, appoitmentsList, handleAppointmentsTrailer, handleAppointmentsTrailerPickup, handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

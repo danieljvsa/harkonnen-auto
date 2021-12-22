@@ -30,6 +30,8 @@ import { AppointmentPreventiveMaintenanceEdit } from '../screens/AppointmentPrev
 import { EvaluationCreate } from '../screens/EvaluationCreate'
 import { EvaluationEdit } from '../screens/EvaluationEdit'
 import { Evaluations } from '../screens/Evaluations'
+import { AdminScreen } from '../screens/AdminScreen'
+import { SignUpEmployee } from '../screens/SignUpEmployee'
 
 const {Navigator, Screen} = createStackNavigator()
 
@@ -65,6 +67,8 @@ export function AuthRoutes() {
             <Screen name="EvaluationCreate" component={EvaluationCreate} />        
             <Screen name="EvaluationEdit" component={EvaluationEdit} />
             <Screen name="Evaluations" component={Evaluations} />
+            <Screen name="AdminScreen" component={AdminScreen} />
+            <Screen name="SignUpEmployee" component={SignUpEmployee} />
         </Navigator>
     )
 }

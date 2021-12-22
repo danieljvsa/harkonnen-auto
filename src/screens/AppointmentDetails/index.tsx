@@ -116,7 +116,8 @@ export function AppointmentDetails({route}: any){
               }
               {(appointmentTrailer?.id === id && appointmentTrailer?.id_company === id_company) ? 
                 <View>
-                  <Text style={styles.cardTitle}>{(appointmentTrailer?.serviceType === 'assistanceRequest') ? 'Pedido de Assitência' : 'Assistência Mecânica'}</Text>
+                  {console.log(appointmentTrailer)}
+                  <Text style={styles.cardTitle}>{(appointmentTrailer?.serviceType === 'assistanceRequest') ? 'Pedido de Assistência' : 'Assistência Mecânica'}</Text>
                   <Text style={styles.cardText}>Data e Hora: {appointmentTrailer?.date}</Text>
                   <Text style={styles.cardText}>Modelo: {appointmentTrailer?.model}</Text>
                   <Text style={styles.cardText}>Marca: {appointmentTrailer?.brand}</Text>
