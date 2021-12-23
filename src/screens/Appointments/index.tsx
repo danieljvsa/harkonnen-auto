@@ -37,11 +37,11 @@ export function Appointments(){
 
   
 
-  function goToAppointmentDetails(id: string, companyId: string, currentUserId: string, currentWorkshopProf: string) {
+  function goToAppointmentDetails(id: string, companyId: string, currentUserId: string, currentWorkshopProf: string, appointment: any) {
     if(id != '' && companyId != ''){
       getAppointmentById(id, companyId, currentUserId)
       setIsDetail(true)
-      navigation.navigate('AppointmentDetails' as never, {id: id, id_company: companyId, currentUserId: currentUserId, currentWorkshopProf: currentWorkshopProf} as never)
+      navigation.navigate('AppointmentDetails' as never, {id: id, id_company: companyId, currentUserId: currentUserId, currentWorkshopProf: currentWorkshopProf, appointment: appointment.item} as never)
     }
   }
 
@@ -50,7 +50,7 @@ export function Appointments(){
         if(appoitment.item.serviceType === 'preventiveMaintenance'){
           
           return (
-            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)} >
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf, appoitment)} >
               <Text style={styles.cardTitle} >Manutenção Preventiva</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
               <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user' && currentUser?.id != appoitment.item.currentUserId) ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
@@ -60,7 +60,7 @@ export function Appointments(){
         else if(appoitment.item.serviceType === 'breakMaintenance'){
           
           return (
-            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf, appoitment)}>
               <Text style={styles.cardTitle} >Manutenção de Rutura</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
               <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user' && currentUser?.id != appoitment.item.currentUserId) ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>
@@ -70,7 +70,7 @@ export function Appointments(){
         else if(appoitment.item.serviceType === 'assistanceRequest'){
           
           return (
-            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf, appoitment)}>
               <Text style={styles.cardTitle} >Pedido de Assistência</Text>
               <Text style={{color: theme.colors.errorMessage, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginLeft: 20}} >Prioridade: Muito Alta</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
@@ -81,7 +81,7 @@ export function Appointments(){
         else if(appoitment.item.serviceType === 'mechanicalAssistance'){
           
           return (
-            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf, appoitment)}>
               <Text style={styles.cardTitle} >Assitência Mecânica</Text>
               <Text style={{color: theme.colors.errorMessage, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginLeft: 20}} >Prioridade: Alta</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date}</Text>
@@ -92,7 +92,7 @@ export function Appointments(){
         else if(appoitment.item.serviceType === 'pickup'){
           
           return (
-            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf)}>
+            <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf, appoitment)}>
               <Text style={styles.cardTitle} >Serviços de Pickup</Text>
               <Text style={styles.cardText}>Data e Hora: {appoitment.item.date} {appoitment.item.hour}</Text>
               <Text style={{color: theme.colors.input, fontSize: 18, flex: 1, fontFamily: theme.fonts.text, marginBottom: 8, marginLeft: 20}}>{(currentUser?.account != 'user' && currentUser?.id != appoitment.item.currentUserId) ? `Marcado por ${appoitment.item.username}`: `Empresa: ${appoitment.item.username}`}</Text>

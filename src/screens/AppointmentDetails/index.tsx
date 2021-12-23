@@ -17,15 +17,27 @@ import { CardProfileProf } from '../../components/CardProfileProf'
 export function AppointmentDetails({route}: any){
     const {handleTotalCharge, appointmentBreakMaintenance, appointmentPreventiveMaintenance, appointmentTrailer, appointmentTrailerPickup, currentUser} = useContext(AuthContext)
     const navigation = useNavigation()
+    const {id, id_company, currentUserId, currentWorkshopProf, appointment} = route.params
     const [isOption, setOption] = useState(false)
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
     const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Wait, we are fetching you location...');
     const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
-    const [totalCharge, setTotalCharge] = useState(appointmentPreventiveMaintenance?.totalCharge.toString() || appointmentBreakMaintenance?.totalCharge || '')
-    const {id, id_company, currentUserId, currentWorkshopProf} = route.params
+    const [totalCharge, setTotalCharge] = useState('')
     const {deleteAppointment} = useContext(AuthContext)
   
+
+    useEffect(() => {
+      if(appointment.serviceType === 'breakMaintenance'){
+        if(appointment.totalCharge){
+          setTotalCharge(appointment?.totalCharge)
+        }
+      } else {
+        if(appointment.totalCharge){
+          setTotalCharge(appointment.totalCharge.toString())
+        }
+      }
+    }, [])
 
   function goBack() {
     navigation.goBack()
@@ -42,14 +54,12 @@ export function AppointmentDetails({route}: any){
   
 
   function handleEdit() {
-    if (appointmentBreakMaintenance?.id === id && appointmentBreakMaintenance?.id_company === id_company){
-      navigation.navigate('AppointmentInitialEdit' as never, {appointment: appointmentBreakMaintenance} as never)
-    } else if (appointmentPreventiveMaintenance?.id === id && appointmentPreventiveMaintenance?.id_company === id_company){
-      navigation.navigate('AppointmentInitialEdit' as never, {appointment: appointmentPreventiveMaintenance} as never)
-    } else if (appointmentTrailer?.id === id && appointmentTrailer?.id_company === id_company){
-
-    } else if (appointmentTrailerPickup?.id === id && appointmentTrailerPickup?.id_company === id_company){
-      navigation.navigate('AppointmentInitialTrailerPickupEdit' as never, {appointment: appointmentTrailerPickup} as never)
+    if (appointment.serviceType === 'breakMaintenance'){
+      navigation.navigate('AppointmentInitialEdit' as never, {appointment: appointment} as never)
+    } else if (appointment.serviceType === 'preventiveMaintenance'){
+      navigation.navigate('AppointmentInitialEdit' as never, {appointment: appointment} as never)
+    } else if (appointment.serviceType === 'pickup'){
+      navigation.navigate('AppointmentInitialTrailerPickupEdit' as never, {appointment: appointment} as never)
     } else {
 
     }
@@ -57,11 +67,11 @@ export function AppointmentDetails({route}: any){
 
   function handlePrice() {
     handleOption()
-    if(appointmentBreakMaintenance?.id === id && appointmentBreakMaintenance?.id_company === id_company && appointmentBreakMaintenance){
-      handleTotalCharge(appointmentBreakMaintenance?.id_company, appointmentBreakMaintenance?.id, totalCharge, appointmentBreakMaintenance?.currentUserId, appointmentBreakMaintenance?.currentWorkshopProf)
+    if(appointment.serviceType === 'breakMaintenance'){
+      handleTotalCharge(appointment.id_company, appointment.id, totalCharge, appointment.currentUserId, appointment.currentWorkshopProf)
     }
-    else if(appointmentPreventiveMaintenance && appointmentPreventiveMaintenance?.id === id && appointmentPreventiveMaintenance?.id_company === id_company){
-      handleTotalCharge(appointmentPreventiveMaintenance?.id_company, appointmentPreventiveMaintenance?.id, parseFloat(totalCharge), appointmentPreventiveMaintenance?.currentUserId, appointmentPreventiveMaintenance?.currentWorkshopProf)
+    else if(appointment.serviceType === 'preventiveMaintenance'){
+      handleTotalCharge(appointment.id_company, appointment.id, parseFloat(totalCharge), appointment.currentUserId, appointment.currentWorkshopProf)
     }
   }
 
@@ -88,60 +98,60 @@ export function AppointmentDetails({route}: any){
             <View style={{marginTop: 50}} >
             </View>
             <ScrollView style={styles.list} >
-              {(appointmentBreakMaintenance?.id === id && appointmentBreakMaintenance?.id_company === id_company) ? 
+              {(appointment.serviceType === 'breakMaintenance') ? 
                 <View>
                   <Text style={styles.cardTitle} >Manutenção de Rutura</Text>
-                  <Text style={styles.cardText}>Data: {appointmentBreakMaintenance?.date}</Text>
-                  <Text style={styles.cardText}>Hora: {appointmentBreakMaintenance?.hour}</Text>
-                  <Text style={styles.cardText}>Modelo: {appointmentBreakMaintenance?.model}</Text>
-                  <Text style={styles.cardText}>Marca: {appointmentBreakMaintenance?.brand}</Text>
+                  <Text style={styles.cardText}>Data: {appointment.date}</Text>
+                  <Text style={styles.cardText}>Hora: {appointment.hour}</Text>
+                  <Text style={styles.cardText}>Modelo: {appointment.model}</Text>
+                  <Text style={styles.cardText}>Marca: {appointment?.brand}</Text>
                   <Text style={styles.cardText}>Observações: </Text>
-                  <Text style={styles.cardText}>{(appointmentBreakMaintenance?.obs != '') ? appointmentBreakMaintenance?.obs : 'Não existem observações...'}</Text>
-                  <Text style={styles.cardText}>{(appointmentBreakMaintenance?.totalCharge !== undefined) ? `Orçamento: ${appointmentBreakMaintenance?.totalCharge}€` : 'Orçamento: Não existe ainda valor acordado.' }</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointmentBreakMaintenance?.currentUserId) ? `Marcado por ${appointmentBreakMaintenance?.username}`: `Empresa: ${appointmentBreakMaintenance?.username}`}</Text></RectButton>
+                  <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
+                  <Text style={styles.cardText}>{(appointment?.totalCharge !== undefined) ? `Orçamento: ${appointment?.totalCharge}€` : 'Orçamento: Não existe ainda valor acordado.' }</Text>
+                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
                 </View> : <></>
               }
-              {(appointmentPreventiveMaintenance?.id === id && appointmentPreventiveMaintenance?.id_company === id_company) ? 
+              {(appointment.serviceType === 'preventiveMaintenance') ? 
                 <View>
                   <Text style={styles.cardTitle}>Manutenção Preventiva</Text>
-                  <Text style={styles.cardText}>Data: {appointmentPreventiveMaintenance?.date}</Text>
-                  <Text style={styles.cardText}>Hora: {appointmentPreventiveMaintenance?.hour}</Text>
-                  <Text style={styles.cardText}>Modelo: {appointmentPreventiveMaintenance?.model}</Text>
-                  <Text style={styles.cardText}>Marca: {appointmentPreventiveMaintenance?.brand}</Text>
+                  <Text style={styles.cardText}>Data: {appointment?.date}</Text>
+                  <Text style={styles.cardText}>Hora: {appointment?.hour}</Text>
+                  <Text style={styles.cardText}>Modelo: {appointment?.model}</Text>
+                  <Text style={styles.cardText}>Marca: {appointment?.brand}</Text>
                   <Text style={styles.cardText}>Observações: </Text> 
-                  <Text style={styles.cardText}>{(appointmentPreventiveMaintenance?.obs != '') ? appointmentPreventiveMaintenance?.obs : 'Não existem observações...'}</Text>
-                  <Text style={styles.cardText}>Orçamento: {appointmentPreventiveMaintenance?.totalCharge}€</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointmentPreventiveMaintenance?.currentUserId) ? `Marcado por ${appointmentPreventiveMaintenance?.username}`: `Empresa: ${appointmentPreventiveMaintenance?.username}`}</Text></RectButton>
+                  <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
+                  <Text style={styles.cardText}>Orçamento: {appointment?.totalCharge}€</Text>
+                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
                 </View> : <></>
               }
-              {(appointmentTrailer?.id === id && appointmentTrailer?.id_company === id_company) ? 
+              {(appointment.serviceType === 'assistanceRequest' || appointment.serviceType === 'mechanicalAssistance') ? 
                 <View>
-                  {console.log(appointmentTrailer)}
-                  <Text style={styles.cardTitle}>{(appointmentTrailer?.serviceType === 'assistanceRequest') ? 'Pedido de Assistência' : 'Assistência Mecânica'}</Text>
-                  <Text style={styles.cardText}>Data e Hora: {appointmentTrailer?.date}</Text>
-                  <Text style={styles.cardText}>Modelo: {appointmentTrailer?.model}</Text>
-                  <Text style={styles.cardText}>Marca: {appointmentTrailer?.brand}</Text>
+                  {console.log(appointment)}
+                  <Text style={styles.cardTitle}>{(appointment?.serviceType === 'assistanceRequest') ? 'Pedido de Assistência' : 'Assistência Mecânica'}</Text>
+                  <Text style={styles.cardText}>Data e Hora: {appointment?.date}</Text>
+                  <Text style={styles.cardText}>Modelo: {appointment?.model}</Text>
+                  <Text style={styles.cardText}>Marca: {appointment?.brand}</Text>
                   <Text style={styles.cardText}>Observações: </Text>
-                  <Text style={styles.cardText}>{(appointmentTrailer?.obs != '') ? appointmentTrailer?.obs : 'Não existem observações...'}</Text>
-                  <Text style={styles.cardText}>Preço: {appointmentTrailer?.totalCharge}€</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointmentTrailer?.currentUserId) ? `Marcado por ${appointmentTrailer?.username}`: `Empresa: ${appointmentTrailer?.username}`}</Text></RectButton>       
+                  <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
+                  <Text style={styles.cardText}>Preço: {appointment?.totalCharge}€</Text>
+                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>       
                 </View> : <></>
               }
-              {(appointmentTrailerPickup?.id === id && appointmentTrailerPickup?.id_company === id_company) ? 
+              {(appointment.serviceType === 'pickup') ? 
                 <View>
                   <Text style={styles.cardTitle}>Serviço de Pickup</Text>
-                  <Text style={styles.cardText}>Data: {appointmentTrailerPickup?.date}</Text>
-                  <Text style={styles.cardText}>Hora: {appointmentTrailerPickup?.hour}</Text>
-                  <Text style={styles.cardText}>Modelo: {appointmentTrailerPickup?.model}</Text>
-                  <Text style={styles.cardText}>Marca: {appointmentTrailerPickup?.brand}</Text>
+                  <Text style={styles.cardText}>Data: {appointment?.date}</Text>
+                  <Text style={styles.cardText}>Hora: {appointment?.hour}</Text>
+                  <Text style={styles.cardText}>Modelo: {appointment?.model}</Text>
+                  <Text style={styles.cardText}>Marca: {appointment?.brand}</Text>
                   <Text style={styles.cardText}>Observações: </Text>
-                  <Text style={styles.cardText}>{(appointmentTrailerPickup?.obs != '') ? appointmentTrailerPickup?.obs : 'Não existem observações...'}</Text>
-                  <Text style={styles.cardText}>Orçamento: {appointmentTrailerPickup?.totalCharge}€</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointmentTrailerPickup?.currentUserId) ? `Marcado por ${appointmentTrailerPickup?.username}`: `Empresa: ${appointmentTrailerPickup?.username}`}</Text></RectButton>
+                  <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
+                  <Text style={styles.cardText}>Orçamento: {appointment?.totalCharge}€</Text>
+                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
                 </View> : <></>
               }
-              {(currentUser?.account === 'workshop' && isOption) ? (
-                (appointmentBreakMaintenance?.id === id && appointmentBreakMaintenance?.id_company === id_company || (appointmentPreventiveMaintenance?.id === id && appointmentPreventiveMaintenance?.id_company === id_company ) ? ( <>
+              {((currentUser?.account === 'workshop'|| currentUser?.services === 'workshop') && isOption) ? (
+                (appointment.serviceType === 'breakMaintenance' || appointment.serviceType === 'preventiveMaintenance' ) ? ( <>
                   <View style={styles.inputG}>
                     <Text style={styles.inputTitle}>
                       Preço Total
@@ -149,27 +159,27 @@ export function AppointmentDetails({route}: any){
                     <TextInput style={styles.input} placeholder="ex: 90.00" value={totalCharge} onChangeText={(text) => setTotalCharge(text)} />
                   </View>
                 </>) : <></>
-              )) : <></> }
+              ) : <></> }
               <View>
                 <Text>
                 </Text>
               </View>
             </ScrollView>
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: (isOption) ? 120 : 150}}>
-              {(currentUser?.account === 'user' && appointmentTrailer?.id != id && appointmentTrailer?.id_company != id_company) ? ( <>
+              {(currentUser?.account === 'user' && (appointment.item.serviceType != 'assistanceRequest' || appointment.item.serviceType != 'mechanicalAssistance')) ? ( <>
                   <ButtonIcon title="Editar" onPress={() => handleEdit()} /> 
                 </>
               ) : <></> }
-              {(currentUser?.account === 'workshop') ? (
-                (appointmentBreakMaintenance?.id === id && appointmentBreakMaintenance?.id_company === id_company || appointmentPreventiveMaintenance?.id === id && appointmentPreventiveMaintenance?.id_company === id_company) ? <>
+              {(currentUser?.account === 'workshop' || currentUser?.services === 'workshop') ? (
+                (appointment.serviceType === 'breakMaintenance' || appointment.serviceType === 'preventiveMaintenance') ? <>
                   <ButtonIcon title="Editar" onPress={() => handlePrice()} /> 
                 </> : <></>
               ) : <></> }
-              {(currentUser?.account === 'workshop' && appointmentTrailerPickup?.currentUserId === currentUser.id && appointmentTrailer?.id != id && appointmentTrailer?.id_company != id_company) ? ( <>
+              {((currentUser?.account === 'workshop' || currentUser?.services === 'workshop') && appointment.serviceType === 'pickup') ? ( <>
                   <ButtonIcon title="Editar" onPress={() => handleEdit()} /> 
                 </>
               ) : <></> }
-              {(currentUser?.account === 'trailers' && appointmentBreakMaintenance?.currentUserId === currentUser.id || appointmentPreventiveMaintenance?.currentUserId === currentUser?.id ) ? ( <>
+              {((currentUser?.account === 'trailers' || currentUser?.services === 'trailers') && appointment.serviceType === 'breakMaintenance' ) ? ( <>
                   <ButtonIcon title="Editar" onPress={() => handleEdit()} /> 
                 </>
               ) : <></> }
