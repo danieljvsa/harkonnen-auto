@@ -39,7 +39,7 @@ export function Menu({...rest} : RectButtonProps){
             <RectButton onPress={gotToAppoitments} {...rest}>
                 <Image source={calendar} />
             </RectButton>
-            {(currentUser?.account === "workshop" || currentUser?.account === "trailers") ? (
+            {(currentUser?.account === "workshop" || currentUser?.account === "trailers" || currentUser?.account === 'employee') ? (
                 <RectButton {...rest} onPress={goToProfileProf} >
                     <Image source={perfil}  />
                 </RectButton>

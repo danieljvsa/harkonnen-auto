@@ -1,5 +1,5 @@
 
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 
 import { ButtonIcon } from '../../components/ButtonIcon'
@@ -17,8 +17,12 @@ import { CardProfile } from '../../components/CardProfile'
 import { useNavigation } from '@react-navigation/native'
 
 export function Profile(){
-    const {currentUser, signOut} = useContext(AuthContext)
+    const {currentUser, signOut, getClientUser} = useContext(AuthContext)
     const navigation = useNavigation()
+
+    useEffect(() => {
+        getClientUser()
+    }, [])
     
     function goToGeneralInformation() {
         navigation.navigate('GeneralInformation' as never)
@@ -28,12 +32,16 @@ export function Profile(){
         navigation.navigate('ViewProfile' as never)
     }
 
+    function goToEvaluationList(){
+        navigation.navigate('Evaluations' as never, {company: currentUser} as never)
+    }
+
     return(
         <View style={styles.container}>
             <Image source={logoImg} style={styles.img} ></Image>
             <View style={styles.menu} >
                 <CardProfile title="Informações Gerais" onPress={goToGeneralInformation} />
-                <CardProfile title="Avaliações do Perfil" />
+                <CardProfile title="Avaliações do Perfil" onPress={goToEvaluationList} />
                 <CardProfile title="Ver Perfil" onPress={goToProfile} />
                 <CardProfile title="Sair" onPress={signOut} />
             </View>

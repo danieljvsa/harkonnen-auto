@@ -19,14 +19,14 @@ import * as Location from 'expo-location';
 
 export function GeneralInformation(){
     const navigation = useNavigation()
-    const [email, setEmail] = useState('')
-    const [name, setName] = useState('')
-    const [phone, setPhone] = useState('')
-    const [address, setAddress] = useState('')
-    const [image, setImage] = useState('')
+    const {updateName, currentUser, updateEmail, updatePhone, updateImage, updateAddress, locations, updateLocation, currentClient} = useContext(AuthContext)
+    const [email, setEmail] = useState(currentClient?.email || '')
+    const [name, setName] = useState(currentClient?.username || '')
+    const [phone, setPhone] = useState(currentClient?.phone || '')
+    const [address, setAddress] = useState(currentClient?.address || '')
+    const [image, setImage] = useState(currentClient?.image ||'')
     const [location, setLocation] = useState('')
-    const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
-    const {updateName, currentUser, updateEmail, updatePhone, updateImage, updateAddress, locations, updateLocation} = useContext(AuthContext)
+    const [locationServiceEnabled, setLocationServiceEnabled] = useState(false)
 
     async function GetCurrentLocation() {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -167,7 +167,7 @@ export function GeneralInformation(){
                                     <Text style={styles.inputTitle} >Nº de Telefone</Text>
                                     <TextInput style={styles.input} placeholder="ex: 912333222" value={phone} onChangeText={(text) => setPhone(text)} />
                                 </View>
-                                {(currentUser?.account === "workshop" || currentUser?.account === "trailers") ? (
+                                {(currentUser?.account === "workshop" || currentUser?.account === "trailers" || currentUser?.account === "employee") ? (
                                     <>
                                         <View style={styles.inputG}>
                                             <Text style={styles.inputTitle} >Morada</Text>

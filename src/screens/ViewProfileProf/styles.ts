@@ -168,5 +168,28 @@ export const styles = StyleSheet.create({
     imgEval: {
         width: 30,
         height: 30
-    }
+    },
+    secHeading:{
+        color: theme.colors.heading,
+        fontSize: 24,
+        fontFamily: theme.fonts.text,
+        paddingTop: 0,
+        paddingLeft: 26,
+        marginBottom: 5
+    },
+    secText:{
+        color: theme.colors.title,
+        fontSize: 18,
+        fontFamily: theme.fonts.text,
+        paddingTop: 0,
+        paddingLeft: 26
+    },
+    desc: {
+        color: theme.colors.input,
+        fontSize: 18,
+        fontFamily: theme.fonts.text,
+        paddingTop: 0,
+        paddingLeft: 26,
+        marginBottom: 10,
+    },
 })

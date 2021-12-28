@@ -18,10 +18,11 @@ import { Picker } from '@react-native-picker/picker';
 
 export function ServiceStatusReb(){
     const navigation = useNavigation()
-    const [assistanceRequest, setAssistanceRequest] = useState('')
-    const [pickup, setPickup] = useState('')
-    const [mechanicalAssistance, setMechanicalAssistance] = useState('')
-    const {updateServicesStatusReb} = useContext(AuthContext)
+    const {updateServicesStatusReb, currentClient} = useContext(AuthContext)
+    const [assistanceRequest, setAssistanceRequest] = useState(currentClient?.assistanceRequest || '')
+    const [pickup, setPickup] = useState(currentClient?.pickup|| '')
+    const [mechanicalAssistance, setMechanicalAssistance] = useState(currentClient?.mechanicalAssistance || '')
+    
 
     function handleUpdatesReb() {
         updateServicesStatusReb(assistanceRequest, pickup, mechanicalAssistance)

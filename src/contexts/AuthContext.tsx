@@ -151,9 +151,30 @@ type User = {
 type Client = {
     id: string,
     username: string,
+    email: string,
     phone: string,
     account: string,
-    image: string
+    image: string,
+    address?: string,
+    fullReview?: string, 
+    extraReview?: string,
+    serviceCollection?: string,
+    airConditioning?: string,
+    battery?: string,
+    brakes?: string,
+    damper?: string,
+    extraReviewCharge?: string,
+    fullReviewCharge?: string,
+    oil?: string,
+    serviceCollectionCharge?: string,
+    tires?: string,
+    engine?: string,
+    assistanceRequest?: string, 
+    pickup?: string, 
+    mechanicalAssistance?: string,
+    assistanceRequestCharge?: string, 
+    pickupCharge?: string, 
+    mechanicalAssistanceCharge?: string
 }
 
 type AuthContextData = {
@@ -173,6 +194,7 @@ type AuthContextData = {
     updateLocation: (location: string) => void,
     updateServicesCharges: (fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string, engine: string) => void,
     locations: Object[],
+    appointment: any | null,
     updateServicesStatus: (fullReview: string, extraReview: string, serviceCollection: string) => void,
     updateServicesChargesReb: (assistanceRequest: string, pickup: string, mechanicalAssistance: string) => void,
     updateServicesStatusReb: (assistanceRequest: string, pickup: string, mechanicalAssistance: string) => void,
@@ -214,6 +236,7 @@ type AuthContextData = {
     getEvaluationsList: (companyId: string) => void,
     evaluation: Evaluation | null,
     deleteEmployee: (id: string) => void,
+    getClientById: (id: string) => void,
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -242,6 +265,7 @@ export function AuthProvider({children}:any) {
     const [evaluationAverage, setEvaluationAverage] = useState(0)
     const [evaluation, setEvaluation] = useState<Evaluation | null>(null)
     const [deleteUser, setDeleteUser] = useState<User | null>(null)
+    const [appointment, setAppointment] = useState<any | null>(null)
     
 
     useEffect(() => {
@@ -647,21 +671,170 @@ export function AuthProvider({children}:any) {
         })
     }
 
+    async function getClientById(id: string){
+            await firebase.database().ref("/users/" + id).get().then((snapshot) =>{
+                if (snapshot.exists()) {
+                    if(snapshot.val().account === 'user'){
+                        setCurrentClient({  
+                            id: (id) ? id : "777",
+                            username: snapshot.val().username,
+                            email: snapshot.val().email,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,                
+                        })   
+                    } else if (snapshot.val().account === 'workshop'){
+                        setCurrentClient({  
+                            id: (id) ? id : "777",
+                            username: snapshot.val().username,
+                            email: snapshot.val().email,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,  
+                            address: snapshot.val().address,
+                            fullReview: snapshot.child("services").child("status").val().fullReview,
+                            extraReview: snapshot.child("services").child("status").val().extraReview,
+                            serviceCollection: snapshot.child("services").child("status").val().serviceCollection,
+                            extraReviewCharge: snapshot.child("services").child("charges").val().extraReview,
+                            fullReviewCharge: snapshot.child("services").child("charges").val().fullReview,
+                            serviceCollectionCharge: snapshot.child("services").child("charges").val().serviceCollection,
+                            airConditioning: snapshot.child("services").child("charges").val().airConditioning,
+                            battery: snapshot.child("services").child("charges").val().battery,
+                            brakes: snapshot.child("services").child("charges").val().brakes,
+                            damper: snapshot.child("services").child("charges").val().damper,
+                            oil: snapshot.child("services").child("charges").val().oil,
+                            tires: snapshot.child("services").child("charges").val().tires,
+                            engine: snapshot.child("services").child("charges").val().engine,               
+                        })
+                    } else {
+                        setCurrentClient({
+                            id: (id) ? id : "777",
+                            username: snapshot.val().username,
+                            email: snapshot.val().email,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,
+                            address: snapshot.val().address,
+                            assistanceRequest: snapshot.child("services").child("status").val().assistanceRequest,
+                            pickup: snapshot.child("services").child("status").val().pickup,
+                            mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
+                            assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest, 
+                            pickupCharge: snapshot.child("services").child("charges").val().pickup, 
+                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
+                        })
+                    }
+                }else{
+                    console.log("No data avaiable")
+                }
+            })
+        
+    }
+
     async function getClientUser(){
-        await firebase.database().ref("/users/" + currentUser?.id).get().then((snapshot) =>{
-            if (snapshot.exists()) {
-                setCurrentClient({  
-                    id: (currentUser?.id) ? currentUser?.id : "777",
-                    username: snapshot.val().username,
-                    phone: snapshot.val().phone,
-                    account: snapshot.val().account,
-                    image: snapshot.val().image
-                    
-                })
-            }else{
-                console.log("No data avaiable")
-            }
-        })
+        if(currentUser?.account === 'employee'){
+            await firebase.database().ref("/users/" + currentUser?.companyId).get().then((snapshot) =>{
+                if (snapshot.exists()) {
+                    if (snapshot.val().account === 'workshop'){
+                        setCurrentClient({  
+                            id: (currentUser?.companyId) ? currentUser?.companyId : "777",
+                            username: snapshot.val().username,
+                            email: snapshot.val().email,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,  
+                            address: snapshot.val().address,
+                            fullReview: snapshot.child("services").child("status").val().fullReview,
+                            extraReview: snapshot.child("services").child("status").val().extraReview,
+                            serviceCollection: snapshot.child("services").child("status").val().serviceCollection,
+                            extraReviewCharge: snapshot.child("services").child("charges").val().extraReview,
+                            fullReviewCharge: snapshot.child("services").child("charges").val().fullReview,
+                            serviceCollectionCharge: snapshot.child("services").child("charges").val().serviceCollection,
+                            airConditioning: snapshot.child("services").child("charges").val().airConditioning,
+                            battery: snapshot.child("services").child("charges").val().battery,
+                            brakes: snapshot.child("services").child("charges").val().brakes,
+                            damper: snapshot.child("services").child("charges").val().damper,
+                            oil: snapshot.child("services").child("charges").val().oil,
+                            tires: snapshot.child("services").child("charges").val().tires,
+                            engine: snapshot.child("services").child("charges").val().engine,               
+                        })
+                    } else {
+                        setCurrentClient({
+                            id: (currentUser?.companyId) ? currentUser?.companyId : "777",
+                            username: snapshot.val().username,
+                            email: snapshot.val().email,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,
+                            address: snapshot.val().address,
+                            assistanceRequest: snapshot.child("services").child("status").val().assistanceRequest,
+                            pickup: snapshot.child("services").child("status").val().pickup,
+                            mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
+                            assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest, 
+                            pickupCharge: snapshot.child("services").child("charges").val().pickup, 
+                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
+                        })
+                    }
+                }else{
+                    console.log("No data avaiable")
+                }
+            })
+        } else {
+            await firebase.database().ref("/users/" + currentUser?.id).get().then((snapshot) =>{
+                if (snapshot.exists()) {
+                    if(snapshot.val().account === 'user'){
+                        setCurrentClient({  
+                            id: (currentUser?.id) ? currentUser?.id : "777",
+                            email: snapshot.val().email,
+                            username: snapshot.val().username,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,                
+                        })   
+                    } else if (snapshot.val().account === 'workshop'){
+                        setCurrentClient({  
+                            id: (currentUser?.id) ? currentUser?.id : "777",
+                            username: snapshot.val().username,
+                            email: snapshot.val().email,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,  
+                            address: snapshot.val().address,
+                            fullReview: snapshot.child("services").child("status").val().fullReview,
+                            extraReview: snapshot.child("services").child("status").val().extraReview,
+                            serviceCollection: snapshot.child("services").child("status").val().serviceCollection,
+                            extraReviewCharge: snapshot.child("services").child("charges").val().extraReview,
+                            fullReviewCharge: snapshot.child("services").child("charges").val().fullReview,
+                            serviceCollectionCharge: snapshot.child("services").child("charges").val().serviceCollection,
+                            airConditioning: snapshot.child("services").child("charges").val().airConditioning,
+                            battery: snapshot.child("services").child("charges").val().battery,
+                            brakes: snapshot.child("services").child("charges").val().brakes,
+                            damper: snapshot.child("services").child("charges").val().damper,
+                            oil: snapshot.child("services").child("charges").val().oil,
+                            tires: snapshot.child("services").child("charges").val().tires,
+                            engine: snapshot.child("services").child("charges").val().engine,               
+                        })
+                    } else {
+                        setCurrentClient({
+                            id: (currentUser?.id) ? currentUser?.id : "777",
+                            email: snapshot.val().email,
+                            username: snapshot.val().username,
+                            phone: snapshot.val().phone,
+                            account: snapshot.val().account,
+                            image: snapshot.val().image,
+                            address: snapshot.val().address,
+                            assistanceRequest: snapshot.child("services").child("status").val().assistanceRequest,
+                            pickup: snapshot.child("services").child("status").val().pickup,
+                            mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
+                            assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest, 
+                            pickupCharge: snapshot.child("services").child("charges").val().pickup, 
+                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
+                        })
+                    }
+                }else{
+                    console.log("No data avaiable")
+                }
+            })
+        }
     }
 
     async function getProfUser() {
@@ -1303,7 +1476,7 @@ export function AuthProvider({children}:any) {
             await firebase.database().ref('/appointments/' + currentUser?.id).child(id).on('value', (snapshot) =>{
                 if(snapshot.exists()){
                     if(snapshot.val().serviceType === 'preventiveMaintenance'){
-                        setAppointmentPreventiveMaintenance({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1338,7 +1511,7 @@ export function AuthProvider({children}:any) {
                             
                         }*/
                         //console.log(images)
-                        setAppointmentBreakMaintenance({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1356,7 +1529,7 @@ export function AuthProvider({children}:any) {
                         images = []
                     }
                     else if(snapshot.val().serviceType === 'assistanceRequest' || snapshot.val().serviceType === 'mechanicalAssistance'){
-                        setAppointmentTrailer({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1371,7 +1544,7 @@ export function AuthProvider({children}:any) {
                         })
                     }
                     else if(snapshot.val().serviceType === 'pickup'){
-                        setAppointmentTrailerPickup({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1401,7 +1574,7 @@ export function AuthProvider({children}:any) {
             await firebase.database().ref('/appointments/' + currentUser?.companyId).child(id_company).on('value', (snapshot) =>{
                 if(snapshot.exists()){
                     if(snapshot.val().serviceType === 'preventiveMaintenance'){
-                        setAppointmentPreventiveMaintenance({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1434,7 +1607,7 @@ export function AuthProvider({children}:any) {
                             })
                             
                         }*/
-                        setAppointmentBreakMaintenance({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1452,7 +1625,7 @@ export function AuthProvider({children}:any) {
                         images = []
                     }
                     else if(snapshot.val().serviceType === 'assistanceRequest' || snapshot.val().serviceType === 'mechanicalAssistance'){
-                        setAppointmentTrailer({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1467,7 +1640,7 @@ export function AuthProvider({children}:any) {
                         })
                     }
                     else if(snapshot.val().serviceType === 'pickup'){
-                        setAppointmentTrailerPickup({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1495,7 +1668,7 @@ export function AuthProvider({children}:any) {
             await firebase.database().ref('/appointments/' + currentUser?.id).child(id_company).on('value', (snapshot) =>{
                 if(snapshot.exists()){
                     if(snapshot.val().serviceType === 'preventiveMaintenance'){
-                        setAppointmentPreventiveMaintenance({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1528,7 +1701,7 @@ export function AuthProvider({children}:any) {
                             })
                             
                         }*/
-                        setAppointmentBreakMaintenance({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1546,7 +1719,7 @@ export function AuthProvider({children}:any) {
                         images = []
                     }
                     else if(snapshot.val().serviceType === 'assistanceRequest' || snapshot.val().serviceType === 'mechanicalAssistance'){
-                        setAppointmentTrailer({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1561,7 +1734,7 @@ export function AuthProvider({children}:any) {
                         })
                     }
                     else if(snapshot.val().serviceType === 'pickup'){
-                        setAppointmentTrailerPickup({
+                        setAppointment({
                             id: snapshot.val().id,
                             id_company: snapshot.val().id_company,
                             serviceType: snapshot.val().serviceType,
@@ -1939,7 +2112,7 @@ export function AuthProvider({children}:any) {
    }
 
     return(
-        <AuthContext.Provider value={{deleteEmployee, employeeList, getEmployeeList, handleSignUpEmployee, evaluationsList, evaluation, getEvaluationsList, handleUpdateEvaluation, handleExistEvaluation, handleCreateEvaluation, handleTotalCharge, handleUpdatePickup, handleUpdatePreventiveMaintenance, deleteAppointment, handleUpdateBreakMaintenance, getAppointmentById, appointmentTrailerPickup,appointmentTrailer, appointmentPreventiveMaintenance, appointmentBreakMaintenance, getAppointmentsList, appoitmentsList, handleAppointmentsTrailer, handleAppointmentsTrailerPickup, handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{appointment, getClientById, deleteEmployee, employeeList, getEmployeeList, handleSignUpEmployee, evaluationsList, evaluation, getEvaluationsList, handleUpdateEvaluation, handleExistEvaluation, handleCreateEvaluation, handleTotalCharge, handleUpdatePickup, handleUpdatePreventiveMaintenance, deleteAppointment, handleUpdateBreakMaintenance, getAppointmentById, appointmentTrailerPickup,appointmentTrailer, appointmentPreventiveMaintenance, appointmentBreakMaintenance, getAppointmentsList, appoitmentsList, handleAppointmentsTrailer, handleAppointmentsTrailerPickup, handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )

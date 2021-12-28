@@ -68,7 +68,7 @@ export function AppointmentInitialTrailer(){
             if(service === "pickup" && currentTrailerProf?.pickupCharge){
                 setTotalCharge(parseFloat(currentTrailerProf?.pickupCharge))
             }
-        }else{
+        } else {
             setTotalCharge(0)
         }
         //console.log(service)
@@ -224,7 +224,7 @@ export function AppointmentInitialTrailer(){
           service === 'pickup' &&
           brand != '' &&
           model != '' && 
-          totalCharge != 0
+          totalCharge > 0
         ) {
             console.log(service)
           let hour = selectedHour.split(':');

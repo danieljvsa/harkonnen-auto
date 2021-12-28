@@ -22,8 +22,13 @@ export function Evaluations({route}: any){
 
     useEffect(() => {
       if(company){
+        if(company.account === 'employee'){
+          getEvaluationsList(company.companyId);
+          console.log(evaluationsList)
+        }else{
           getEvaluationsList(company.id);
           console.log(evaluationsList)
+        }
       }
   }, [])
     

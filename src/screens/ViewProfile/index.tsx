@@ -1,7 +1,7 @@
 
 
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView, ImageBackground } from 'react-native'
+import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView, ImageBackground, FlatList } from 'react-native'
 import firebase from "../../config/firebase";
 import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types'
 
@@ -14,6 +14,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { RectButton } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
+import { theme } from '../../global/styles/theme';
 
 
 export function ViewProfile(){
@@ -23,16 +24,43 @@ export function ViewProfile(){
     const [phone, setPhone] = useState('')
     const [address, setAddress] = useState('')
     const [image, setImage] = useState('')
-    const {getClientUser, currentClient} = useContext(AuthContext)
+    const {getClientUser, currentClient, currentUser, getEvaluationsList, evaluationsList} = useContext(AuthContext)
 
     useEffect(() => {
-        getClientUser()
-    }, [currentClient])
+        if(currentUser){
+            if(currentUser.account === 'employee' && currentUser?.companyId){
+                getEvaluationsList(currentUser?.companyId);
+                console.log(evaluationsList)
+            } else {
+                getEvaluationsList(currentUser?.id);
+                console.log(evaluationsList)
+            }
+        }
+    }, [])
 
     function goBack() {
         navigation.goBack()
     }
 
+    const renderItem = (evaluation: any) => {
+        if (evaluation.index === 0) {
+            return (
+                <View>
+                    <Text style={{color: theme.colors.heading, fontSize: 20, fontFamily: theme.fonts.text, paddingTop: 0, paddingLeft: 26}}>{evaluation.item.username}</Text>
+                    <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+                </View>  
+            )
+        } else if (evaluation.index === 1){
+            return (
+                <View>
+                    <Text style={{color: theme.colors.heading, fontSize: 20, fontFamily: theme.fonts.text, paddingTop: 0, paddingLeft: 26}}>{evaluation.item.username}</Text>
+                    <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+                </View>  
+            )
+        } else {
+            return <></>
+        }
+    }
    
 
     return(
@@ -63,16 +91,71 @@ export function ViewProfile(){
                         </View>
                         <ScrollView>
                             <View style={styles.login}>
-                                <View style={styles.titleView}>
-                                    <Text style={styles.title}>
-                                        {currentClient?.username}
-                                    </Text>
+                                {(currentClient?.account === 'user') ? 
+                                    <View style={styles.titleView}>
+                                        <Text style={styles.title}>
+                                            {currentClient?.username}
+                                        </Text>
+                                    </View> : ((currentClient?.account === 'workshop') ? ( <>                                        
+                                        <View style={styles.titleView}>
+                                            <Text style={styles.title}>
+                                                {currentClient?.username}
+                                            </Text>
+                                            <Text style={styles.desc}>
+                                                {currentClient?.address}
+                                            </Text>
+                                        </View>
+                                        <View style={{marginBottom: 10}}>
+                                            <Text style={styles.secHeading}>Serviços</Text>
+                                            {(currentClient?.fullReview) ? 
+                                                <Text style={styles.secText}>Revisão Completa</Text>
+                                            : <></>
+                                            }
+                                            {(currentClient?.extraReview) ? 
+                                                <Text style={styles.secText}>Revisão Extra</Text>
+                                            : <></>
+                                            }
+                                            {(currentClient?.serviceCollection) ? 
+                                                <Text style={styles.secText}>Serviço de Pickup</Text>
+                                            : <></>
+                                            }
+                                        </View>
+                                        </>
+                                    ) : ( <>
+                                        <View style={styles.titleView}>
+                                            <Text style={styles.title}>
+                                                {currentClient?.username}
+                                            </Text>
+                                            <Text style={styles.desc}>
+                                                {currentClient?.address}
+                                            </Text>
+                                        </View>
+                                        <View style={{marginBottom: 10}}>
+                                            <Text style={styles.secHeading}>Serviços</Text>
+                                            {(currentClient?.assistanceRequest) ? 
+                                                <Text style={styles.secText}>Pedido de Assistência</Text>
+                                            : <></>
+                                            }
+                                            {(currentClient?.mechanicalAssistance) ? 
+                                                <Text style={styles.secText}>Assitência Mecânica</Text>
+                                            : <></>
+                                            }
+                                            {(currentClient?.pickup) ? 
+                                                <Text style={styles.secText}>Serviço de Pickup</Text>
+                                            : <></>
+                                            }
+                                        </View>
+                                        </>
+                                    ))
+                                }
+                                <View>
+                                    <Text style={styles.secHeading}>Avaliações</Text>
+                                    <RectButton>
+                                        <FlatList data={evaluationsList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+                                    </RectButton>
                                 </View>
                             </View>
                         </ScrollView>
-                        <View style={styles.button}>
-                            <ButtonIcon title="Avaliar" />
-                        </View>
                     </View>
             </KeyboardAvoidingView>
     )

@@ -15,16 +15,11 @@ import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
 
 export function AppointmentDetails({route}: any){
-    const {handleTotalCharge, appointmentBreakMaintenance, appointmentPreventiveMaintenance, appointmentTrailer, appointmentTrailerPickup, currentUser} = useContext(AuthContext)
+    const {handleTotalCharge,deleteAppointment,getClientById, currentUser, appointment} = useContext(AuthContext)
     const navigation = useNavigation()
-    const {id, id_company, currentUserId, currentWorkshopProf, appointment} = route.params
+    const {id, id_company, currentUserId, currentWorkshopProf} = route.params
     const [isOption, setOption] = useState(false)
-    const [search, setSearch] = useState('')
-    const [loading, setLoading] = useState(true)
-    const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Wait, we are fetching you location...');
-    const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
     const [totalCharge, setTotalCharge] = useState('')
-    const {deleteAppointment} = useContext(AuthContext)
   
 
     useEffect(() => {
@@ -42,10 +37,6 @@ export function AppointmentDetails({route}: any){
   function goBack() {
     navigation.goBack()
   }
-
-  useEffect(() => {
-    
-  }, [])
 
   function deleteAppointmentById() {
     deleteAppointment(id_company, id, currentUserId, currentWorkshopProf)
@@ -83,6 +74,16 @@ export function AppointmentDetails({route}: any){
     }
   }
 
+  function goToProfile() {
+    if(currentUser?.id === currentUserId || currentUser?.companyId === currentUserId){
+      getClientById(appointment.currentWorkshopProf)
+      navigation.navigate('ViewProfileProf' as never, {id: appointment.currentWorkshopProf} as never)
+    } else {
+      getClientById(appointment.currentUserId)
+      navigation.navigate('ViewProfileProf' as never, {id: appointment.currentUserId} as never)
+    }
+  }
+
     return(
       <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -98,7 +99,8 @@ export function AppointmentDetails({route}: any){
             <View style={{marginTop: 50}} >
             </View>
             <ScrollView style={styles.list} >
-              {(appointment.serviceType === 'breakMaintenance') ? 
+              {console.log(appointment.totalCharge)}
+              {(appointment?.serviceType === 'breakMaintenance') ? 
                 <View>
                   <Text style={styles.cardTitle} >Manutenção de Rutura</Text>
                   <Text style={styles.cardText}>Data: {appointment.date}</Text>
@@ -107,11 +109,11 @@ export function AppointmentDetails({route}: any){
                   <Text style={styles.cardText}>Marca: {appointment?.brand}</Text>
                   <Text style={styles.cardText}>Observações: </Text>
                   <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
-                  <Text style={styles.cardText}>{(appointment?.totalCharge !== undefined) ? `Orçamento: ${appointment?.totalCharge}€` : 'Orçamento: Não existe ainda valor acordado.' }</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
+                  <Text style={styles.cardText}>{(appointment?.totalCharge !== undefined && appointment.totalCharge != '') ? `Orçamento: ${appointment?.totalCharge}€` : 'Orçamento: Não existe ainda valor acordado.' }</Text>
+                  <RectButton onPress={goToProfile} ><Text style={styles.cardText}>{(currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
                 </View> : <></>
               }
-              {(appointment.serviceType === 'preventiveMaintenance') ? 
+              {(appointment?.serviceType === 'preventiveMaintenance') ? 
                 <View>
                   <Text style={styles.cardTitle}>Manutenção Preventiva</Text>
                   <Text style={styles.cardText}>Data: {appointment?.date}</Text>
@@ -121,7 +123,7 @@ export function AppointmentDetails({route}: any){
                   <Text style={styles.cardText}>Observações: </Text> 
                   <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
                   <Text style={styles.cardText}>Orçamento: {appointment?.totalCharge}€</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
+                  <RectButton onPress={goToProfile} ><Text style={styles.cardText}>{(currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
                 </View> : <></>
               }
               {(appointment.serviceType === 'assistanceRequest' || appointment.serviceType === 'mechanicalAssistance') ? 
@@ -134,8 +136,8 @@ export function AppointmentDetails({route}: any){
                   <Text style={styles.cardText}>Observações: </Text>
                   <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
                   <Text style={styles.cardText}>Preço: {appointment?.totalCharge}€</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>       
-                </View> : <></>
+                  <RectButton onPress={goToProfile} ><Text style={styles.cardText}>{(currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>       
+                </View> : <></> 
               }
               {(appointment.serviceType === 'pickup') ? 
                 <View>
@@ -147,7 +149,7 @@ export function AppointmentDetails({route}: any){
                   <Text style={styles.cardText}>Observações: </Text>
                   <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
                   <Text style={styles.cardText}>Orçamento: {appointment?.totalCharge}€</Text>
-                  <RectButton><Text style={styles.cardText}>{(currentUser?.account != 'user' && currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
+                  <RectButton onPress={goToProfile} ><Text style={styles.cardText}>{(currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
                 </View> : <></>
               }
               {((currentUser?.account === 'workshop'|| currentUser?.services === 'workshop') && isOption) ? (
@@ -166,7 +168,7 @@ export function AppointmentDetails({route}: any){
               </View>
             </ScrollView>
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: (isOption) ? 120 : 150}}>
-              {(currentUser?.account === 'user' && (appointment.item.serviceType != 'assistanceRequest' || appointment.item.serviceType != 'mechanicalAssistance')) ? ( <>
+              {(currentUser?.account === 'user' && (appointment.serviceType != 'assistanceRequest' || appointment.serviceType != 'mechanicalAssistance')) ? ( <>
                   <ButtonIcon title="Editar" onPress={() => handleEdit()} /> 
                 </>
               ) : <></> }

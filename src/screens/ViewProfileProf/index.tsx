@@ -1,7 +1,7 @@
 
 
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView, ImageBackground } from 'react-native'
+import { View, Image, TextInput, Button, Alert, Text, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ListView, ImageBackground, FlatList } from 'react-native'
 import firebase from "../../config/firebase";
 import { ImageInfo } from 'expo-image-picker/build/ImagePicker.types'
 
@@ -16,25 +16,55 @@ import CheckMark from '../../assets/check-mark.png'
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { ButtonEval } from '../../components/ButtonEval';
+import { theme } from '../../global/styles/theme';
 
 
-export function ViewProfileProf(){
+export function ViewProfileProf({route}: any){
     const navigation = useNavigation()
-
-    const [name, setName] = useState('')
-    const [phone, setPhone] = useState('')
-    const [address, setAddress] = useState('')
-    const [image, setImage] = useState('')
-    const {getProfUser, currentTrailerProf, currentWorkshopProf, currentUser} = useContext(AuthContext)
-
-    useEffect(() => {
-        getProfUser()
-    }, [currentTrailerProf, currentWorkshopProf])
-
+    const {currentUser, currentClient, getEvaluationsList, evaluationsList, handleExistEvaluation} = useContext(AuthContext)
+    const {id} = route.params
+    
     function goBack() {
         navigation.goBack()
     }
 
+    useEffect(() => {
+        if(currentUser){
+            if(currentUser.account === 'employee' && currentUser?.companyId){
+                getEvaluationsList(id);
+                console.log(evaluationsList)
+            } else {
+                getEvaluationsList(id);
+                console.log(evaluationsList)
+            }
+        }
+    }, [])
+
+    function goToEvaluation() {
+        if(currentClient){
+            handleExistEvaluation(currentClient.id, currentClient)
+        }
+    }
+
+    const renderItem = (evaluation: any) => {
+        if (evaluation.index === 0) {
+            return (
+                <View>
+                    <Text style={{color: theme.colors.heading, fontSize: 20, fontFamily: theme.fonts.text, paddingTop: 0, paddingLeft: 26}}>{evaluation.item.username}</Text>
+                    <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+                </View>  
+            )
+        } else if (evaluation.index === 1){
+            return (
+                <View>
+                    <Text style={{color: theme.colors.heading, fontSize: 20, fontFamily: theme.fonts.text, paddingTop: 0, paddingLeft: 26}}>{evaluation.item.username}</Text>
+                    <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+                </View>  
+            )
+        } else {
+            return <></>
+        }
+    }
    
 
     return(
@@ -45,7 +75,7 @@ export function ViewProfileProf(){
                     <View style={styles.container}>
                         <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
                         <View style={styles.header}  >
-                            {(currentTrailerProf?.image === "" || currentWorkshopProf?.image === "") ? (
+                            {(currentClient?.image === undefined) ? (
                                 <View style={styles.header}  >
                                     <RectButton style={styles.goBack} onPress={goBack} >
                                         <Image source={arrowBack} style={styles.arrowBack}  />
@@ -55,7 +85,7 @@ export function ViewProfileProf(){
                                 </View>
                             ) : (
                                 <View style={styles.headerUploaded} >
-                                    <ImageBackground source={{uri: (currentWorkshopProf != null) ? currentWorkshopProf?.image : currentTrailerProf?.image }} style={styles.imageUploaded} >
+                                    <ImageBackground source={{uri: (currentClient?.image != undefined) ? currentClient?.image : currentClient?.image }} style={styles.imageUploaded} >
                                     <RectButton style={styles.goBackUploaded} onPress={goBack} >
                                         <Image source={arrowBack} style={styles.arrowBack}  />
                                     </RectButton>
@@ -65,36 +95,75 @@ export function ViewProfileProf(){
                         </View>
                         <ScrollView>
                             <View style={styles.login}>
-                                <View style={styles.titleView}>
-                                    <Text style={styles.title}>
-                                        {(currentWorkshopProf != null) ? currentWorkshopProf?.username : currentTrailerProf?.username}
-                                    </Text>
-                                </View>
-                            </View>
-                        </ScrollView>
-                        <View style={styles.buttonDiv} >
-                        {(currentUser?.id === currentTrailerProf?.id || currentUser?.id === currentWorkshopProf?.id) ? ( 
-                               <></>
-                        ) : ( <>
-                                <View style={styles.eval}>
-                                    <RectButton >
-                                        <Image source={CheckMark} style={styles.imgEval} />
+                                {(currentClient?.account === 'user') ? 
+                                    <View style={styles.titleView}>
+                                        <Text style={styles.title}>
+                                            {currentClient?.username}
+                                        </Text>
+                                    </View> : ((currentClient?.account === 'workshop') ? ( <>  
+                                        <View style={styles.titleView}>                  
+                                            <Text style={styles.title}>
+                                                {currentClient?.username}
+                                            </Text>
+                                            <Text style={styles.desc}>
+                                                {currentClient?.address}
+                                            </Text>
+                                        </View>
+                                        <View style={{marginBottom: 10}}>
+                                            <Text style={styles.secHeading}>Serviços</Text>
+                                            {(currentClient?.fullReview) ? 
+                                                <Text style={styles.secText}>Revisão Completa</Text>
+                                            : <></>
+                                            }
+                                            {(currentClient?.extraReview) ? 
+                                                <Text style={styles.secText}>Revisão Extra</Text>
+                                            : <></>
+                                            }
+                                            {(currentClient?.serviceCollection) ? 
+                                                <Text style={styles.secText}>Serviço de Pickup</Text>
+                                            : <></>
+                                            }
+                                        </View>
+                                        </>
+                                    ) : ( <>
+                                        <View style={styles.titleView}>
+                                            <Text style={styles.title}>
+                                                {currentClient?.username}
+                                            </Text>
+                                            <Text style={styles.desc}>
+                                                {currentClient?.address}
+                                            </Text>
+                                        </View>
+                                        <View style={{marginBottom: 10}}>
+                                            <Text style={styles.secHeading}>Serviços</Text>
+                                            {(currentClient?.assistanceRequest) ? 
+                                                <Text style={styles.secText}>Pedido de Assistência</Text>
+                                            : <></>
+                                            }
+                                            {(currentClient?.mechanicalAssistance) ? 
+                                                <Text style={styles.secText}>Assitência Mecânica</Text>
+                                            : <></>
+                                            }
+                                            {(currentClient?.pickup) ? 
+                                                <Text style={styles.secText}>Serviço de Pickup</Text>
+                                            : <></>
+                                            }
+                                        </View>
+                                        </>
+                                    ))
+                                }
+                                <View>
+                                    <Text style={styles.secHeading}>Avaliações</Text>
+                                    <RectButton>
+                                        <FlatList data={evaluationsList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
                                     </RectButton>
                                 </View>
-                                {(currentWorkshopProf != null) ?
-                                    (
-                                        <View style={styles.button}>
-                                            <ButtonEval title="Marcar Reparação" />
-                                        </View>
-                                    ) : (
-                                        <View style={styles.button}>
-                                            <ButtonEval title="Pedir Reboque" />
-                                        </View>
-                                    )
-                                }
-                            
-                            </>
-                        )}
+                            </View>      
+                        </ScrollView>
+                        <View style={styles.buttonDiv} >
+                            <View style={styles.button}>
+                                <ButtonEval title="Avaliar" onPress={goToEvaluation} />
+                            </View>
                         </View>
                     </View>
             </KeyboardAvoidingView>

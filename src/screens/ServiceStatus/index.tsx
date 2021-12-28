@@ -18,10 +18,10 @@ import { Picker } from '@react-native-picker/picker';
 
 export function ServiceStatus(){
     const navigation = useNavigation()
-    const [fullReview, setFullReview] = useState('')
-    const [extraReview, setExtraReview] = useState('')
-    const [serviceCollection, setServiceCollection] = useState('')
-    const {updateName, currentUser, locations, updateServicesStatus} = useContext(AuthContext)
+    const {currentClient, updateServicesStatus} = useContext(AuthContext)
+    const [fullReview, setFullReview] = useState(currentClient?.fullReview || '')
+    const [extraReview, setExtraReview] = useState(currentClient?.extraReview ||'')
+    const [serviceCollection, setServiceCollection] = useState(currentClient?.serviceCollection ||'')
 
     function handleUpdates() {
         updateServicesStatus(fullReview, extraReview, serviceCollection)

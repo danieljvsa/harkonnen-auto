@@ -23,7 +23,7 @@ export function Appointments(){
     const [loading, setLoading] = useState(true)
     const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Wait, we are fetching you location...');
     const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
-  
+    const[app, setApp] = useState<Object | null>(null)
     
   
 
@@ -38,7 +38,7 @@ export function Appointments(){
   
 
   function goToAppointmentDetails(id: string, companyId: string, currentUserId: string, currentWorkshopProf: string, appointment: any) {
-    if(id != '' && companyId != ''){
+    if(id != '' && companyId != '' && appointment){
       getAppointmentById(id, companyId, currentUserId)
       setIsDetail(true)
       navigation.navigate('AppointmentDetails' as never, {id: id, id_company: companyId, currentUserId: currentUserId, currentWorkshopProf: currentWorkshopProf, appointment: appointment.item} as never)
@@ -48,7 +48,7 @@ export function Appointments(){
   const renderItem = (appoitment: any) => {  
     if(appoitment){
         if(appoitment.item.serviceType === 'preventiveMaintenance'){
-          
+
           return (
             <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf, appoitment)} >
               <Text style={styles.cardTitle} >Manutenção Preventiva</Text>
@@ -58,7 +58,7 @@ export function Appointments(){
             ) 
         }
         else if(appoitment.item.serviceType === 'breakMaintenance'){
-          
+         
           return (
             <RectButton style={styles.containerCard} key={appoitment.index} onPress={() => goToAppointmentDetails(appoitment.item.id, appoitment.item.id_company, appoitment.item.currentUserId, appoitment.item.currentWorkshopProf, appoitment)}>
               <Text style={styles.cardTitle} >Manutenção de Rutura</Text>
