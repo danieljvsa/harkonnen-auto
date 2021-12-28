@@ -28,9 +28,9 @@ O projeto ainda está em desenvolvimento e as próximas atualizações serão vo
 - [x] Procurar e Listar empresas (por geolocalização)
 - [x] Criação dos agendamentos (Oficinas); 
 - [x] Criação dos agendamentos (Reboques); 
-- [ ] Sistema de avaliação (Empresas); 
-- [ ] Sistema de avalição (Utilizador); 
-- [ ] Sistema administrativo (Empresas); 
+- [x] Sistema de avaliação (Empresas); 
+- [x] Sistema de avalição (Utilizador); 
+- [x] Sistema administrativo (Empresas); 
 - [ ] Sistema de quiz; 
 
 ## 🧪 Tecnologias
