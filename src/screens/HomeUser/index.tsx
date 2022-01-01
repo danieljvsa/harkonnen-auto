@@ -36,6 +36,10 @@ export function HomeUser(){
         }
     }
 
+    function goToQuiz(){
+        navigation.navigate('QuizHome' as never)
+    }
+
     return(
         <View style={styles.container}>
             <Image source={logoImg} style={styles.img} ></Image>
@@ -45,19 +49,19 @@ export function HomeUser(){
                     (currentUser.account === "workshop" || currentUser.services === 'workshop') ? ( <>
                         <Card src={Admin} title="Administrativo" onPress={goToAdmin} />
                         <Card src={Car} title="Assistência de Viagem" onPress={gotToTrailersSearch} />
-                        <Card src={CheckMark} title="Quiz" />
+                        <Card src={CheckMark} title="Quiz" onPress={goToQuiz} />
                         </>
                     ) : (  <>
                         <Card src={Admin} title="Administrativo" onPress={goToAdmin} />
                         <Card src={Wrench} title="Oficinas" onPress={goToWorkshopSearch} />
-                        <Card src={CheckMark} title="Quiz" />
+                        <Card src={CheckMark} title="Quiz" onPress={goToQuiz} />
                         </>
                     )
                 )
                 : (  <>
                     <Card src={Wrench} title="Oficinas" onPress={goToWorkshopSearch} />
                     <Card src={Car} title="Assistência de Viagem" onPress={gotToTrailersSearch} />
-                    <Card src={CheckMark} title="Quiz" />
+                    <Card src={CheckMark} title="Quiz" onPress={goToQuiz} />
                     </>
                 )
                 }

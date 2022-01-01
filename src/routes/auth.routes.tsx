@@ -32,6 +32,8 @@ import { EvaluationEdit } from '../screens/EvaluationEdit'
 import { Evaluations } from '../screens/Evaluations'
 import { AdminScreen } from '../screens/AdminScreen'
 import { SignUpEmployee } from '../screens/SignUpEmployee'
+import { QuizHome } from '../screens/QuizHome'
+import { QuizPlay } from '../screens/QuizPlay'
 
 const {Navigator, Screen} = createStackNavigator()
 
@@ -69,6 +71,8 @@ export function AuthRoutes() {
             <Screen name="Evaluations" component={Evaluations} />
             <Screen name="AdminScreen" component={AdminScreen} />
             <Screen name="SignUpEmployee" component={SignUpEmployee} />
+            <Screen name="QuizHome" component={QuizHome} />
+            <Screen name="QuizPlay" component={QuizPlay} />
         </Navigator>
     )
 }

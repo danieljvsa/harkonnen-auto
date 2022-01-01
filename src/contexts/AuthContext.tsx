@@ -5,6 +5,7 @@ import 'react-native-get-random-values';
 import { v4 as uuid4 } from 'uuid';
 import * as Location from 'expo-location';
 import { Alert } from "react-native";
+import axios from 'axios'
 
 
 type Evaluation = {
@@ -237,6 +238,10 @@ type AuthContextData = {
     evaluation: Evaluation | null,
     deleteEmployee: (id: string) => void,
     getClientById: (id: string) => void,
+    getQuiz: () => void,
+    questions: any[],
+    getQuizMedium: () => void,
+    getQuizHard: () => void,
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -266,7 +271,7 @@ export function AuthProvider({children}:any) {
     const [evaluation, setEvaluation] = useState<Evaluation | null>(null)
     const [deleteUser, setDeleteUser] = useState<User | null>(null)
     const [appointment, setAppointment] = useState<any | null>(null)
-    
+    const [questions, setQuestions] = useState([])
 
     useEffect(() => {
         getLocations()
@@ -2111,8 +2116,45 @@ export function AuthProvider({children}:any) {
     })
    }
 
+   async function getQuiz() {
+       let data = ''
+       await axios.get('https://opentdb.com/api.php?amount=5&category=28&difficulty=easy&type=multiple').then(
+        res => {
+            const response = res.data.results
+            navigation.navigate('QuizPlay' as never, {questions: response} as never)
+            setQuestions(response)
+            //console.log(questions)
+        }
+       )
+   }
+   
+   async function getQuizMedium() {
+        let data = ''
+        await axios.get('https://opentdb.com/api.php?amount=5&category=28&difficulty=medium&type=multiple').then(
+        res => {
+            const response = res.data.results
+            navigation.navigate('QuizPlay' as never, {questions: response} as never)
+            setQuestions(response)
+            //console.log(questions)
+        }
+        )
+    }
+
+    async function getQuizHard() {
+        let data = ''
+        await axios.get('https://opentdb.com/api.php?amount=5&category=28&difficulty=hard&type=multiple').then(
+        res => {
+            const response = res.data.results
+            navigation.navigate('QuizPlay' as never, {questions: response} as never)
+            setQuestions(response)
+            //console.log(questions)
+        }
+        )
+    }
+
+
     return(
-        <AuthContext.Provider value={{appointment, getClientById, deleteEmployee, employeeList, getEmployeeList, handleSignUpEmployee, evaluationsList, evaluation, getEvaluationsList, handleUpdateEvaluation, handleExistEvaluation, handleCreateEvaluation, handleTotalCharge, handleUpdatePickup, handleUpdatePreventiveMaintenance, deleteAppointment, handleUpdateBreakMaintenance, getAppointmentById, appointmentTrailerPickup,appointmentTrailer, appointmentPreventiveMaintenance, appointmentBreakMaintenance, getAppointmentsList, appoitmentsList, handleAppointmentsTrailer, handleAppointmentsTrailerPickup, handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
+        <AuthContext.Provider value={{getQuizMedium, getQuizHard, questions, getQuiz, appointment, getClientById, deleteEmployee, employeeList, getEmployeeList, handleSignUpEmployee, evaluationsList, evaluation, getEvaluationsList, handleUpdateEvaluation, handleExistEvaluation, handleCreateEvaluation, handleTotalCharge, handleUpdatePickup, handleUpdatePreventiveMaintenance, deleteAppointment, handleUpdateBreakMaintenance, getAppointmentById, appointmentTrailerPickup,appointmentTrailer, appointmentPreventiveMaintenance, appointmentBreakMaintenance, getAppointmentsList, appoitmentsList, handleAppointmentsTrailer, handleAppointmentsTrailerPickup, handlePreventiveAppoitment, handleAppointmentWorkshopMark, handleAppoitmentWorkshop, appointmentWorkshop, getTrailersList, getWorkshopList, location, getProfUserbyId, trailersList, workshopList, getProfUser, currentWorkshopProf, currentTrailerProf, currentClient, getClientUser, updateServicesStatusReb, updateServicesChargesReb, updateServicesStatus, updateLocation, locations, updateServicesCharges, updateAddress, updateImage, updatePhone, updateEmail, updateName, signOut, handleSignIn, handleSignUp, errorLogin, errorRegister, isDuplicated, currentUser}}>
             {children}
         </AuthContext.Provider>
     )
