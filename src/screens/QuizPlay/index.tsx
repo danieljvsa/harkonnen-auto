@@ -50,7 +50,7 @@ export function QuizPlay({route}: any){
     if(currentIndex < maxIndex - 1){
       setCurrentIndex(currentIndex + 1)
     } else {
-      navigation.navigate('HomeUser' as never)
+      navigation.navigate('QuizResult' as never, {maxIndex: maxIndex, correctCount: correctCount} as never)
     }
   }
 
