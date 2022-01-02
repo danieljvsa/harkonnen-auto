@@ -31,7 +31,7 @@ O projeto ainda está em desenvolvimento e as próximas atualizações serão vo
 - [x] Sistema de avaliação (Empresas); 
 - [x] Sistema de avalição (Utilizador); 
 - [x] Sistema administrativo (Empresas); 
-- [ ] Sistema de quiz; 
+- [x] Sistema de quiz; 
 
 ## 🧪 Tecnologias
 
