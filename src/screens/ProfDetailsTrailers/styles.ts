@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
         color: theme.colors.input,
         fontSize: 18,
         fontFamily: theme.fonts.text,
-        paddingTop: 0,
+        marginTop: -10,
         paddingLeft: 26,
         marginBottom: 10,
     },
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
         fontFamily: theme.fonts.text,
         paddingTop: 0,
         paddingLeft: 26,
-        marginBottom: 5
+        //marginBottom: 5
     },
     secText:{
         color: theme.colors.title,
@@ -167,7 +167,8 @@ export const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginTop: 20
     },
     evalView: {
         marginTop: 50,

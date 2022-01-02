@@ -140,8 +140,8 @@ export const styles = StyleSheet.create({
         paddingTop: 50, 
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
-       
+        alignItems: 'center',
+        
     },
     secHeading:{
         color: theme.colors.heading,
@@ -149,7 +149,7 @@ export const styles = StyleSheet.create({
         fontFamily: theme.fonts.text,
         paddingTop: 0,
         paddingLeft: 26,
-        marginBottom: 5
+        //marginBottom: 5
     },
     secText:{
         color: theme.colors.title,
@@ -162,7 +162,7 @@ export const styles = StyleSheet.create({
         color: theme.colors.input,
         fontSize: 18,
         fontFamily: theme.fonts.text,
-        paddingTop: 0,
+        marginTop: -10,
         paddingLeft: 26,
         marginBottom: 10,
     },

@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: theme.fonts.text,
         paddingTop: 0,
-        paddingLeft: 26
+        
     },
     title:{
         textAlign: 'center',

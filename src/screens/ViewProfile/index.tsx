@@ -15,6 +15,7 @@ import { RectButton } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { theme } from '../../global/styles/theme';
+import { Stars } from '../../components/Stars';
 
 
 export function ViewProfile(){
@@ -126,6 +127,9 @@ export function ViewProfile(){
                                             <Text style={styles.title}>
                                                 {currentClient?.username}
                                             </Text>
+                                            <View style={{marginLeft: 26, marginTop: -20}}>
+                                                <Stars stars={currentClient?.evaluationAgerage} showNumber={true}  />
+                                            </View>
                                             <Text style={styles.desc}>
                                                 {currentClient?.address}
                                             </Text>

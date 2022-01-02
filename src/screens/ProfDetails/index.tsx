@@ -17,6 +17,7 @@ import CheckMark from '../../assets/check-mark.png'
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { ButtonEval } from '../../components/ButtonEval';
+import Stars from '../../components/Stars';
 
 
 export function ProfDetails(){
@@ -106,6 +107,9 @@ export function ProfDetails(){
                                     <Text style={styles.title}>
                                         {currentWorkshopProf?.username}
                                     </Text>
+                                    <View style={{marginLeft: 26, marginTop: -20}}>
+                                        <Stars stars={currentWorkshopProf?.evaluationAgerage} showNumber={true}  />
+                                    </View>
                                     <Text style={styles.desc}>
                                         {currentWorkshopProf?.address}
                                     </Text>
@@ -128,7 +132,9 @@ export function ProfDetails(){
                                 <View>
                                     <Text style={styles.secHeading}>Avaliações</Text>
                                     <RectButton onPress={goToEvaluationList}>
-                                        <FlatList data={evaluationsList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+                                        <ScrollView>
+                                            <FlatList data={evaluationsList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+                                        </ScrollView>
                                     </RectButton>
                                 </View>
                             </View>

@@ -17,6 +17,7 @@ import CheckMark from '../../assets/check-mark.png'
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { ButtonEval } from '../../components/ButtonEval';
+import { Stars } from '../../components/Stars';
 
 
 export function ProfDetailsTrailers(){
@@ -106,6 +107,9 @@ export function ProfDetailsTrailers(){
                                     <Text style={styles.title}>
                                         {currentTrailerProf?.username}
                                     </Text>
+                                    <View style={{marginLeft: 26, marginTop: -20}}>
+                                        <Stars stars={currentTrailerProf?.evaluationAgerage} showNumber={true}  />
+                                    </View>
                                     <Text style={styles.desc}>
                                         {currentTrailerProf?.address}
                                     </Text>

@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native'
 import { FlatList, RectButton } from 'react-native-gesture-handler'
 import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
+import Stars from '../../components/Stars'
 
 export function Evaluations({route}: any){
     const {getEvaluationsList, evaluationsList} = useContext(AuthContext)
@@ -40,8 +41,10 @@ export function Evaluations({route}: any){
     return (
       <View>
           <Text style={{color: theme.colors.heading, fontSize: 20, fontFamily: theme.fonts.text, paddingTop: 0, paddingLeft: 26}}>{evaluation.item.username}</Text>
-          <Text style={styles.secText}> Avaliação: {evaluation.item.stars}</Text>
-          <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+          <View style={{marginLeft: 32}}>
+            <Stars stars={evaluation.item.stars} showNumber={true} />
+            <Text style={styles.secText}> Comentário: {evaluation.item.obs}</Text>
+          </View>
       </View>  
   )
   } 

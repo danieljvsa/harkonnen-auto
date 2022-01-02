@@ -119,7 +119,8 @@ type WorkshopProf = {
     oil?: string,
     serviceCollectionCharge?: string,
     tires?: string,
-    engine?: string     
+    engine?: string,
+    evaluationAgerage?: any     
 }
 
 type TrailerProf = {
@@ -134,7 +135,8 @@ type TrailerProf = {
     mechanicalAssistance: string,
     assistanceRequestCharge?: string, 
     pickupCharge?: string, 
-    mechanicalAssistanceCharge?: string
+    mechanicalAssistanceCharge?: string,
+    evaluationAgerage?: any   
 }
 
 type User = {
@@ -146,7 +148,8 @@ type User = {
     account: string,
     companyId?: string,
     services?: string,
-    enterpriseName?: string 
+    enterpriseName?: string,
+    evaluationAgerage?: any   
 }
 
 type Client = {
@@ -175,7 +178,8 @@ type Client = {
     mechanicalAssistance?: string,
     assistanceRequestCharge?: string, 
     pickupCharge?: string, 
-    mechanicalAssistanceCharge?: string
+    mechanicalAssistanceCharge?: string,
+    evaluationAgerage?: any   
 }
 
 type AuthContextData = {
@@ -686,7 +690,8 @@ export function AuthProvider({children}:any) {
                             email: snapshot.val().email,
                             phone: snapshot.val().phone,
                             account: snapshot.val().account,
-                            image: snapshot.val().image,                
+                            image: snapshot.val().image,  
+                            evaluationAgerage: snapshot.val().evaluationAgerage               
                         })   
                     } else if (snapshot.val().account === 'workshop'){
                         setCurrentClient({  
@@ -709,7 +714,8 @@ export function AuthProvider({children}:any) {
                             damper: snapshot.child("services").child("charges").val().damper,
                             oil: snapshot.child("services").child("charges").val().oil,
                             tires: snapshot.child("services").child("charges").val().tires,
-                            engine: snapshot.child("services").child("charges").val().engine,               
+                            engine: snapshot.child("services").child("charges").val().engine, 
+                            evaluationAgerage: snapshot.val().evaluationAgerage              
                         })
                     } else {
                         setCurrentClient({
@@ -725,7 +731,8 @@ export function AuthProvider({children}:any) {
                             mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
                             assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest, 
                             pickupCharge: snapshot.child("services").child("charges").val().pickup, 
-                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
+                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance,
+                            evaluationAgerage: snapshot.val().evaluationAgerage
                         })
                     }
                 }else{
@@ -760,7 +767,8 @@ export function AuthProvider({children}:any) {
                             damper: snapshot.child("services").child("charges").val().damper,
                             oil: snapshot.child("services").child("charges").val().oil,
                             tires: snapshot.child("services").child("charges").val().tires,
-                            engine: snapshot.child("services").child("charges").val().engine,               
+                            engine: snapshot.child("services").child("charges").val().engine,
+                            evaluationAgerage: snapshot.val().evaluationAgerage               
                         })
                     } else {
                         setCurrentClient({
@@ -776,7 +784,8 @@ export function AuthProvider({children}:any) {
                             mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
                             assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest, 
                             pickupCharge: snapshot.child("services").child("charges").val().pickup, 
-                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
+                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance,
+                            evaluationAgerage: snapshot.val().evaluationAgerage
                         })
                     }
                 }else{
@@ -793,7 +802,8 @@ export function AuthProvider({children}:any) {
                             username: snapshot.val().username,
                             phone: snapshot.val().phone,
                             account: snapshot.val().account,
-                            image: snapshot.val().image,                
+                            image: snapshot.val().image,   
+                            evaluationAgerage: snapshot.val().evaluationAgerage             
                         })   
                     } else if (snapshot.val().account === 'workshop'){
                         setCurrentClient({  
@@ -816,7 +826,8 @@ export function AuthProvider({children}:any) {
                             damper: snapshot.child("services").child("charges").val().damper,
                             oil: snapshot.child("services").child("charges").val().oil,
                             tires: snapshot.child("services").child("charges").val().tires,
-                            engine: snapshot.child("services").child("charges").val().engine,               
+                            engine: snapshot.child("services").child("charges").val().engine, 
+                            evaluationAgerage: snapshot.val().evaluationAgerage              
                         })
                     } else {
                         setCurrentClient({
@@ -832,7 +843,8 @@ export function AuthProvider({children}:any) {
                             mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
                             assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest, 
                             pickupCharge: snapshot.child("services").child("charges").val().pickup, 
-                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
+                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance,
+                            evaluationAgerage: snapshot.val().evaluationAgerage
                         })
                     }
                 }else{
@@ -865,7 +877,8 @@ export function AuthProvider({children}:any) {
                         damper: snapshot.child("services").child("charges").val().damper,
                         oil: snapshot.child("services").child("charges").val().oil,
                         tires: snapshot.child("services").child("charges").val().tires,
-                        engine: snapshot.child("services").child("charges").val().engine,    
+                        engine: snapshot.child("services").child("charges").val().engine,  
+                        evaluationAgerage: snapshot.val().evaluationAgerage  
                     })
                 }else{
                     console.log("No data avaiable")
@@ -886,7 +899,8 @@ export function AuthProvider({children}:any) {
                         mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
                         assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest, 
                         pickupCharge: snapshot.child("services").child("charges").val().pickup, 
-                        mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
+                        mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance,
+                        evaluationAgerage: snapshot.val().evaluationAgerage
                     })
                 }else{
                     console.log("No data avaiable")
@@ -1041,7 +1055,8 @@ export function AuthProvider({children}:any) {
                             fullReviewCharge: snapshot.child("services").child("charges").val().fullReview,
                             oil: snapshot.child("services").child("charges").val().oil,
                             serviceCollectionCharge: snapshot.child("services").child("charges").val().serviceCollection,
-                            tires: snapshot.child("services").child("charges").val().tires
+                            tires: snapshot.child("services").child("charges").val().tires,
+                            evaluationAgerage: snapshot.val().evaluationAgerage
                         })
                     }else{
                         setCurrentTrailerProf({  
@@ -1056,7 +1071,8 @@ export function AuthProvider({children}:any) {
                             mechanicalAssistance: snapshot.child("services").child("status").val().mechanicalAssistance,
                             assistanceRequestCharge: snapshot.child("services").child("charges").val().assistanceRequest,
                             pickupCharge: snapshot.child("services").child("charges").val().pickup,
-                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance
+                            mechanicalAssistanceCharge: snapshot.child("services").child("charges").val().mechanicalAssistance,
+                            evaluationAgerage: snapshot.val().evaluationAgerage
                         })
                     }
                 }else{

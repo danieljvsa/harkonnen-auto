@@ -119,16 +119,16 @@ export function TrailersSearch(){
       if(displayCurrentAddress === 'Wait, we are fetching you location...'){
         if (search != ""){
           if(item.username.toLowerCase().includes(search.toLowerCase())){
-            return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />
+            return <CardProfileProf stars={item.evaluationAgerage.toString()} showNumber={true} title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />
           } else {
             return <></>
           }
         }else{
-          return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />
+          return <CardProfileProf stars={item.evaluationAgerage.toString()} showNumber={true} title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />
         }      
       } else {
         if(item.location === displayCurrentAddress){
-          return <CardProfileProf title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
+          return <CardProfileProf stars={item.evaluationAgerage.toString()} showNumber={true} title={item.username} image={item.image} key={index} onPress={() => goToProfDetails(item.id)} />     
         } else{
           return <></>
         }
