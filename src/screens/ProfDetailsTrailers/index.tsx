@@ -31,6 +31,7 @@ export function ProfDetailsTrailers(){
 
     useEffect(() => {
         if(currentTrailerProf){
+            //função para resgatar as avaliações dadas a esta empresa
             getEvaluationsList(currentTrailerProf?.id);
             console.log(evaluationsList)
         }
@@ -38,19 +39,23 @@ export function ProfDetailsTrailers(){
 
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 
     function goToAppointment(){
+        //navegação para screen inicial para o pedido de agendamento
         navigation.navigate('AppointmentInitialTrailer' as never)
     }
 
     function goToEvaluation() {
         if(currentTrailerProf){
+            //verificar a existência de avaliações a esta empresa
             handleExistEvaluation(currentTrailerProf?.id, currentTrailerProf)
         }
     }
 
+    //função para navegar para a screens de avaliações desta empresa
     function goToEvaluationList(){
         navigation.navigate('Evaluations' as never, {company: currentTrailerProf} as never)
     }

@@ -21,6 +21,7 @@ export function Evaluations({route}: any){
     const {company} = route.params
     const [isDetail, setIsDetail] = useState(false)
 
+    //bloco de código para resgatar lista de avaliações do perfil escolhido ou do utilizador
     useEffect(() => {
       if(company){
         if(company.account === 'employee'){
@@ -34,6 +35,7 @@ export function Evaluations({route}: any){
   }, [])
     
   function goBack() {
+    //função para voltar uma tela atrás
     navigation.goBack()
   }
 

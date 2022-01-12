@@ -15,7 +15,7 @@ import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
 
 export function AppointmentDetails({route}: any){
-    const {handleTotalCharge,deleteAppointment,getClientById, currentUser, appointment} = useContext(AuthContext)
+    const {handleTotalCharge,deleteAppointment,getClientById, currentUser, appointment, getEvaluationsList} = useContext(AuthContext)
     const navigation = useNavigation()
     const {id, id_company, currentUserId, currentWorkshopProf} = route.params
     const [isOption, setOption] = useState(false)
@@ -23,6 +23,7 @@ export function AppointmentDetails({route}: any){
   
 
     useEffect(() => {
+      //necessário para separar os tipos de manutenção preventiva e de rutura
       if(appointment.serviceType === 'breakMaintenance'){
         if(appointment.totalCharge){
           setTotalCharge(appointment?.totalCharge)
@@ -35,15 +36,17 @@ export function AppointmentDetails({route}: any){
     }, [])
 
   function goBack() {
+    //função para voltar uma tela atrás
     navigation.goBack()
   }
 
+  //função para eliminar agendamento
   function deleteAppointmentById() {
     deleteAppointment(id_company, id, currentUserId, currentWorkshopProf)
     navigation.navigate('HomeUser' as never)
   }
   
-
+  //função para editar os diferentes tipos de pedidos de agendamento
   function handleEdit() {
     if (appointment.serviceType === 'breakMaintenance'){
       navigation.navigate('AppointmentInitialEdit' as never, {appointment: appointment} as never)
@@ -56,6 +59,7 @@ export function AppointmentDetails({route}: any){
     }
   }
 
+  //função para as empresas contratadas modificarem o preço, de acordo, com o valor real acordado
   function handlePrice() {
     handleOption()
     if(appointment.serviceType === 'breakMaintenance'){
@@ -66,6 +70,7 @@ export function AppointmentDetails({route}: any){
     }
   }
 
+  //função para permitir ver ou não uma opção de alterar o preço do serviço requisitado
   function handleOption(){
     if(!isOption){
       setOption(true)
@@ -74,12 +79,15 @@ export function AppointmentDetails({route}: any){
     }
   }
 
+  //função para ver perfil da empresa/utilizador que contratada/contratou
   function goToProfile() {
     if(currentUser?.id === currentUserId || currentUser?.companyId === currentUserId){
       getClientById(appointment.currentWorkshopProf)
+      getEvaluationsList(appointment.currentWorkshopProf)
       navigation.navigate('ViewProfileProf' as never, {id: appointment.currentWorkshopProf} as never)
     } else {
       getClientById(appointment.currentUserId)
+      getEvaluationsList(appointment.currentUserId)
       navigation.navigate('ViewProfileProf' as never, {id: appointment.currentUserId} as never)
     }
   }

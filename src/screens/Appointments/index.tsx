@@ -28,15 +28,17 @@ export function Appointments(){
   
 
   function goBack() {
+    //função para voltar uma tela atrás
     navigation.goBack()
   }
 
   useEffect(() => {
+    //função para resgatar a lista deagendamentos do utiliazdor ou empresa
     getAppointmentsList()
   }, [isDetail])
 
   
-
+  //função para o utilizador ir de encontro à screen de detalhes do«e um agendamento
   function goToAppointmentDetails(id: string, companyId: string, currentUserId: string, currentWorkshopProf: string, appointment: any) {
     if(id != '' && companyId != '' && appointment){
       getAppointmentById(id, companyId, currentUserId)
@@ -45,6 +47,7 @@ export function Appointments(){
     }
   }
 
+  //Bloco para controlar comportamento de cada tipo de agendamento na lista
   const renderItem = (appoitment: any) => {  
     if(appoitment){
         if(appoitment.item.serviceType === 'preventiveMaintenance'){

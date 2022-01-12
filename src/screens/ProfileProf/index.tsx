@@ -21,14 +21,17 @@ export function ProfileProf(){
     const navigation = useNavigation()
 
     useEffect(() => {
+        //função para resgatar informações especificas do utilizador
         getClientUser()
     }, [])
     
     function goToGeneralInformation() {
+        //navegação para a screen de configurações gerais
         navigation.navigate('GeneralInformation' as never)
     }
 
     function goToChangePlans() {
+        //navegação para a screen para modificar preços dos seus serviços
         if(currentUser?.account === "workshop" || currentUser?.services === 'workshop'){
             navigation.navigate('ChangePlans' as never)
         }else{
@@ -36,6 +39,7 @@ export function ProfileProf(){
         }
     }
     function goToServiceStatus() {
+        //navegação para a screen para modificar estado de disponibilidade do serviço
         if(currentUser?.account === "workshop" || currentUser?.services === 'workshop'){
             navigation.navigate('ServiceStatus' as never)
         }else{
@@ -44,10 +48,12 @@ export function ProfileProf(){
     }
 
     function goToProfile(){
+        //navegação para a screen para ver estado do proprio perfil
         navigation.navigate('ViewProfile' as never)
     }
 
     function goToEvaluationList(){
+        //navegação para visualizar as avaliações feitas à sua pessoa
         navigation.navigate('Evaluations' as never, {company: currentUser} as never)
     }
 

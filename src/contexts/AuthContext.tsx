@@ -283,7 +283,8 @@ export function AuthProvider({children}:any) {
         
         
     },[])
-    
+
+    //função para lidar com erros no registo de um utilizador
     async function handleErrorSignUp(email: string, password: string, name: string, phone: string, account: string) {
         if(name == "" || email == "" || password == "" || phone == "" || account == ""){
             setRegisterError(true)
@@ -292,6 +293,7 @@ export function AuthProvider({children}:any) {
         )
     }
 
+    //função para lidar com erros no registo de um empregado
     async function handleErrorSignUpEmployee(email: string, password: string, name: string, companyId: string) {
         if(name == "" || email == "" || password == "" || companyId == "" ){
             setRegisterError(true)
@@ -300,6 +302,7 @@ export function AuthProvider({children}:any) {
         )
     }
 
+    //função para lidar com erros na autenticação de um utilizador
     async function handleErrorSignIn(email: string, password: string) {
         if(email == "" || password == "" ){
             setLoginError(true)
@@ -308,6 +311,7 @@ export function AuthProvider({children}:any) {
         )
     }
 
+    //função para lidar com contas duplicadas
     async function handleDuplicatedAccounts(email: string, password: string){
         await firebase.auth().signInWithEmailAndPassword(email,password)
         .then((user) => {
@@ -316,6 +320,7 @@ export function AuthProvider({children}:any) {
         })
     }
 
+    //função para lidar com saída do utilizador da sua conta
     async function signOut() {
         firebase.auth().signOut().then(() => {
             navigation.navigate('SignIn' as never)
@@ -325,6 +330,7 @@ export function AuthProvider({children}:any) {
           
     }
 
+    //função para lidar com parte funcional da autenticação
     async function signIn(email: string, password: string) {
         if(errorLogin === false){
             firebase.auth().signInWithEmailAndPassword(email, password)
@@ -379,6 +385,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para lidar com parte funcional do registo de um utilizador
     async function signUp(email: string, password: string, name: string, phone: string, account: string){
         if(isDuplicated === false){
             await firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -415,6 +422,7 @@ export function AuthProvider({children}:any) {
         }
     }   
 
+    //função para lidar com parte funcional do registo de um empregado
     async function signUpEmployee(email: string, password: string, name: string, companyId: string, account: string, enterpriseName: string){
         if(isDuplicated === false){
             await firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -446,22 +454,26 @@ export function AuthProvider({children}:any) {
         }
     }  
 
+    //função para lidar globalmente com a autenticação
     function handleSignIn(email: string, password: string) {
         handleErrorSignIn(email,password)
         signIn(email,password)
     }
 
+    //função para lidar globalmente com o registo do utilizador
     function handleSignUp(email: string, password: string, name: string, phone: string, account: string){
         handleErrorSignUp(email, password, name, phone, account)
         handleDuplicatedAccounts(email,password)
         signUp(email, password, name, phone, account)
     }
 
+    //função para lidar globalmente com a registo do empregado
     function handleSignUpEmployee(email: string, password: string, name: string, companyId: string, account: string, enterpriseName: string){
         handleErrorSignUpEmployee(email, password, name, companyId)
         signUpEmployee(email, password, name, companyId, account, enterpriseName)
     }
 
+    //função para mudar o nome do utilizador
     async function updateName(name: string){
         if(currentUser?.account === 'employee'){
             await firebase.database().ref('/users/' + currentUser?.companyId).update({username: name})
@@ -470,6 +482,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para mudar o email do utilizador
     async function updateEmail(email: string){
         if(currentUser?.account === 'employee'){
             await firebase.database().ref('/users/' + currentUser?.companyId).update({email: email})
@@ -478,6 +491,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para mudar o nº de telefone do utilizador
     async function updatePhone(phone: string){
         if(currentUser?.account === 'employee'){
             await firebase.database().ref('/users/' + currentUser?.companyId).update({phone: phone})
@@ -486,6 +500,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para mudar a imagem do utilizador
     async function updateImage(image: any){
         const fileExtension = image.split('.').pop()
         let response = await fetch(image)
@@ -519,6 +534,7 @@ export function AuthProvider({children}:any) {
         )
     }
     
+    //função para mudar o endereço da empresa
     async function updateAddress(address: string){
         if(currentUser?.account === 'employee'){
             await firebase.database().ref('/users/' + currentUser?.companyId).update({address: address})
@@ -527,6 +543,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para mudar a localização da empresa
     async function updateLocation(location: string){
         if(currentUser?.account === 'employee'){
             await firebase.database().ref('/users/' + currentUser?.companyId).update({location: location})
@@ -535,6 +552,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para mudar orçamentos de serviços da Oficina
     async function updateServicesCharges(fullReview: string, extraReview: string, oil: string, damper: string, battery: string, airConditioning: string, tires: string, brakes: string, serviceCollection: string, engine: string){
         if(currentUser?.account === 'employee'){
             if (fullReview != "") {
@@ -601,6 +619,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+     //função para mudar disponibilidade de serviços da Oficina
     async function updateServicesStatus(fullReview: string, extraReview: string, serviceCollection: string){
         if(currentUser?.account === 'employee'){
             if (fullReview != "") {
@@ -625,6 +644,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+     //função para mudar orçamentos de serviços da Empresa de Reboques
     async function updateServicesChargesReb(assistanceRequest: string, pickup: string, mechanicalAssistance: string){
         if(currentUser?.account === 'employee'){
             if (assistanceRequest != "") {
@@ -649,6 +669,7 @@ export function AuthProvider({children}:any) {
         }   
     }
 
+    //função para mudar disponibilidade de serviços da Empresa de Reboques
     async function updateServicesStatusReb(assistanceRequest: string, pickup: string, mechanicalAssistance: string){
         if(currentUser?.account === 'employee'){
             if (assistanceRequest != "") {
@@ -680,6 +701,7 @@ export function AuthProvider({children}:any) {
         })
     }
 
+    //função para guadar informação detalhada de um cliente especifico
     async function getClientById(id: string){
             await firebase.database().ref("/users/" + id).get().then((snapshot) =>{
                 if (snapshot.exists()) {
@@ -742,6 +764,7 @@ export function AuthProvider({children}:any) {
         
     }
 
+    //função para guadar informação detalhada do utilizador
     async function getClientUser(){
         if(currentUser?.account === 'employee'){
             await firebase.database().ref("/users/" + currentUser?.companyId).get().then((snapshot) =>{
@@ -854,6 +877,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para guadar informação detalhada de uma empresa
     async function getProfUser() {
         if(currentUser?.account === "workshop"){
             await firebase.database().ref("/users/" + currentUser?.id).get().then((snapshot) =>{
@@ -909,6 +933,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para guadar informação dos empregados da empresa
     async function getEmployeeList() {
      
         await firebase.database().ref('/users').on('value', (snapshot) =>{
@@ -935,6 +960,7 @@ export function AuthProvider({children}:any) {
     
     }
 
+    //função para guadar informação das oficinas registadas
     async function getWorkshopList() {
      
             await firebase.database().ref('/users').on('value', (snapshot) =>{
@@ -960,6 +986,7 @@ export function AuthProvider({children}:any) {
         
     }
 
+    //função para guadar informação das empresas de reboque registadas
     async function getTrailersList() {
         
             await firebase.database().ref('/users').on('value', (snapshot) =>{
@@ -986,6 +1013,7 @@ export function AuthProvider({children}:any) {
         
     }
 
+    //função para guadar informação dos agendamentos feito pelo utilizador ou para ele
     async function getAppointmentsList() {
         if (currentUser?.account === 'employee') {
             await firebase.database().ref('/appointments/' + currentUser?.companyId).on('value', (snapshot) =>{
@@ -1032,7 +1060,7 @@ export function AuthProvider({children}:any) {
             })
         }
 }
-
+    //função para guadar informação de uma empresa especifica
     async function getProfUserbyId(userId: string) {
             await firebase.database().ref("/users/" + userId).get().then((snapshot) =>{
                 if (snapshot.exists()) {
@@ -1081,6 +1109,7 @@ export function AuthProvider({children}:any) {
             })
     }
 
+    //função para guadar informação de agendamento inicial
     async function handleAppoitmentWorkshop(day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string) {
         let formattedDate = day + '/' + month + '/' + year
         setAppoitmentWorkshop({
@@ -1093,6 +1122,7 @@ export function AuthProvider({children}:any) {
         console.log(appointmentWorkshop)
     }
 
+    //função para guadar informação de um agendamento manutenção de rutura
     async function handleAppointmentWorkshopMark(images: any[], obs: string, companyName: string, userName: string){
         if(currentUser?.account === 'employee'){
             let clientRef = await firebase.database().ref("/appointments/" + currentUser?.companyId).push()
@@ -1231,6 +1261,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para guadar informação de um agendamento manutenção prévia
     async function handlePreventiveAppoitment(isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, obs: any, address: any, companyName: string, userName: string) {
         if(currentUser?.account === 'employee'){
             let clientRef = await firebase.database().ref("/appointments/" + currentUser?.companyId).push()
@@ -1345,6 +1376,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para guadar informação de um agendamento de um pedido de Pickup
     async function handleAppointmentsTrailerPickup(day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, obs: string, totalCharge: any, addressCollection: string, addressDelivery:string, companyName: string, userName: string) {
         if(currentUser?.account === 'employee'){
             let formattedDate = day + '/' + month + '/' + year
@@ -1425,6 +1457,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para guadar informação de um agendamento de um pedido de assistência ou uma assistência mecânica
     async function handleAppointmentsTrailer(date: any, brand: string, model: string, service: string, obs: string, totalCharge: any, companyName: string, userName: string) {
         if(currentUser?.account === 'employee'){
             let clientRef = await firebase.database().ref("/appointments/" + currentUser?.companyId).push()
@@ -1491,6 +1524,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para guadar informação de um agendamento especifico
     async function getAppointmentById(id: string, id_company: string, currentUserId: string) {
         let images: string[] = []
         if(currentUser?.account === 'user' || currentUser?.id === currentUserId){
@@ -1782,6 +1816,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para mudar informação de um agendamento manutenção de rutura
     async function handleUpdateBreakMaintenance(id_company: string, id: string, day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, currentUserId: string, obs: string, images: string[], currentWorkshopProf: string) {
         console.log(images)
         let formattedDate = day + '/' + month + '/' + year
@@ -1859,6 +1894,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para eliminar informação de um agendamento
     async function deleteAppointment(id_company: string, id: string, currentUserId: string, currentWorkshopProf: string) {
         await firebase.database().ref("/appointments/" + currentUserId).child(id).remove()
         await firebase.database().ref("/appointments/" + currentWorkshopProf).child(id_company).remove()
@@ -1872,6 +1908,7 @@ export function AuthProvider({children}:any) {
         console.log(appoitmentsList)
     }
 
+    //função para guadar informação de um empregado
     async function deleteEmployee(id: string) {
         await firebase.database().ref('/users/').child(id).remove()
         let app: any[] = employeeList
@@ -1883,6 +1920,7 @@ export function AuthProvider({children}:any) {
         }
     }
 
+    //função para mudar informação de um agendamento manutenção prévia
     async function handleUpdatePreventiveMaintenance(id_company: string, id: string, day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, currentUserId: string, obs: string, currentWorkshopProf: string, isFullReview: any, isExtraReview: any, isServiceCollection: any, isOil: any, isDamper: any, isBattery: any, isAirConditioning: any, isTires: any, isBrakes: any, isEngine: any, totalCharge: any, address: any) {
         let formattedDate = day + '/' + month + '/' + year
         await firebase.database().ref('/appointments/' + currentUserId).child(id).update({
@@ -1935,6 +1973,7 @@ export function AuthProvider({children}:any) {
         })
     }
 
+    //função para mudar informação de um agendamento de um pedido de Pickup
     async function handleUpdatePickup(id_company: string, id: string, day: number, month: number, year: number, hour: string, serviceType: string, model: string, brand: string, currentUserId: string, obs: string, currentWorkshopProf: string, totalCharge: any, addressCollection: string, addressDelivery:string) {
             let formattedDate = day + '/' + month + '/' + year
             await firebase.database().ref("/appointments/" + currentUserId).child(id).update({
@@ -1969,6 +2008,7 @@ export function AuthProvider({children}:any) {
             })
     }
 
+    //função para guadar informação de uma mudança de orçameno por parte das oficinas 
    async function handleTotalCharge(id_company: string, id: string, totalCharge: any, currentUserId: string, currentWorkshopProf: string) {
     await firebase.database().ref("/appointments/" + currentUserId).child(id).update({
         totalCharge: totalCharge
@@ -1978,24 +2018,40 @@ export function AuthProvider({children}:any) {
     })
    }
 
+   //função para verificar existência de uma avaliação do utilizador e sua consecutiva mudança
    async function handleExistEvaluation(companyId: string, company: any) {
         if(currentUser){
             await firebase.database().ref("/evaluations/" + companyId).get().then((snapshoot) => {
-                if (snapshoot.hasChild(currentUser.id)) {
-                    setEvaluation({
-                        id: snapshoot.child(currentUser.id).val().id,
-                        stars: snapshoot.child(currentUser.id).val().stars,
-                        obs: snapshoot.child(currentUser.id).val().obs,
-                        username: snapshoot.child(currentUser.id).val().username
-                    })
-                    navigation.navigate('EvaluationEdit' as never, {company: company} as never)
+                if(currentUser.account === 'employee' && currentUser.companyId){
+                    if (snapshoot.hasChild(currentUser.companyId)) {
+                        setEvaluation({
+                            id: snapshoot.child(currentUser.id).val().companyId,
+                            stars: snapshoot.child(currentUser.id).val().stars,
+                            obs: snapshoot.child(currentUser.id).val().obs,
+                            username: snapshoot.child(currentUser.id).val().username
+                        })
+                        navigation.navigate('EvaluationEdit' as never, {company: company} as never)
+                    } else {
+                        navigation.navigate('EvaluationCreate' as never, {company: company} as never)
+                    }
                 } else {
-                    navigation.navigate('EvaluationCreate' as never, {company: company} as never)
+                    if (snapshoot.hasChild(currentUser.id)) {
+                        setEvaluation({
+                            id: snapshoot.child(currentUser.id).val().id,
+                            stars: snapshoot.child(currentUser.id).val().stars,
+                            obs: snapshoot.child(currentUser.id).val().obs,
+                            username: snapshoot.child(currentUser.id).val().username
+                        })
+                        navigation.navigate('EvaluationEdit' as never, {company: company} as never)
+                    } else {
+                        navigation.navigate('EvaluationCreate' as never, {company: company} as never)
+                    }
                 }
             })
         }
    }
 
+   //função para mudar informação de um avaliação
    async function handleUpdateEvaluation(companyId: string, stars: string, obs: string){
         if(currentUser){
             await firebase.database().ref("/evaluations/" + companyId).child(currentUser.id).update({
@@ -2015,8 +2071,10 @@ export function AuthProvider({children}:any) {
                     
                 })
 
-                setEvaluationAverage(evalTotal / evalCount)
-                
+                let evaluationAverage = evalTotal / evalCount
+                firebase.database().ref('/users/' + companyId).update({
+                    evaluationAgerage: evaluationAverage
+                })
                 
                 //console.log(trailersList)
                 /*for (let index = 0; index < array.length; index++) {
@@ -2025,18 +2083,17 @@ export function AuthProvider({children}:any) {
                 }*/
             })
 
-            await firebase.database().ref('/users/' + companyId).update({
-                evaluationAgerage: evaluationAverage
-            })
+            
         }
    }
 
+   //função para guardar uma nova avaliação
    async function handleCreateEvaluation(companyId: string, stars: string, obs: string) {
         if(currentUser){
             if(currentUser.account === 'employee' && currentUser?.companyId){
                 let evaluationRef = await firebase.database().ref("/evaluations/" + companyId).child(currentUser?.companyId)
                 await evaluationRef.set({
-                    id: currentUser.id,
+                    id: currentUser.companyId,
                     stars: stars,
                     obs: obs,
                     username: currentUser.username
@@ -2054,18 +2111,16 @@ export function AuthProvider({children}:any) {
                         
                     })
     
-                    setEvaluationAverage(evalTotal / evalCount)
-                    
+                    let evaluationAverage = evalTotal / evalCount
+                    firebase.database().ref('/users/' + companyId).update({
+                        evaluationAgerage: evaluationAverage
+                    })
                     
                     //console.log(trailersList)
                     /*for (let index = 0; index < array.length; index++) {
                         if(account === "workshop" && region === location ){
                         
                     }*/
-                })
-    
-                await firebase.database().ref('/users/' + companyId).update({
-                    evaluationAgerage: evaluationAverage
                 })
             } else {
                 let evaluationRef = await firebase.database().ref("/evaluations/" + companyId).child(currentUser?.id)
@@ -2088,8 +2143,10 @@ export function AuthProvider({children}:any) {
                         
                     })
     
-                    setEvaluationAverage(evalTotal / evalCount)
-                    
+                    let evaluationAverage = evalTotal / evalCount
+                    firebase.database().ref('/users/' + companyId).update({
+                        evaluationAgerage: evaluationAverage
+                    })
                     
                     //console.log(trailersList)
                     /*for (let index = 0; index < array.length; index++) {
@@ -2098,14 +2155,13 @@ export function AuthProvider({children}:any) {
                     }*/
                 })
     
-                await firebase.database().ref('/users/' + companyId).update({
-                    evaluationAgerage: evaluationAverage
-                })
+                
             }
         }
    }
 
-   async function getEvaluationsList(companyId: string) {
+    //função para listar avaliações sobre um determinado utilizador
+    async function getEvaluationsList(companyId: string) {
     await firebase.database().ref('/evaluations/' + companyId).on('value', (snapshot) =>{
         //console.log(snapshot.val())
         let evaluations: any[] = []
@@ -2132,7 +2188,8 @@ export function AuthProvider({children}:any) {
     })
    }
 
-   async function getQuiz() {
+   //função para gerar novo quiz no nivel facil 
+    async function getQuiz() {
        let data = ''
        await axios.get('https://opentdb.com/api.php?amount=5&category=28&difficulty=easy&type=multiple').then(
         res => {
@@ -2143,8 +2200,9 @@ export function AuthProvider({children}:any) {
         }
        )
    }
-   
-   async function getQuizMedium() {
+
+    //função para gerar novo quiz no nivel medio
+    async function getQuizMedium() {
         let data = ''
         await axios.get('https://opentdb.com/api.php?amount=5&category=28&difficulty=medium&type=multiple').then(
         res => {
@@ -2156,6 +2214,7 @@ export function AuthProvider({children}:any) {
         )
     }
 
+    //função para gerar novo quiz no nivel dificil
     async function getQuizHard() {
         let data = ''
         await axios.get('https://opentdb.com/api.php?amount=5&category=28&difficulty=hard&type=multiple').then(

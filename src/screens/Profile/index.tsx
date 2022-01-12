@@ -21,18 +21,22 @@ export function Profile(){
     const navigation = useNavigation()
 
     useEffect(() => {
+        //função para resgatar informações especificas do utilizador
         getClientUser()
     }, [])
     
     function goToGeneralInformation() {
+        //navegação para a screen de configurações gerais
         navigation.navigate('GeneralInformation' as never)
     }
 
     function goToProfile() {
+        //navegação para a screen para ver estado do proprio perfil
         navigation.navigate('ViewProfile' as never)
     }
 
     function goToEvaluationList(){
+        //navegação para visualizar as avaliações feitas à sua pessoa
         navigation.navigate('Evaluations' as never, {company: currentUser} as never)
     }
 

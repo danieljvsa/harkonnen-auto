@@ -26,7 +26,7 @@ export function EvaluationEdit({route}: any){
     const [stars, setStars] = useState(evaluation?.stars || '')
     const [obs, setObs] = useState(evaluation?.obs || '')
 
-    
+    //função para guardar avaliação a utilizador ou empresa
     function handleFinishClick() {
         if(company.id != '' && stars != '' && obs != ''){
             handleUpdateEvaluation(company.id, stars, obs)
@@ -35,6 +35,7 @@ export function EvaluationEdit({route}: any){
     }
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 

@@ -27,31 +27,37 @@ export function AppointmentBreakMaintenanceEdit({route}: any){
     const [obs, setObs] = useState(appointment.obs || '')
     
     const {handleUpdateBreakMaintenance} = useContext(AuthContext)
-    console.log(appointment.images)
+    //console.log(appointment.images)
     useEffect(() => {}, [images])
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 
     async function pickImage(){
         let imageList: any[] = []
+        //loop para colocar as imagens esolhidas num estado
         for (let index = 0; index < images.length; index++) {
             imageList.push(images[index])        
         }
+
+        //pedido de acesso à galeria do dispositivos
         let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if (permissionResult.granted === false) {
           alert("Permission to access camera roll is required!");
           return;
         }
-    
+        
+        //acesso à galeria
         let pickerResult = await ImagePicker.launchImageLibraryAsync();
         
         if (pickerResult.cancelled === true) {
             return;
         }
         
+        //coloca os acessos das imagens escolhidas visiveis para utilização
         const { uri } = pickerResult as unknown as ImageInfo
         imageList.push(uri as never)
         if(imageList.length <= 6){
@@ -61,6 +67,7 @@ export function AppointmentBreakMaintenanceEdit({route}: any){
         console.log(images)
     }
 
+    //função para eliminar imagens expostas
     async function deleteImage(image: any) {
         let imageList = []
         for (let index = 0; index < images.length; index++) {
@@ -72,6 +79,7 @@ export function AppointmentBreakMaintenanceEdit({route}: any){
         console.log(images)
     }
 
+    //item para regular como os elementos da lista irão se comportar
     const renderItem = (image: any) => {
         if(images.length > 0){
             return ( <>
@@ -88,8 +96,8 @@ export function AppointmentBreakMaintenanceEdit({route}: any){
 
     }
 
-    function handleSave() {
-        
+    //função para guardar os dados do agendamento modificados na base de dados e enviar de volta à screen de pesquisa
+    function handleSave() {    
         handleUpdateBreakMaintenance(appointment.id_company, appointment.id, commitment.day, commitment.month, commitment.year, commitment.hour, commitment.service, commitment.model, commitment.brand, appointment.currentUserId, obs, images, appointment.currentWorkshopProf)
         navigation.navigate('Appointments' as never)
         

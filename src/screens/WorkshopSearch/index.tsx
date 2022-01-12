@@ -15,7 +15,7 @@ import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
 
 export function WorkshopSearch(){
-    const {workshopList, getProfUserbyId, getWorkshopList} = useContext(AuthContext)
+    const {workshopList, getProfUserbyId, getWorkshopList, getEvaluationsList} = useContext(AuthContext)
     const navigation = useNavigation()
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
@@ -25,20 +25,24 @@ export function WorkshopSearch(){
     
   useEffect(() => {
     if(displayCurrentAddress === 'Wait, we are fetching you location...'){
+      //função para carregar lista de oficinas da zona selecionada
       getWorkshopList()
     }
   }, [displayCurrentAddress]);
 
   function goBack() {
+    //função para voltar uma tela atrás
     navigation.goBack()
   }
 
+  //função para chamar as funções que lidam com a geolocalização
   function handleGeo(){
     CheckIfLocationEnabled();
     GetCurrentLocation();
   }
 
   async function GetCurrentLocation() {
+      //pedido de permissão para usar geolocalização do sistema
       let { status } = await Location.requestForegroundPermissionsAsync();
 
       await Location.enableNetworkProviderAsync()
@@ -56,6 +60,7 @@ export function WorkshopSearch(){
       
       if (coords) {
         const { latitude, longitude } = coords;
+        //adquirindo a localização do utilizador
         let response = await Location.reverseGeocodeAsync({
           latitude,
           longitude
@@ -78,7 +83,7 @@ export function WorkshopSearch(){
     //console.log(workshopList)
 
   async function CheckIfLocationEnabled() {
-    
+    //pedido de permissão para usar geolocalização do sistema
     let enabled = await Location.hasServicesEnabledAsync();
 
     if (!enabled) {
@@ -93,9 +98,11 @@ export function WorkshopSearch(){
     }
   };
 
+  //funçaõ que lida com as funções que carregam dados do perfil e da sua navegação
   function goToProfDetails(userId: string) {
     if(userId != ''){
       getProfUserbyId(userId)
+      getEvaluationsList(userId)
       navigation.navigate('ProfDetails' as never)
     }
   }

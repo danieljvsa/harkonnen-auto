@@ -25,10 +25,12 @@ export function AdminScreen(){
 
     
   useEffect(() => {
+    //chamada de função para pesquisar a lista de empregados
     getEmployeeList()
   }, []);
 
   function goBack() {
+    //função para voltar uma tela atrás
     navigation.goBack()
   }
 
@@ -36,10 +38,11 @@ export function AdminScreen(){
 
     //console.log(workshopList)
   function onDelete(id: any){
+    //função para eliminar um empregado
     deleteEmployee(id)
   }
   
-
+  //item para regular como os elementos da lista irão se comportar
   const renderItem = (employee: any) => {
     //console.log(employee)
     if(employee.item.companyId === currentUser?.id){
@@ -57,6 +60,7 @@ export function AdminScreen(){
     } 
   } 
 
+  //função para enviar para a screen de criação de um empregado
   function goToCreateUser() {
     navigation.navigate('SignUpEmployee' as never)
   }
@@ -74,7 +78,7 @@ export function AdminScreen(){
                 </RectButton>
             </View>
             <View style={{marginTop: 60}} >
-              <Text style={styles.img}>Oficinas</Text>
+              <Text style={styles.img}>Empregados</Text>
             </View>
             <View style={styles.search}>
               <TextInput style={styles.inputSearch} placeholder="Pesquisar funcionários..." value={search} onChangeText={(text) => setSearch(text)} />

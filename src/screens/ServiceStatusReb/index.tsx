@@ -25,10 +25,12 @@ export function ServiceStatusReb(){
     
 
     function handleUpdatesReb() {
+        //função para modificar o estado de cada serviço
         updateServicesStatusReb(assistanceRequest, pickup, mechanicalAssistance)
     }
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 

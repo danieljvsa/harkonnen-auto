@@ -21,10 +21,12 @@ export function ChangePlansReb(){
     const [mechanicalAssistance, setMechanicalAssistance] = useState(currentClient?.mechanicalAssistanceCharge || '')
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 
     function updateAssistancePrices(){
+        //função para modificar o preço médio de cada serviço
         updateServicesChargesReb(assistanceRequest, pickup, mechanicalAssistance)
     }
 

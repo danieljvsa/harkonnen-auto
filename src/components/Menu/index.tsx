@@ -13,7 +13,7 @@ import AuthContext from '../../contexts/AuthContext'
 
 export function Menu({...rest} : RectButtonProps){
     const navigation = useNavigation()
-    const {currentUser} = useContext(AuthContext)
+    const {currentUser, getAppointmentsList} = useContext(AuthContext)
 
     function goToProfileProf() {
         navigation.navigate('ProfileProf' as never)
@@ -28,6 +28,7 @@ export function Menu({...rest} : RectButtonProps){
     }
 
     function gotToAppoitments() {
+        getAppointmentsList()
         navigation.navigate('Appointments' as never)
     }
 

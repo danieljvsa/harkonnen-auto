@@ -32,25 +32,30 @@ export function ProfDetails(){
     //console.log(currentWorkshopProf)
     useEffect(() => {
         if(currentWorkshopProf){
+            //função para resgatar as avaliações dadas a esta empresa
             getEvaluationsList(currentWorkshopProf?.id);
             console.log(evaluationsList)
         }
     }, [])
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 
     function goToAppointment(){
+        //navegação para screen inicial para o pedido de agendamento
         navigation.navigate('AppointmentInitial' as never)
     }
     
     function goToEvaluation() {
         if(currentWorkshopProf){
+            //verificar a existência de avaliações a esta empresa
             handleExistEvaluation(currentWorkshopProf?.id, currentWorkshopProf)
         }
     }
 
+    //função para navegar para a screens de avaliações desta empresa
     function goToEvaluationList(){
         navigation.navigate('Evaluations' as never, {company: currentWorkshopProf} as never)
     }

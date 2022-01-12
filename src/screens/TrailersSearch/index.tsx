@@ -17,7 +17,7 @@ import arrowBack from '../../assets/arrow-back.png'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export function TrailersSearch(){
-    const {trailersList, getProfUserbyId, getTrailersList} = useContext(AuthContext)
+    const {trailersList, getProfUserbyId, getTrailersList, getEvaluationsList} = useContext(AuthContext)
     const navigation = useNavigation()
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
@@ -27,15 +27,18 @@ export function TrailersSearch(){
 
   useEffect(() => {
     if(displayCurrentAddress === 'Wait, we are fetching you location...'){
+      //função para carregar lista de empresas de reboque da zona selecionada
       getTrailersList()
     }
   }, [displayCurrentAddress])
 
   function goBack() {
+    //função para voltar uma tela atrás
     navigation.goBack()
   }
 
   async function GetCurrentLocation() {
+      //pedido de permissão para usar geolocalização do sistema
       let { status } = await Location.requestForegroundPermissionsAsync();
 
       await Location.enableNetworkProviderAsync()
@@ -53,6 +56,7 @@ export function TrailersSearch(){
       
       if (coords) {
         const { latitude, longitude } = coords;
+        //adquirindo a localização do utilizador
         let response = await Location.reverseGeocodeAsync({
           latitude,
           longitude
@@ -62,7 +66,7 @@ export function TrailersSearch(){
 
         for (let item of response) {
           let address = `${item.region}`;
-          
+          //localização adquirida
           console.log(address)
           setDisplayCurrentAddress(address);
           
@@ -75,7 +79,7 @@ export function TrailersSearch(){
     //console.log(workshopList)
 
   async function CheckIfLocationEnabled() {
-    
+    //pedido de permissão para usar geolocalização do sistema
     let enabled = await Location.hasServicesEnabledAsync();
 
     if (!enabled) {
@@ -90,9 +94,11 @@ export function TrailersSearch(){
     }
   };
 
+    //funçaõ que lida com as funções que carregam dados do perfil e da sua navegação
     function goToProfDetails(userId: string) {
       if(userId != ''){
         getProfUserbyId(userId)
+        getEvaluationsList(userId)
         navigation.navigate('ProfDetailsTrailers' as never)
       }
     }

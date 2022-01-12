@@ -26,15 +26,18 @@ export function ViewProfileProf({route}: any){
     const {id} = route.params
     
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 
     useEffect(() => {
         if(currentUser){
             if(currentUser.account === 'employee' && currentUser?.companyId){
+                //função para resgatar lista de avaliações do perfil do utilizador
                 getEvaluationsList(id);
                 console.log(evaluationsList)
             } else {
+                //função para resgatar lista de avaliações do perfil do utilizador
                 getEvaluationsList(id);
                 console.log(evaluationsList)
             }
@@ -43,6 +46,7 @@ export function ViewProfileProf({route}: any){
 
     function goToEvaluation() {
         if(currentClient){
+            //função para veificar existência de avaliações 
             handleExistEvaluation(currentClient.id, currentClient)
         }
     }

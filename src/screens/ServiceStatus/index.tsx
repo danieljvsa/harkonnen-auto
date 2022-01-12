@@ -24,10 +24,12 @@ export function ServiceStatus(){
     const [serviceCollection, setServiceCollection] = useState(currentClient?.serviceCollection ||'')
 
     function handleUpdates() {
+        //função para modificar o estado de cada serviço
         updateServicesStatus(fullReview, extraReview, serviceCollection)
     }
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 

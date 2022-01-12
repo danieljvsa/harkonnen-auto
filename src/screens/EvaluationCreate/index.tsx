@@ -24,9 +24,9 @@ export function EvaluationCreate({route}: any){
     const {company} = route.params
     const [stars, setStars] = useState('')
     const [obs, setObs] = useState('')
-    const {handleCreateEvaluation} = useContext(AuthContext)
+    const {handleCreateEvaluation, currentUser} = useContext(AuthContext)
 
-    
+    //função para guardar avaliação a utilizador ou empresa
     function handleFinishClick() {
         if(company.id != '' && stars != '' && obs != ''){
             handleCreateEvaluation(company.id, stars, obs)
@@ -35,6 +35,7 @@ export function EvaluationCreate({route}: any){
     }
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 

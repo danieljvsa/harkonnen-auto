@@ -18,6 +18,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
 import { theme } from '../../global/styles/theme';
 
+//nomes de meses que serão usados no calendário
 const months = [
     'Janeiro',
     'Fevereiro',
@@ -33,8 +34,10 @@ const months = [
     'Dezembro',
   ];
   
+  //dias da semana que vão ser utilizados no calendário
   const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
+  //horas que vão ser utilizados no calendário
   const hoursList = ['8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '20:00']
 
 export function AppointmentInitialTrailerPickupEdit({route}: any){
@@ -58,6 +61,7 @@ export function AppointmentInitialTrailerPickupEdit({route}: any){
     const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
     const {handleUpdatePickup, handleAppointmentsTrailer, currentTrailerProf, currentUser} = useContext(AuthContext)
 
+    //bloco de código para definir o preço guardado anteriormente
     useEffect(() => {
         if(service != ""){
             if(service === "assistanceRequest" && currentTrailerProf?.assistanceRequestCharge){
@@ -76,11 +80,13 @@ export function AppointmentInitialTrailerPickupEdit({route}: any){
     }, [service])
 
     useEffect(() => {
+        //variável com a data atual do sistema
         let today = new Date();
         setSelectedYear(today.getFullYear());
         setSelectedMonth(today.getMonth());
     }, [])
 
+    //bloco de código que maném o mês e o ano atualizados pela data do sistema do dispositivo
     useEffect(() => {
         let daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
         let newListDays = [];
@@ -132,6 +138,7 @@ export function AppointmentInitialTrailerPickupEdit({route}: any){
             setSelectedHour(0);
     }, [selectedMonth, selectedYear])
     
+    //bloco que mantém o dias e as horas atualizadas
     useEffect(() => {
         if (selectedDay > 0) {
           let d = new Date(selectedYear, selectedMonth, selectedDay);
@@ -205,6 +212,7 @@ export function AppointmentInitialTrailerPickupEdit({route}: any){
             }
     }, [selectedDay, selectedMonth, selectedYear, listDays])
 
+    //bloco que será utilizado numa atualização futura para resetar o calendário
     const handleCloseButton = () => {
         //setShow(false);
         setSelectedYear(0);
@@ -213,7 +221,8 @@ export function AppointmentInitialTrailerPickupEdit({route}: any){
         setSelectedHour(null);
       };
     
-      const handleFinishClick = async () => {
+    //função para gravar os dados do agendamento relativos a esta screen
+    const handleFinishClick = async () => {
         console.log(service)
         if (
           //user.public_id &&
@@ -256,7 +265,8 @@ export function AppointmentInitialTrailerPickupEdit({route}: any){
     
       };
     
-      const handleLeftDateClick = () => {
+    //função para andar um mês para trás
+    const handleLeftDateClick = () => {
         let today = new Date();
     
         let mountDate = new Date(selectedYear, selectedMonth);
@@ -270,7 +280,8 @@ export function AppointmentInitialTrailerPickupEdit({route}: any){
         }
       };
     
-      const handleRightDateClick = () => {
+    //função para andar um mês para frente
+    const handleRightDateClick = () => {
         let maxDate = new Date();
         maxDate.setMonth(maxDate.getMonth() + 2);
     
@@ -285,7 +296,8 @@ export function AppointmentInitialTrailerPickupEdit({route}: any){
         }
       };
     
-      const handleDateItem = (item: any) => {
+    //verifica hora e data disponivel
+    const handleDateItem = (item: any) => {
         if (item.status) {
           if (selectedDay !== item.number) {
             setSelectedDay(item.number);
@@ -294,12 +306,14 @@ export function AppointmentInitialTrailerPickupEdit({route}: any){
         }
       };
     
-      const handleTimeItem = (item: any) => {
+    
+    const handleTimeItem = (item: any) => {
         setSelectedHour(item);
         setFinishButtonActive(true);
       };
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 

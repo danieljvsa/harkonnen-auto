@@ -48,14 +48,17 @@ export function AppointmentPreventiveMaintenance(){
     
     const {currentWorkshopProf, handlePreventiveAppoitment, currentUser} = useContext(AuthContext)
 
+    //bloco de código paara ir atualizando o preço simulado
     useEffect(() => {
         totaAmount()
     }, [isServiceCollection, isOil, isDamper, isBattery, isAirConditioning, isTires, isBrakes, isEngine, isFullReview, isExtraReview])
    
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 
+    //função para guardar os dados do agendamento na base de dados e enviar de volta à screen de pesquisa
     function handleSave(obs: string) {
         if(currentWorkshopProf?.username && currentUser?.username){
             handlePreventiveAppoitment(isFullReview, isExtraReview, isServiceCollection, isOil, isDamper, isBattery, isAirConditioning, isTires, isBrakes, isEngine, totalCharge, obs, address, currentWorkshopProf?.username, currentUser?.username )
@@ -63,6 +66,7 @@ export function AppointmentPreventiveMaintenance(){
         }
     }
 
+    //função que gere a simulação, aumentando e diminuindo conforme a escolha de serviços
     async function totaAmount(){
         
         //let fullReviewCharge = currentWorkshopProf?.fullReviewCharge

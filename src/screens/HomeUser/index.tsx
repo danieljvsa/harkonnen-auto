@@ -16,14 +16,18 @@ import AuthContext from '../../contexts/AuthContext'
 import { useNavigation } from '@react-navigation/native'
 
 export function HomeUser(){
-    const {currentUser} = useContext(AuthContext)
+    const {currentUser, getWorkshopList, getTrailersList, getEmployeeList} = useContext(AuthContext)
     const navigation = useNavigation()
 
     function goToWorkshopSearch(){
+        //função para resgatar lista das oficinas
+        getWorkshopList()
         navigation.navigate('WorkshopSearch' as never)
     }
 
     function gotToTrailersSearch(){
+        //função para resgatar lista das empresas de reboque
+        getTrailersList()
         navigation.navigate('TrailersSearch' as never)
     }
 
@@ -31,6 +35,8 @@ export function HomeUser(){
         navigation.navigate('Profile' as never)
     }
     function goToAdmin() {
+        //função para resgatar lista dos empregados da empresa
+        getEmployeeList()
         if(currentUser?.account === 'trailers' || currentUser?.account === 'workshop'){
             navigation.navigate('AdminScreen' as never)
         }

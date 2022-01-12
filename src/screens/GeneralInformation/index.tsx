@@ -29,6 +29,7 @@ export function GeneralInformation(){
     const [locationServiceEnabled, setLocationServiceEnabled] = useState(false)
 
     async function GetCurrentLocation() {
+        //pedido de permissão para usar geolocalização do sistema
         let { status } = await Location.requestForegroundPermissionsAsync();
 
         await Location.enableNetworkProviderAsync()
@@ -41,23 +42,27 @@ export function GeneralInformation(){
             { cancelable: false }
           );
         }
-      
+        
+        //adquirindo a localização da morada
         let resCode = await Location.geocodeAsync(address)
         let latitude = 0
         let longitude = 0
-      
+        
         if (resCode) {
             resCode.map((res) => {
                 latitude = res.latitude
                 longitude = res.longitude
             })
             console.log(latitude + ", " + longitude )
-          let response = await Location.reverseGeocodeAsync({
-            latitude ,
-            longitude
-          });
+            
+            //utilizando a localização resersa para saber o local da morada
+            let response = await Location.reverseGeocodeAsync({
+                latitude ,
+                longitude
+            });
       
           for (let item of response) {
+            //localização adquirida
             let location = `${item.region}`;
             setLocation(location);
           }
@@ -67,6 +72,7 @@ export function GeneralInformation(){
       };
 
     async function CheckIfLocationEnabled() {
+         //pedido de permissão para usar geolocalização do sistema
         let enabled = await Location.hasServicesEnabledAsync();
     
         if (!enabled) {
@@ -79,8 +85,9 @@ export function GeneralInformation(){
         } else {
           setLocationServiceEnabled(enabled);
         }
-      };
+    };
 
+    //função para guardar informações básicas do utilizador
     async function handleUpdates() {
         if(name != ""){
             updateName(name)
@@ -105,23 +112,27 @@ export function GeneralInformation(){
     }
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 
     async function pickImage(){
+        //pedido de acesso à galeria do dispositivo
         let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if (permissionResult.granted === false) {
           alert("Permission to access camera roll is required!");
           return;
         }
-    
+        
+        //acesso à galeria
         let pickerResult = await ImagePicker.launchImageLibraryAsync();
         
         if (pickerResult.cancelled === true) {
             return;
         }
-      
+        
+        //coloca os acessos das imagens escolhidas visiveis para utilização
         const { uri } = pickerResult as unknown as ImageInfo
         setImage(uri);
     }

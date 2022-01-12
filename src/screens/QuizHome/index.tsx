@@ -27,18 +27,22 @@ export function QuizHome(){
   }, []);
 
   function goBack() {
+    //função para voltar uma tela atrás
     navigation.goBack()
   }
 
   async function goToEasyQuiz() {
+    //função para gerar um quiz do nivel fácil
     getQuiz()
   }
 
   async function goToMediumQuiz() {
+    //função para gerar um quiz do nivel médio
     getQuizMedium()
   }
   
   async function goToHardQuiz() {
+    //função para gerar um quiz do nivel difícil
     getQuizHard()
   }
 

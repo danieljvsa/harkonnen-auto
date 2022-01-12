@@ -29,10 +29,12 @@ export function ChangePlans(){
     
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 
     function updateReviewPrices(){
+        //função para modificar o preço médio de cada serviço
         updateServicesCharges(fullReview, extraReview, oil, damper, battery, airConditioning, tires, brakes, serviceCollection, engine)
     }
 

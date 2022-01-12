@@ -27,12 +27,14 @@ export function QuizResult({route}: any){
     const [result, setResult] = useState(0)
 
   useEffect(() => {
+    //cálculo do resultado do quiz
     let calc = correctCount / maxIndex
     setResult(calc*100)
   }, [])
 
   
   function goToHome() {
+    //navegação para o menu principal
     navigation.navigate('HomeUser' as never)
   }
     

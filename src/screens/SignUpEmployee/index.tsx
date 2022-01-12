@@ -20,6 +20,7 @@ export function SignUpEmployee(){
 
     function signUp() {
         if(currentUser){
+            //função para criar uma conta de empregado
             handleSignUpEmployee(email,password,name,currentUser?.id, currentUser.account, currentUser.username)
         }
     }

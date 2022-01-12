@@ -36,27 +36,30 @@ export function QuizPlay({route}: any){
 
   useEffect(() => {
     if(questions){
+      //função para tratar da lista de perguntas geradas
       handleAnswer()
-      
     }
   }, [currentIndex])
 
   function handleAnswers(answer: string) {
+    //caso a resposta esteja certa acrescenta 1 às respostas certas
     if(answer === questions[currentIndex].correct_answer){
       setCorrectCount(correctCount + 1)
     } else {
+      //caso a resposta esteja errada acrescenta 1 às respostas erradas
       setIncorrectCount(incorrectCount + 1)
     }
     if(currentIndex < maxIndex - 1){
       setCurrentIndex(currentIndex + 1)
     } else {
+      //navegação para tela de resultados do quiz
       navigation.navigate('QuizResult' as never, {maxIndex: maxIndex, correctCount: correctCount} as never)
     }
   }
 
   function handleAnswer(){
     //console.log(questions)
-    
+    //função para tratar da lista de perguntas geradas
     setError(false)
     let data = ''
     let quests: any = []
@@ -76,7 +79,8 @@ export function QuizPlay({route}: any){
             
             //console.log(data)
             //translate(data, {from: 'en', to: 'pt'}).then(res => {
-            /*axios.request({
+            /* método para mais tarde ser utilizado para traduzir as perguntas e as suas repostas
+            axios.request({
               method: 'POST',
               url: 'https://google-translate1.p.rapidapi.com/language/translate/v2',
               headers: {

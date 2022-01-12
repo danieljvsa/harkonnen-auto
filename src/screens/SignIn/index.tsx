@@ -18,10 +18,12 @@ export function SignIn(){
     const {handleSignIn, errorLogin} = useContext(AuthContext)
 
     function signIn() {
+        //função para autenticar e verificar autenticidade do utlizador
         handleSignIn(email,password)
     }
 
     function goToSignUp() {
+        //navegação para tela de criação de utlizador
         navigation.navigate('SignUp' as never)
     }
 

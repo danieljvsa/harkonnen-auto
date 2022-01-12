@@ -21,10 +21,12 @@ export function SignUp(){
     const {handleSignUp, errorRegister, isDuplicated} = useContext(AuthContext)
 
     function signUp() {
+        //função para criar um utlizador
         handleSignUp(email,password,name,phone,account)
     }
 
     function goToLogin() {
+        //navegação para tela de autenticação de utlizador
         navigation.navigate('SignIn' as never)
     }
 

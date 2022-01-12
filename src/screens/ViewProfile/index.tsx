@@ -30,9 +30,11 @@ export function ViewProfile(){
     useEffect(() => {
         if(currentUser){
             if(currentUser.account === 'employee' && currentUser?.companyId){
+                //função para resgatar lista de avaliações do perfil do utilizador
                 getEvaluationsList(currentUser?.companyId);
                 console.log(evaluationsList)
             } else {
+                //função para resgatar lista de avaliações do perfil do utilizador
                 getEvaluationsList(currentUser?.id);
                 console.log(evaluationsList)
             }
@@ -40,6 +42,7 @@ export function ViewProfile(){
     }, [])
 
     function goBack() {
+        //função para voltar uma tela atrás
         navigation.goBack()
     }
 
