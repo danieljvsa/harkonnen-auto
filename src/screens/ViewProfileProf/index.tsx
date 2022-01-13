@@ -51,6 +51,11 @@ export function ViewProfileProf({route}: any){
         }
     }
 
+    //função para navegar para a screens de avaliações desta empresa
+    function goToEvaluationList(){
+        navigation.navigate('Evaluations' as never, {company: currentClient} as never)
+    }
+
     const renderItem = (evaluation: any) => {
         if (evaluation.index === 0) {
             return (
@@ -162,7 +167,7 @@ export function ViewProfileProf({route}: any){
                                 }
                                 <View>
                                     <Text style={styles.secHeading}>Avaliações</Text>
-                                    <RectButton>
+                                    <RectButton onPress={goToEvaluationList}>
                                         <FlatList data={evaluationsList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
                                     </RectButton>
                                 </View>

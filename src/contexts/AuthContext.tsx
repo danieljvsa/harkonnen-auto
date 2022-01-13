@@ -2025,10 +2025,10 @@ export function AuthProvider({children}:any) {
                 if(currentUser.account === 'employee' && currentUser.companyId){
                     if (snapshoot.hasChild(currentUser.companyId)) {
                         setEvaluation({
-                            id: snapshoot.child(currentUser.id).val().companyId,
-                            stars: snapshoot.child(currentUser.id).val().stars,
-                            obs: snapshoot.child(currentUser.id).val().obs,
-                            username: snapshoot.child(currentUser.id).val().username
+                            id: snapshoot.child(currentUser.companyId).val().id,
+                            stars: snapshoot.child(currentUser.companyId).val().stars,
+                            obs: snapshoot.child(currentUser.companyId).val().obs,
+                            username: snapshoot.child(currentUser.companyId).val().username
                         })
                         navigation.navigate('EvaluationEdit' as never, {company: company} as never)
                     } else {
@@ -2054,11 +2054,17 @@ export function AuthProvider({children}:any) {
    //função para mudar informação de um avaliação
    async function handleUpdateEvaluation(companyId: string, stars: string, obs: string){
         if(currentUser){
-            await firebase.database().ref("/evaluations/" + companyId).child(currentUser.id).update({
-                stars: stars,
-                obs: obs
-            })
-
+            if(currentUser.account === 'employee' && currentUser.companyId){
+                await firebase.database().ref("/evaluations/" + companyId).child(currentUser.companyId).update({
+                    stars: stars,
+                    obs: obs
+                })
+            } else {
+                await firebase.database().ref("/evaluations/" + companyId).child(currentUser.id).update({
+                    stars: stars,
+                    obs: obs
+                })
+            }
             await firebase.database().ref('/evaluations/' + companyId).on('value', (snapshot) =>{
                 let evalTotal = 0
                 let evalCount = 0
@@ -2096,7 +2102,7 @@ export function AuthProvider({children}:any) {
                     id: currentUser.companyId,
                     stars: stars,
                     obs: obs,
-                    username: currentUser.username
+                    username: currentUser.enterpriseName
                 })
     
                 await firebase.database().ref('/evaluations/' + companyId).on('value', (snapshot) =>{
