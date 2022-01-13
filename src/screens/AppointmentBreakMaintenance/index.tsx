@@ -97,8 +97,14 @@ export function AppointmentBreakMaintenance(){
     //função para guardar os dados do agendamento na base de dados e enviar de volta à screen de pesquisa
     function handleSave(images: any [], obs: string) {
         if(currentWorkshopProf?.username && currentUser?.username){
-            handleAppointmentWorkshopMark(images, obs, currentWorkshopProf?.username, currentUser?.username)
-            navigation.navigate('WorkshopSearch' as never)
+            if(currentUser.account === 'employee' && currentUser.enterpriseName){
+                handleAppointmentWorkshopMark(images, obs, currentWorkshopProf?.username, currentUser?.enterpriseName)
+                navigation.navigate('WorkshopSearch' as never)
+            } else {
+                handleAppointmentWorkshopMark(images, obs, currentWorkshopProf?.username, currentUser?.username)
+                navigation.navigate('WorkshopSearch' as never)
+            }
+            
         }
     }
 

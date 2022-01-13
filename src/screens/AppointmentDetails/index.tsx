@@ -134,7 +134,7 @@ export function AppointmentDetails({route}: any){
                   <RectButton onPress={goToProfile} ><Text style={styles.cardText}>{(currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>
                 </View> : <></>
               }
-              {(appointment.serviceType === 'assistanceRequest' || appointment.serviceType === 'mechanicalAssistance') ? 
+              {(appointment.serviceType === 'assistanceRequest') ? 
                 <View>
                   {console.log(appointment)}
                   <Text style={styles.cardTitle}>{(appointment?.serviceType === 'assistanceRequest') ? 'Pedido de Assistência' : 'Assistência Mecânica'}</Text>
@@ -143,7 +143,20 @@ export function AppointmentDetails({route}: any){
                   <Text style={styles.cardText}>Marca: {appointment?.brand}</Text>
                   <Text style={styles.cardText}>Observações: </Text>
                   <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
-                  <Text style={styles.cardText}>Preço: {appointment?.totalCharge}€</Text>
+                  <Text style={styles.cardText}>Preço: {(appointment?.totalCharge === null) ? '0' : appointment?.totalCharge}€</Text>
+                  <RectButton onPress={goToProfile} ><Text style={styles.cardText}>{(currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>       
+                </View> : <></> 
+              }
+              {(appointment.serviceType === 'mechanicalAssistance') ? 
+                <View>
+                  {console.log(appointment)}
+                  <Text style={styles.cardTitle}>{(appointment?.serviceType === 'assistanceRequest') ? 'Pedido de Assistência' : 'Assistência Mecânica'}</Text>
+                  <Text style={styles.cardText}>Data e Hora: {appointment?.date}</Text>
+                  <Text style={styles.cardText}>Modelo: {appointment?.model}</Text>
+                  <Text style={styles.cardText}>Marca: {appointment?.brand}</Text>
+                  <Text style={styles.cardText}>Observações: </Text>
+                  <Text style={styles.cardText}>{(appointment?.obs != '') ? appointment?.obs : 'Não existem observações...'}</Text>
+                  <Text style={styles.cardText}>Preço: {(appointment?.totalCharge === null) ? '0' : appointment?.totalCharge}€</Text>
                   <RectButton onPress={goToProfile} ><Text style={styles.cardText}>{(currentUser?.id != appointment?.currentUserId) ? `Marcado por ${appointment?.username}`: `Empresa: ${appointment?.username}`}</Text></RectButton>       
                 </View> : <></> 
               }

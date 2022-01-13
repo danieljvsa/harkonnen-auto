@@ -281,8 +281,13 @@ export function AppointmentInitialTrailer(){
         
             let formattedNow = `${nowYear}-${nowMonth}-${nowDay} ${nowHour}:${nowMinutes}:${nowSeconds}`;
             if(currentTrailerProf?.username && currentUser?.username){
-                handleAppointmentsTrailer(formattedNow, brand, model, service, obs, totalCharge, currentTrailerProf?.username, currentUser?.username)
-                navigation.navigate('TrailersSearch' as never)
+                if(currentUser.account === 'employee' && currentUser.enterpriseName){
+                    handleAppointmentsTrailer(formattedNow, brand, model, service, obs, totalCharge, currentTrailerProf?.username, currentUser?.enterpriseName)
+                    navigation.navigate('TrailersSearch' as never)
+                }else{
+                    handleAppointmentsTrailer(formattedNow, brand, model, service, obs, totalCharge, currentTrailerProf?.username, currentUser?.username)
+                    navigation.navigate('TrailersSearch' as never)
+                }
             }
         }
       };

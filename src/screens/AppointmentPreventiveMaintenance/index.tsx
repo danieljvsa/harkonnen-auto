@@ -61,8 +61,14 @@ export function AppointmentPreventiveMaintenance(){
     //função para guardar os dados do agendamento na base de dados e enviar de volta à screen de pesquisa
     function handleSave(obs: string) {
         if(currentWorkshopProf?.username && currentUser?.username){
-            handlePreventiveAppoitment(isFullReview, isExtraReview, isServiceCollection, isOil, isDamper, isBattery, isAirConditioning, isTires, isBrakes, isEngine, totalCharge, obs, address, currentWorkshopProf?.username, currentUser?.username )
-            navigation.navigate('WorkshopSearch' as never)
+            if(currentUser.account === 'employee' && currentUser.enterpriseName){
+                handlePreventiveAppoitment(isFullReview, isExtraReview, isServiceCollection, isOil, isDamper, isBattery, isAirConditioning, isTires, isBrakes, isEngine, totalCharge, obs, address, currentWorkshopProf?.username, currentUser?.enterpriseName )
+                navigation.navigate('WorkshopSearch' as never)
+            } else {
+                handlePreventiveAppoitment(isFullReview, isExtraReview, isServiceCollection, isOil, isDamper, isBattery, isAirConditioning, isTires, isBrakes, isEngine, totalCharge, obs, address, currentWorkshopProf?.username, currentUser?.username )
+                navigation.navigate('WorkshopSearch' as never)
+            }
+            
         }
     }
 
