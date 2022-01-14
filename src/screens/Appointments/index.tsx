@@ -125,7 +125,7 @@ export function Appointments(){
               <Text style={styles.img}>Agendamentos</Text>
             </View>
             <ScrollView style={styles.list} >
-              <FlatList data={appoitmentsList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+              <FlatList data={appoitmentsList} renderItem={item => renderItem(item)} />
             </ScrollView>
           </View>
         </ScrollView>

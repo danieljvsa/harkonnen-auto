@@ -65,6 +65,9 @@ export function GeneralInformation(){
             //localização adquirida
             let location = `${item.region}`;
             setLocation(location);
+            if (location != ""){
+                updateLocation(location)
+            }
           }
 
           console.log(location)

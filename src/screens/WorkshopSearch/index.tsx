@@ -108,20 +108,20 @@ export function WorkshopSearch(){
   }
 
   const renderItem = (workshop: any) => {
-    console.log(displayCurrentAddress)
+    console.log(workshop.item.evaluationAgerage)
     if(displayCurrentAddress === 'Wait, we are fetching you location...'){
       if (search != ""){
         if(workshop.item.username.toLowerCase().includes(search.toLowerCase())){
-          return <CardProfileProf stars={workshop.item.evaluationAgerage.toString()} showNumber={true} title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} /> 
+          return <CardProfileProf stars={(workshop.item.evaluationAgerage === undefined) ? '0' : workshop.item.evaluationAgerage.toString()} showNumber={true} title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} /> 
         } else{
           return <></>
         }
       }else{
-        return <CardProfileProf stars={workshop.item.evaluationAgerage.toString()} showNumber={true} title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />
+        return <CardProfileProf stars={(workshop.item.evaluationAgerage === undefined) ? '0' : workshop.item.evaluationAgerage.toString()} showNumber={true} title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />
       } 
     } else {
       if(workshop.item.location === displayCurrentAddress){
-        return <CardProfileProf stars={workshop.item.evaluationAgerage.toString()} showNumber={true} title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />
+        return <CardProfileProf stars={(workshop.item.evaluationAgerage === undefined) ? '0' : workshop.item.evaluationAgerage.toString()} showNumber={true} title={workshop.item.username} image={workshop.item.image} key={workshop.index} onPress={() => goToProfDetails(workshop.item.id)} />
       } else{
       return <></>
       }
@@ -150,7 +150,7 @@ export function WorkshopSearch(){
               </RectButton>
             </View>
             <ScrollView style={styles.list} >
-              <FlatList data={workshopList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+              <FlatList data={workshopList} renderItem={item => renderItem(item)} />
             </ScrollView>
           </View>
         </ScrollView>

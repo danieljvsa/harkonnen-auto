@@ -281,7 +281,7 @@ export function AppointmentInitialTrailer(){
         
             let formattedNow = `${nowYear}-${nowMonth}-${nowDay} ${nowHour}:${nowMinutes}:${nowSeconds}`;
             if(currentTrailerProf?.username && currentUser?.username){
-                if(currentUser.account === 'employee' && currentUser.enterpriseName){
+                if(currentUser.account === 'employee' && currentUser?.enterpriseName){
                     handleAppointmentsTrailer(formattedNow, brand, model, service, obs, totalCharge, currentTrailerProf?.username, currentUser?.enterpriseName)
                     navigation.navigate('TrailersSearch' as never)
                 }else{
