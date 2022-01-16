@@ -15,9 +15,9 @@ import * as Location from 'expo-location';
 import { CardProfileProf } from '../../components/CardProfileProf'
 
 export function AppointmentDetails({route}: any){
-    const {handleTotalCharge,deleteAppointment,getClientById, currentUser, appointment, getEvaluationsList} = useContext(AuthContext)
+    const {handleTotalCharge,deleteAppointment,getClientById, currentUser, getEvaluationsList} = useContext(AuthContext)
     const navigation = useNavigation()
-    const {id, id_company, currentUserId, currentWorkshopProf} = route.params
+    const {id, id_company, currentUserId, currentWorkshopProf, appointment} = route.params
     const [isOption, setOption] = useState(false)
     const [totalCharge, setTotalCharge] = useState('')
   
@@ -179,7 +179,7 @@ export function AppointmentDetails({route}: any){
                     <Text style={styles.inputTitle}>
                       Preço Total
                     </Text>
-                    <TextInput style={styles.input} placeholder="ex: 90.00" value={totalCharge} onChangeText={(text) => setTotalCharge(text)} />
+                    <TextInput style={styles.input} placeholder="ex: 90.00" value={totalCharge} onChangeText={(text) => setTotalCharge(text)} keyboardType="numeric" />
                   </View>
                 </>) : <></>
               ) : <></> }

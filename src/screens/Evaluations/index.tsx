@@ -67,7 +67,7 @@ export function Evaluations({route}: any){
               <Text style={styles.img}>Avaliações</Text>
             </View>
             <ScrollView style={styles.list} >
-              <FlatList data={evaluationsList} renderItem={item => renderItem(item)} keyExtractor={item => item.index} />
+              <FlatList data={evaluationsList} renderItem={item => renderItem(item)} />
             </ScrollView>
           </View>
         </ScrollView>
